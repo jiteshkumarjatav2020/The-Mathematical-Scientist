@@ -342,9 +342,9 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
       <div>Premium JEE Learning Framework Core Console.</div>
     </div>
     <div class="f-links">
-      <a href="https://www.youtube.com/@jitesh_iitian_kgp" target="_blank">YouTube Channel</a>
-      <a href="#library">Repository Library</a>
-      <a href="#leaderboard">Rankers Desk</a>
+      <a href="https://www.youtube.com/@jitesh_iitian_kgp" target="_blank">YouTube</a>
+      <a href="https://www.instagram.com/jitesh_iitkgp_iitian" target="_blank">Instagram</a>
+      <a href="mailto:jiteshkumarjatav2020@gmail.com">Contact Gmail</a>
     </div>
   </div>
 </footer>
@@ -354,10 +354,10 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
 const CONFIG = {
   channelId: "UCl2gZwzlidIpBzQy_jMZGsg",
   adminPin: "TMS2026",
-  channelUrl: "https://www.youtube.com/@jitesh_iitian_kgp"
+  channelUrl: "https://www.youtube.com/@jitesh_iitian_kgp",
+  contactEmail: "jiteshkumarjatav2020@gmail.com"
 };
 
-// YAHAN SE SAARE PRE-SEEDED QUESTIONS AUR DEMO LINKS KO HATA DIYA GAYA HAI (EMPTY REPOSITORY)
 let resourceDatabaseIndex = [];
 
 let activeCategoryFilter = "All";
@@ -562,7 +562,7 @@ function submitAspirantDoubt() {
   const chapter = document.getElementById('dChapter').value;
 
   setTimeout(() => {
-    window.location.href = `mailto:jiteshkumarjatav2020@gmail.com?subject=TMS Doubt Package [${currentDoubtPriorityLevel}]&body=Aspirant Name: ${name}%0AContact: ${contact}%0ADomain Area: ${topic}%0AContext Chapter: ${chapter}%0A%0ATheoretical Block friction Details:%0A${encodeURIComponent(doubt)}`;
+    window.location.href = `mailto:${CONFIG.contactEmail}?subject=TMS Doubt Package [${currentDoubtPriorityLevel}]&body=Aspirant Name: ${name}%0AContact: ${contact}%0ADomain Area: ${topic}%0AContext Chapter: ${chapter}%0A%0ATheoretical Block friction Details:%0A${encodeURIComponent(doubt)}`;
   }, 1200);
 }
 
