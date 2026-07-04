@@ -64,7 +64,7 @@
   section.alt{ background:linear-gradient(180deg, rgba(21,42,72,0.35), rgba(21,42,72,0)); }
   .rule{ height:1px; background:linear-gradient(90deg, transparent, var(--line), transparent); max-width:1180px; margin:0 auto; }
 
-  /* ---------- HERO (text-only, no banner image) ---------- */
+  /* ---------- HERO ---------- */
   .hero{ padding:64px 0 46px; }
   .hero-caption{
     text-align:left; padding:0 24px; max-width:900px; margin:0 auto;
@@ -115,29 +115,11 @@
   .btn.danger:hover{ background:#d66657; }
   .btn:disabled{ opacity:0.5; cursor:not-allowed; transform:none; }
 
-  /* ---------- VIDEO ---------- */
-  .video-frame{
-    max-width:860px; margin:0 auto; border:1px solid var(--line); border-radius:4px; padding:10px;
-    background:rgba(14,32,56,0.6);
-  }
-  .video-frame .aspect{ position:relative; width:100%; padding-top:56.25%; background:#000; }
-  .video-frame iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
-
-  /* ---------- VIDEO + UPLOADS SIDE-BY-SIDE ROW ---------- */
-  .video-uploads-row{
-    display:grid; grid-template-columns:1.3fr 1fr; gap:32px; max-width:1180px; margin:0 auto; align-items:start;
-  }
-  .col-label{
-    font-family:'Playfair Display',serif; font-size:1.05rem; color:var(--cream); font-weight:700;
-    margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid var(--line);
-  }
-  .video-col .video-frame{ margin:0; }
+  /* ---------- UPLOADS ROW ---------- */
   .uploads-col{ display:flex; flex-direction:column; }
   .playlist-grid-scroll{
-    display:flex; flex-direction:column; gap:10px; max-height:420px; overflow-y:auto; padding-right:6px;
+    display:flex; flex-direction:column; gap:10px; overflow-y:auto; padding-right:6px;
   }
-  .playlist-grid-scroll::-webkit-scrollbar{ width:6px; }
-  .playlist-grid-scroll::-webkit-scrollbar-thumb{ background:var(--line); border-radius:3px; }
   .pv-row{
     display:flex; gap:12px; align-items:center; border:1px solid var(--line); border-radius:4px;
     padding:8px; text-decoration:none; background:rgba(21,42,72,0.35);
@@ -150,30 +132,10 @@
     display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
   .pv-row .pv-date{ font-size:0.72rem; color:var(--muted); margin-top:4px; font-family:'JetBrains Mono',monospace; }
 
-  @media (max-width:860px){
-    .video-uploads-row{ grid-template-columns:1fr; }
-    .playlist-grid-scroll{ max-height:none; }
-  }
-
-  /* ---------- PLAYLIST GRID (fallback, full width) ---------- */
-  .playlist-grid{
-    display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:22px;
-    max-width:1180px; margin:0 auto;
-  }
-  .pv-card{
-    border:1px solid var(--line); border-radius:4px; overflow:hidden; background:rgba(21,42,72,0.35);
-    text-decoration:none; display:block; transition:border-color .15s ease, transform .15s ease;
-  }
-  .pv-card:hover{ border-color:var(--gold); transform:translateY(-3px); }
-  .pv-card .thumb{ width:100%; aspect-ratio:16/9; object-fit:cover; display:block; background:#0b1a2c; }
-  .pv-card .pv-body{ padding:12px 14px 16px; }
-  .pv-card .pv-title{ font-size:0.92rem; color:var(--ink); font-weight:600; line-height:1.4;
-    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-  .pv-card .pv-date{ font-size:0.76rem; color:var(--muted); margin-top:6px; font-family:'JetBrains Mono',monospace; }
   .playlist-status{ text-align:center; color:var(--muted); font-size:0.9rem; padding:20px; }
   .playlist-footer{ text-align:center; margin-top:30px; }
 
-  /* ---------- UPLOAD SECTION ---------- */
+  /* ---------- ADMIN MODAL ---------- */
   .admin-corner-btn{
     position:fixed; top:18px; right:18px; z-index:50;
     background:rgba(14,32,56,0.85); color:var(--gold); border:1px solid var(--line);
@@ -195,15 +157,6 @@
     box-shadow:0 20px 60px rgba(0,0,0,0.5);
   }
 
-  .lock-box{
-    max-width:420px; margin:0 auto; text-align:center; border:1px solid var(--line);
-    padding:40px 30px; border-radius:4px; background:rgba(21,42,72,0.35);
-  }
-  .lock-box .lock-icon{ font-size:2rem; margin-bottom:14px; }
-  .lock-box input{
-    width:100%; padding:12px 14px; margin:16px 0; border-radius:2px; border:1px solid var(--line);
-    background:var(--navy-deep); color:var(--ink); font-size:1rem; letter-spacing:0.15em; text-align:center;
-  }
   .lock-msg{ font-size:0.85rem; min-height:20px; margin-top:4px; }
   .lock-msg.err{ color:var(--danger); }
   .lock-msg.ok{ color:var(--ok); }
@@ -227,19 +180,9 @@
     width:100%; padding:10px 12px; border-radius:2px; border:1px solid var(--line);
     background:var(--navy-deep); color:var(--ink); font-size:0.92rem; font-family:'Inter',sans-serif;
   }
-  .source-toggle{ display:flex; gap:10px; margin-bottom:14px; }
-  .source-toggle button{
-    flex:1; padding:9px; border-radius:2px; border:1px solid var(--line); background:transparent;
-    color:var(--muted); cursor:pointer; font-size:0.85rem;
-  }
-  .source-toggle button.active{ background:rgba(212,175,55,0.12); color:var(--gold); border-color:var(--gold); }
   .hint{ font-size:0.78rem; color:var(--muted); margin-top:4px; }
-  .file-drop{
-    border:1px dashed var(--line); border-radius:4px; padding:22px; text-align:center; color:var(--muted);
-    font-size:0.88rem; cursor:pointer; background:rgba(255,255,255,0.02);
-  }
-  .file-drop.has-file{ color:var(--gold-bright); border-color:var(--gold); border-style:solid; }
 
+  /* ---------- RESOURCES TAB & LIST ---------- */
   .resources{ max-width:1000px; margin:0 auto; }
   .tabs{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:28px; }
   .tab{
@@ -283,7 +226,6 @@
 
 <div class="math-bg" id="mathBg"></div>
 
-<!-- Fixed admin corner control -->
 <button id="adminCornerBtn" class="admin-corner-btn">&#128274; Admin</button>
 <div id="adminModalOverlay" class="admin-modal-overlay">
   <div class="admin-modal">
@@ -299,7 +241,6 @@
   </div>
 </div>
 
-<!-- ================= 1. HERO (banner image removed) ================= -->
 <section class="hero">
   <div class="hero-caption">
     <div class="kicker">IIT JEE Main &amp; JEE Advanced</div>
@@ -329,7 +270,6 @@
 
 <div class="rule"></div>
 
-<!-- ================= 2. CHANNEL LINK ================= -->
 <section>
   <div class="wrap">
     <div class="channel-cta">
@@ -342,7 +282,6 @@
   </div>
 </section>
 
-<!-- ================= 3. RECENT UPLOADS ================= -->
 <section class="alt">
   <div class="wrap">
     <div class="eyebrow">Fresh From The Channel</div>
@@ -359,10 +298,8 @@
   </div>
 </section>
 
-
 <div class="rule"></div>
 
-<!-- ================= 5. PASSWORD PROTECTED UPLOAD SECTION ================= -->
 <section class="alt">
   <div class="wrap">
     <div class="eyebrow">Resource Library</div>
@@ -375,7 +312,7 @@
     </div>
 
     <div id="uploadForm" class="upload-form" style="display:none;">
-      <h3>Add a Resource</h3>
+      <h3>Add a Resource Link</h3>
       <div class="form-row">
         <div class="form-field">
           <label>Title</label>
@@ -393,25 +330,11 @@
         </div>
       </div>
 
-      <div class="source-toggle">
-        <button type="button" class="active" id="srcFileBtn">Upload file (under 4 MB)</button>
-        <button type="button" id="srcLinkBtn">Paste a link (Drive / large PDF)</button>
-      </div>
-
-      <div id="fileSourceBlock" class="form-row full">
+      <div id="linkSourceBlock" class="form-row full">
         <div class="form-field">
-          <label>File</label>
-          <div class="file-drop" id="fileDrop">Click to choose a file &mdash; PDF, image, or doc, under 4&nbsp;MB</div>
-          <input type="file" id="resFile" style="display:none" />
-          <div class="hint">Stored directly on this page. For bigger PDFs, use the link option instead — Google Drive works well.</div>
-        </div>
-      </div>
-
-      <div id="linkSourceBlock" class="form-row full" style="display:none;">
-        <div class="form-field">
-          <label>Link</label>
+          <label>Resource Link</label>
           <input type="url" id="resLink" placeholder="https://drive.google.com/..." />
-          <div class="hint">Make sure link sharing is set to "Anyone with the link".</div>
+          <div class="hint">Make sure link sharing is set to "Anyone with the link". Google Drive, OneDrive or any public URL works well.</div>
         </div>
       </div>
 
@@ -437,7 +360,6 @@
   </div>
 </section>
 
-<!-- ================= 6. FOOTER ================= -->
 <footer>
   <div class="flogo">The Mathematical Scientist</div>
   <div class="fsub">&copy; <span id="year"></span> The Mathematical Scientist. All rights reserved.</div>
@@ -448,28 +370,13 @@
 
 <script>
 /* =========================================================================
-   CONFIG — edit these values for your channel. Nothing else needs to change.
+   CONFIG — edit these values for your channel.
    ========================================================================= */
 const CONFIG = {
-  // Your channel's public URL (used for the "Visit My YouTube Channel" buttons)
   channelUrl: "https://www.youtube.com/@jitesh_iitian_kgp",
-
-  // Your channel ID — starts with "UC...". Find it via:
-  // YouTube channel page -> right-click -> "View page source" -> search "channelId"
-  // OR use a free lookup tool like commentpicker.com/youtube-channel-id.php
-  // Required for the "Latest Video" and "Recent Uploads" sections to auto-update.
   channelId: "UCl2gZwzlidIpBzQy_jMZGsg",
-
-  // Fallback video ID (the part after v= in a YouTube URL) shown if the
-  // channel ID above is not filled in yet, or if the live fetch fails.
   fallbackVideoId: "dQw4w9WgXcQ",
-
-  // Admin PIN for adding/removing resources. Change this to something only you know.
   uploadPin: "TMS2026",
-
-  // Optional: type your channel's actual total video count here (a plain number)
-  // to show it in the "Videos" stat on the homepage. Leave as null to instead
-  // show how many recent uploads could be loaded from the live feed.
   videoCount: null
 };
 /* ========================================================================= */
@@ -512,8 +419,6 @@ async function loadChannelFeed(){
     return;
   }
 
-  // No API key needed: read the channel's public RSS feed through a CORS relay,
-  // then parse it into cards.
   const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${CONFIG.channelId}`;
   const proxied = `https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`;
 
@@ -567,37 +472,14 @@ async function loadChannelFeed(){
 loadChannelFeed();
 
 /* ========================================================================
-   PASSWORD-PROTECTED RESOURCE LIBRARY (Notes / PYQ / Books / PDFs)
-   Uses window.storage (shared) so resources persist and are visible to
-   everyone who opens this page. Files under ~4MB are stored inline;
-   bigger material should be added as a link (Google Drive etc).
+   RUNTIME LINK-ONLY RESOURCE LIBRARY
    ======================================================================== */
 let isAdmin = false;
 let currentFilter = "All";
-let selectedFile = null;
-let sourceMode = "file";
-
-const RESOURCES_KEY = "tms:resources";
-
-async function loadResources(){
-  try{
-    const res = await window.storage.get(RESOURCES_KEY, true);
-    return res && res.value ? JSON.parse(res.value) : [];
-  }catch(e){
-    return [];
-  }
-}
-async function saveResources(list){
-  await window.storage.set(RESOURCES_KEY, JSON.stringify(list), true);
-}
+let memoryResources = []; // Dynamic local array storage for running application state
 
 function iconFor(cat){
   return {Notes:"N", PYQ:"Q", "Test Series":"T", Books:"B", PDFs:"P"}[cat] || "F";
-}
-function fmtSize(bytes){
-  if(!bytes) return "";
-  if(bytes < 1024*1024) return Math.round(bytes/1024) + " KB";
-  return (bytes/1024/1024).toFixed(1) + " MB";
 }
 
 function updateHeroStats(list){
@@ -608,11 +490,10 @@ function updateHeroStats(list){
   setStat('statTest', count('Test Series'));
 }
 
-async function renderResources(){
-  const list = await loadResources();
-  updateHeroStats(list);
+function renderResources(){
+  updateHeroStats(memoryResources);
   const container = document.getElementById('resList');
-  const filtered = currentFilter === "All" ? list : list.filter(r => r.category === currentFilter);
+  const filtered = currentFilter === "All" ? memoryResources : memoryResources.filter(r => r.category === currentFilter);
 
   if(filtered.length === 0){
     container.innerHTML = `<div class="empty-state">No resources here yet${isAdmin ? " — add the first one above." : "."}</div>`;
@@ -628,46 +509,21 @@ async function renderResources(){
       <div class="res-icon">${iconFor(r.category)}</div>
       <div class="res-info">
         <div class="res-title">${r.title}</div>
-        <div class="res-meta">${r.category} &middot; ${dateStr}${r.size ? " &middot; " + fmtSize(r.size) : ""}</div>
+        <div class="res-meta">${r.category} &middot; ${dateStr}</div>
       </div>
       <div class="res-actions">
-        <a class="btn ghost small" href="${r.type === 'file' ? '#' : r.dataOrUrl}" target="_blank" rel="noopener" data-id="${r.id}" data-type="${r.type}">${r.type === 'file' ? 'Download' : 'Open'}</a>
+        <a class="btn ghost small" href="${r.dataOrUrl}" target="_blank" rel="noopener">Open Link</a>
         ${isAdmin ? `<button class="btn danger small" data-remove="${r.id}">Remove</button>` : ""}
       </div>`;
     container.appendChild(item);
   });
 
-  // wire up file downloads (stored inline as base64) and removals
-  container.querySelectorAll('a[data-type="file"]').forEach(a => {
-    a.addEventListener('click', async (e) => {
-      e.preventDefault();
-      const id = a.getAttribute('data-id');
-      const all = await loadResources();
-      const r = all.find(x => x.id === id);
-      if(!r) return;
-      try{
-        const fileRes = await window.storage.get("tms:file:" + id, true);
-        const blob = fileRes.value; // base64 data URL
-        const link = document.createElement('a');
-        link.href = blob;
-        link.download = r.fileName || r.title;
-        link.click();
-      }catch(err){
-        alert("Couldn't retrieve this file right now. Please try again shortly.");
-      }
-    });
-  });
+  // wire up link removals
   container.querySelectorAll('[data-remove]').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      if(!confirm("Remove this resource for everyone?")) return;
+    btn.addEventListener('click', () => {
+      if(!confirm("Remove this resource link?")) return;
       const id = btn.getAttribute('data-remove');
-      let all = await loadResources();
-      const target = all.find(x => x.id === id);
-      all = all.filter(x => x.id !== id);
-      await saveResources(all);
-      if(target && target.type === 'file'){
-        try{ await window.storage.delete("tms:file:" + id, true); }catch(e){}
-      }
+      memoryResources = memoryResources.filter(x => x.id !== id);
       renderResources();
     });
   });
@@ -739,88 +595,35 @@ document.getElementById('lockAgainBtn').addEventListener('click', () => {
 });
 
 /* ---- add-resource form ---- */
-document.getElementById('srcFileBtn').addEventListener('click', () => {
-  sourceMode = "file";
-  document.getElementById('srcFileBtn').classList.add('active');
-  document.getElementById('srcLinkBtn').classList.remove('active');
-  document.getElementById('fileSourceBlock').style.display = "grid";
-  document.getElementById('linkSourceBlock').style.display = "none";
-});
-document.getElementById('srcLinkBtn').addEventListener('click', () => {
-  sourceMode = "link";
-  document.getElementById('srcLinkBtn').classList.add('active');
-  document.getElementById('srcFileBtn').classList.remove('active');
-  document.getElementById('linkSourceBlock').style.display = "grid";
-  document.getElementById('fileSourceBlock').style.display = "none";
-});
-
-document.getElementById('fileDrop').addEventListener('click', () => {
-  document.getElementById('resFile').click();
-});
-document.getElementById('resFile').addEventListener('change', (e) => {
-  const f = e.target.files[0];
-  const drop = document.getElementById('fileDrop');
-  if(!f) { selectedFile = null; return; }
-  if(f.size > 4 * 1024 * 1024){
-    drop.textContent = "That file is over 4 MB — please use the link option instead.";
-    drop.classList.remove('has-file');
-    selectedFile = null;
-    return;
-  }
-  selectedFile = f;
-  drop.textContent = `Selected: ${f.name} (${fmtSize(f.size)})`;
-  drop.classList.add('has-file');
-});
-
-document.getElementById('addResourceBtn').addEventListener('click', async () => {
+document.getElementById('addResourceBtn').addEventListener('click', () => {
   const title = document.getElementById('resTitle').value.trim();
   const category = document.getElementById('resCategory').value;
+  const link = document.getElementById('resLink').value.trim();
   const addMsg = document.getElementById('addMsg');
   addMsg.className = "lock-msg";
 
   if(!title){
     addMsg.textContent = "Please add a title."; addMsg.className = "lock-msg err"; return;
   }
-
-  const id = "res_" + Date.now() + "_" + Math.random().toString(36).slice(2,8);
-  let entry = { id, title, category, dateAdded: new Date().toISOString() };
-
-  if(sourceMode === "file"){
-    if(!selectedFile){ addMsg.textContent = "Please choose a file."; addMsg.className = "lock-msg err"; return; }
-    addMsg.textContent = "Uploading…";
-    try{
-      const dataUrl = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(selectedFile);
-      });
-      await window.storage.set("tms:file:" + id, dataUrl, true);
-      entry.type = "file";
-      entry.fileName = selectedFile.name;
-      entry.size = selectedFile.size;
-      entry.dataOrUrl = "";
-    }catch(err){
-      addMsg.textContent = "Upload failed — try a smaller file or use a link."; addMsg.className = "lock-msg err"; return;
-    }
-  } else {
-    const link = document.getElementById('resLink').value.trim();
-    if(!link){ addMsg.textContent = "Please paste a link."; addMsg.className = "lock-msg err"; return; }
-    entry.type = "link";
-    entry.dataOrUrl = link;
+  if(!link){
+    addMsg.textContent = "Please paste a link."; addMsg.className = "lock-msg err"; return;
   }
 
-  const list = await loadResources();
-  list.push(entry);
-  await saveResources(list);
+  const id = "res_" + Date.now() + "_" + Math.random().toString(36).slice(2,8);
+  let entry = { 
+    id, 
+    title, 
+    category, 
+    dateAdded: new Date().toISOString(),
+    type: "link",
+    dataOrUrl: link
+  };
 
-  addMsg.textContent = "Added."; addMsg.className = "lock-msg ok";
+  memoryResources.push(entry);
+
+  addMsg.textContent = "Link Added Successfully."; addMsg.className = "lock-msg ok";
   document.getElementById('resTitle').value = "";
   document.getElementById('resLink').value = "";
-  selectedFile = null;
-  document.getElementById('resFile').value = "";
-  document.getElementById('fileDrop').textContent = "Click to choose a file — PDF, image, or doc, under 4 MB";
-  document.getElementById('fileDrop').classList.remove('has-file');
   renderResources();
 });
 
