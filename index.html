@@ -1,650 +1,619 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The Mathematical Scientist</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=EB+Garamond:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Mathematical Scientist – TMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --navy-deep:#0a1628;
-    --navy:#0e2038;
-    --navy-soft:#152a48;
-    --steel:#1e3a5f;
-    --gold:#d4af37;
-    --gold-bright:#f0cc5c;
-    --cream:#f3ede0;
-    --ink:#e8e2d4;
-    --muted:#93a2ba;
-    --line:rgba(212,175,55,0.28);
-    --danger:#c0564a;
-    --ok:#4a9c7a;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    background:
-      radial-gradient(ellipse at 20% -10%, rgba(30,58,95,0.55), transparent 55%),
-      radial-gradient(ellipse at 100% 0%, rgba(212,175,55,0.08), transparent 40%),
-      var(--navy-deep);
-    color:var(--ink);
-    font-family:'Inter',sans-serif;
-    line-height:1.6;
-    min-height:100vh;
-  }
-  a{color:inherit;}
-
-  /* ---------- background math watermark ---------- */
-  .math-bg{
-    position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
-    opacity:0.05; font-family:'EB Garamond', serif; font-style:italic; color:var(--gold);
-  }
-  .math-bg span{ position:absolute; white-space:nowrap; font-size:2.4rem; }
-
-  .wrap{ position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:0 24px; }
-
-  /* ---------- eyebrow / dividers ---------- */
-  .eyebrow{
-    display:flex; align-items:center; gap:14px; justify-content:center;
-    text-transform:uppercase; letter-spacing:0.28em; font-size:0.72rem;
-    color:var(--gold); font-weight:600; margin-bottom:14px;
-  }
-  .eyebrow::before,.eyebrow::after{ content:""; height:1px; width:36px; background:var(--gold); opacity:0.6; }
-
-  h2.section-title{
-    font-family:'Playfair Display',serif; font-weight:700; text-align:center;
-    font-size:clamp(1.6rem,3vw,2.3rem); margin:0 0 8px; color:var(--cream);
-  }
-  p.section-sub{
-    text-align:center; color:var(--muted); max-width:560px; margin:0 auto 42px; font-size:0.98rem;
-  }
-
-  section{ position:relative; padding:76px 0; }
-  section.alt{ background:linear-gradient(180deg, rgba(21,42,72,0.35), rgba(21,42,72,0)); }
-  .rule{ height:1px; background:linear-gradient(90deg, transparent, var(--line), transparent); max-width:1180px; margin:0 auto; }
-
-  /* ---------- HERO ---------- */
-  .hero{ padding:64px 0 46px; }
-  .hero-caption{
-    text-align:left; padding:0 24px; max-width:900px; margin:0 auto;
-  }
-  .hero-caption .kicker{
-    font-family:'JetBrains Mono',monospace; font-size:0.78rem; letter-spacing:0.12em;
-    color:var(--gold); text-transform:uppercase;
-  }
-  .hero-caption h1{
-    font-family:'Playfair Display',serif; font-size:clamp(2.2rem,5vw,3.4rem);
-    color:var(--cream); margin:14px 0 16px; font-weight:800; line-height:1.1;
-  }
-  .hero-caption p{ color:var(--muted); font-size:1.05rem; margin:0; max-width:640px; }
-
-  .hero-stats{
-    display:flex; flex-wrap:wrap; gap:48px; margin-top:34px;
-  }
-  .hero-stats .stat-num{
-    font-family:'Playfair Display',serif; font-weight:700; font-size:1.8rem; color:var(--gold);
-  }
-  .hero-stats .stat-label{
-    font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.12em;
-    text-transform:uppercase; color:var(--muted); margin-top:4px;
-  }
-
-  /* ---------- CHANNEL LINK ---------- */
-  .channel-cta{
-    display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:22px;
-    padding:34px 28px; border:1px solid var(--line); border-radius:4px;
-    background:linear-gradient(135deg, rgba(212,175,55,0.06), rgba(21,42,72,0.4));
-    max-width:760px; margin:0 auto;
-  }
-  .channel-cta .cta-text{ text-align:left; }
-  .channel-cta .cta-text .label{ color:var(--muted); font-size:0.85rem; }
-  .channel-cta .cta-text .name{ font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--cream); font-weight:700; }
-  .btn{
-    display:inline-flex; align-items:center; gap:10px;
-    background:var(--gold); color:var(--navy-deep); font-weight:700;
-    padding:13px 26px; border-radius:2px; text-decoration:none; font-size:0.92rem;
-    letter-spacing:0.02em; border:1px solid var(--gold); cursor:pointer;
-    transition:transform .15s ease, background .15s ease;
-  }
-  .btn:hover{ background:var(--gold-bright); transform:translateY(-1px); }
-  .btn.ghost{ background:transparent; color:var(--gold); }
-  .btn.ghost:hover{ background:rgba(212,175,55,0.1); }
-  .btn.small{ padding:8px 16px; font-size:0.82rem; }
-  .btn.danger{ background:var(--danger); border-color:var(--danger); color:#fff; }
-  .btn.danger:hover{ background:#d66657; }
-  .btn:disabled{ opacity:0.5; cursor:not-allowed; transform:none; }
-
-  /* ---------- UPLOADS ROW ---------- */
-  .uploads-col{ display:flex; flex-direction:column; }
-  .playlist-grid-scroll{
-    display:flex; flex-direction:column; gap:10px; overflow-y:auto; padding-right:6px;
-  }
-  .pv-row{
-    display:flex; gap:12px; align-items:center; border:1px solid var(--line); border-radius:4px;
-    padding:8px; text-decoration:none; background:rgba(21,42,72,0.35);
-    transition:border-color .15s ease, transform .15s ease;
-  }
-  .pv-row:hover{ border-color:var(--gold); transform:translateX(2px); }
-  .pv-row .thumb{ width:96px; aspect-ratio:16/9; object-fit:cover; border-radius:2px; flex-shrink:0; background:#0b1a2c; }
-  .pv-row .pv-body{ min-width:0; }
-  .pv-row .pv-title{ font-size:0.84rem; color:var(--ink); font-weight:600; line-height:1.35;
-    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-  .pv-row .pv-date{ font-size:0.72rem; color:var(--muted); margin-top:4px; font-family:'JetBrains Mono',monospace; }
-
-  .playlist-status{ text-align:center; color:var(--muted); font-size:0.9rem; padding:20px; }
-  .playlist-footer{ text-align:center; margin-top:30px; }
-
-  /* ---------- ADMIN MODAL ---------- */
-  .admin-corner-btn{
-    position:fixed; top:18px; right:18px; z-index:50;
-    background:rgba(14,32,56,0.85); color:var(--gold); border:1px solid var(--line);
-    padding:9px 16px; border-radius:20px; font-size:0.82rem; font-weight:600;
-    cursor:pointer; backdrop-filter:blur(6px); box-shadow:0 4px 14px rgba(0,0,0,0.3);
-    transition:border-color .15s ease, transform .15s ease;
-  }
-  .admin-corner-btn:hover{ border-color:var(--gold); transform:translateY(-1px); }
-  .admin-corner-btn.active{ background:rgba(74,156,122,0.18); color:var(--ok); border-color:var(--ok); }
-
-  .admin-modal-overlay{
-    display:none; position:fixed; inset:0; z-index:60; background:rgba(6,14,26,0.72);
-    align-items:center; justify-content:center; backdrop-filter:blur(2px);
-  }
-  .admin-modal-overlay.open{ display:flex; }
-  .admin-modal{
-    width:90%; max-width:340px; text-align:center; border:1px solid var(--line);
-    padding:34px 28px; border-radius:6px; background:var(--navy);
-    box-shadow:0 20px 60px rgba(0,0,0,0.5);
-  }
-
-  .lock-msg{ font-size:0.85rem; min-height:20px; margin-top:4px; }
-  .lock-msg.err{ color:var(--danger); }
-  .lock-msg.ok{ color:var(--ok); }
-
-  .admin-bar{
-    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;
-    max-width:1000px; margin:0 auto 30px; padding:14px 20px; border:1px solid var(--line);
-    border-radius:4px; background:rgba(74,156,122,0.08);
-  }
-  .admin-bar .tag{ color:var(--ok); font-size:0.85rem; font-weight:600; font-family:'JetBrains Mono',monospace; }
-
-  .upload-form{
-    max-width:1000px; margin:0 auto 40px; padding:26px; border:1px solid var(--line); border-radius:4px;
-    background:rgba(14,32,56,0.5);
-  }
-  .upload-form h3{ font-family:'Playfair Display',serif; margin:0 0 18px; color:var(--cream); font-size:1.1rem; }
-  .form-row{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:14px; }
-  .form-row.full{ grid-template-columns:1fr; }
-  .form-field label{ display:block; font-size:0.78rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
-  .form-field input[type=text], .form-field input[type=url], .form-field select{
-    width:100%; padding:10px 12px; border-radius:2px; border:1px solid var(--line);
-    background:var(--navy-deep); color:var(--ink); font-size:0.92rem; font-family:'Inter',sans-serif;
-  }
-  .hint{ font-size:0.78rem; color:var(--muted); margin-top:4px; }
-
-  /* ---------- RESOURCES TAB & LIST ---------- */
-  .resources{ max-width:1000px; margin:0 auto; }
-  .tabs{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:28px; }
-  .tab{
-    padding:8px 18px; border-radius:20px; border:1px solid var(--line); background:transparent;
-    color:var(--muted); font-size:0.82rem; cursor:pointer; letter-spacing:0.03em;
-  }
-  .tab.active{ background:var(--gold); color:var(--navy-deep); border-color:var(--gold); font-weight:600; }
-
-  .res-list{ display:flex; flex-direction:column; gap:10px; }
-  .res-item{
-    display:flex; align-items:center; gap:16px; padding:14px 18px; border:1px solid var(--line);
-    border-radius:4px; background:rgba(21,42,72,0.3);
-  }
-  .res-item .res-icon{
-    width:42px; height:42px; border-radius:4px; background:rgba(212,175,55,0.1); color:var(--gold);
-    display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0;
-    font-family:'JetBrains Mono',monospace; font-weight:600;
-  }
-  .res-item .res-info{ flex:1; min-width:0; }
-  .res-item .res-title{ font-weight:600; color:var(--ink); font-size:0.95rem; }
-  .res-item .res-meta{ font-size:0.78rem; color:var(--muted); margin-top:2px; font-family:'JetBrains Mono',monospace; }
-  .res-item .res-actions{ display:flex; gap:8px; flex-shrink:0; }
-  .empty-state{ text-align:center; color:var(--muted); padding:50px 20px; font-size:0.92rem; }
-
-  /* ---------- FOOTER ---------- */
-  footer{ padding:44px 0 34px; text-align:center; border-top:1px solid var(--line); }
-  footer .flogo{ font-family:'Playfair Display',serif; color:var(--gold); font-weight:700; font-size:1.05rem; }
-  footer .fsub{ color:var(--muted); font-size:0.82rem; margin-top:8px; }
-  footer .fsocial{ margin-top:16px; display:flex; gap:18px; justify-content:center; }
-  footer .fsocial a{ color:var(--muted); font-size:0.85rem; text-decoration:none; border-bottom:1px solid transparent; }
-  footer .fsocial a:hover{ color:var(--gold); border-color:var(--gold); }
-
-  @media (max-width:768px){
-    .form-row{ grid-template-columns:1fr; }
-    .channel-cta{ flex-direction:column; text-align:center; }
-    .channel-cta .cta-text{ text-align:center; }
-  }
+[data-theme="dark"]{--bg:#0A0A0A;--bg2:#111111;--bg3:#1A1A1A;--bg4:#222222;--text:#F5F5F5;--muted:#888888;--border:rgba(255,255,255,0.07);--card:#1A1A1A;--card2:#222222;}\n[data-theme="light"]{--bg:#F4F4F0;--bg2:#EBEBEB;--bg3:#FFFFFF;--bg4:#F0F0EB;--text:#1A1A1A;--muted:#666666;--border:rgba(0,0,0,0.1);--card:#FFFFFF;--card2:#F4F4F0;}
+:root{--gold:#D4AF37;--gold-light:#F0D06B;--gold-dark:#AA8513;--font-serif:'Playfair Display',serif;--font-sans:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);line-height:1.5;overflow-x:hidden;}
+.p-wrap{max-width:1300px;margin:0 auto;padding:0 24px;}
+header{padding:24px 0;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(10,10,10,0.8);backdrop-filter:blur(12px);z-index:100;transition:background 0.3s;}
+body[data-theme="light"] header{background:rgba(244,244,240,0.8);}
+.h-flex{display:flex;justify-content:between;align-items:center;}
+.h-left{display:flex;align-items:center;gap:32px;}
+.brand{font-family:var(--font-serif);font-weight:900;font-size:24px;letter-spacing:-0.5px;text-decoration:none;color:var(--text);display:flex;align-items:center;gap:10px;}
+.brand-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;}
+nav{display:flex;gap:24px;}
+nav a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color 0.2s;}
+nav a:hover{color:var(--text);}
+.h-right{display:flex;align-items:center;gap:16px;}
+.theme-btn{background:none;border:1px solid var(--border);color:var(--text);width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;}
+.theme-btn:hover{background:var(--bg2);}
+.admin-btn{background:none;border:1px solid var(--gold);color:var(--gold);padding:8px 16px;border-radius:20px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s;}
+.admin-btn:hover{background:var(--gold);color:#0A0A0A;}
+.admin-btn.active{background:rgba(212,175,55,0.15);}
+.hero{padding:96px 0 64px;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+.hero-grid{display:grid;grid-template-columns:1.2fr 0.8fr;gap:48px;align-items:center;}
+.h-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.2);color:var(--gold);padding:6px 12px;border-radius:100px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:24px;}
+.h-title{font-family:var(--font-serif);font-size:64px;font-weight:900;line-height:1.1;letter-spacing:-2px;margin-bottom:24px;color:var(--text);}
+.h-desc{font-size:18px;color:var(--muted);max-width:540px;margin-bottom:32px;font-weight:300;}
+.h-ctas{display:flex;gap:16px;}
+.btn-p{background:var(--gold);color:#0A0A0A;text-decoration:none;padding:14px 28px;border-radius:24px;font-weight:600;font-size:15px;display:inline-flex;align-items:center;gap:8px;transition:transform 0.2s, background 0.2s;}
+.btn-p:hover{background:var(--gold-light);transform:translateY(-1px);}
+.btn-s{background:none;border:1px solid var(--border);color:var(--text);text-decoration:none;padding:14px 28px;border-radius:24px;font-weight:500;font-size:15px;transition:background 0.2s;}
+.btn-s:hover{background:var(--bg2);}
+.h-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;background:var(--bg2);padding:32px;border-radius:16px;border:1px solid var(--border);}
+.stat-item{display:flex;flex-direction:column;gap:4px;}
+.stat-val{font-family:var(--font-serif);font-size:36px;font-weight:700;color:var(--text);}
+.stat-lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
+.section{padding:80px 0;border-bottom:1px solid var(--border);}
+.s-header{margin-bottom:48px;display:flex;justify-content:between;align-items:flex-end;}
+.s-title-area{max-width:480px;}
+.s-tag{color:var(--gold);font-family:var(--font-mono);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:block;}
+.s-title{font-family:var(--font-serif);font-size:36px;font-weight:900;color:var(--text);letter-spacing:-0.5px;}
+.v-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.v-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;text-decoration:none;color:var(--text);transition:transform 0.2s, border-color 0.2s;}
+.v-card:hover{transform:translateY(-4px);border-color:rgba(212,175,55,0.3);}
+.v-thumb{width:100%;aspect-ratio:16/9;background:var(--bg4);position:relative;object-fit:cover;}
+.v-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);opacity:0;transition:opacity 0.2s;}
+.v-card:hover .v-play{opacity:1;}
+.v-play-icon{width:48px;height:48px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#0A0A0A;font-size:20px;padding-left:4px;}
+.v-info{padding:20px;}
+.v-date{font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:8px;}
+.v-title{font-size:15px;font-weight:600;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.v-status{grid-column:1/-1;text-align:center;padding:48px;color:var(--muted);font-size:14px;background:var(--bg2);border-radius:12px;border:1px dashed var(--border);}
+.lib-grid{display:grid;grid-template-columns:280px 1fr;gap:40px;}
+.lib-sidebar{display:flex;flex-direction:column;gap:32px;}
+.filter-group{display:flex;flex-direction:column;gap:8px;}
+.filter-lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.fbtn{background:none;border:1px solid var(--border);color:var(--text);padding:10px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;justify-content:space-between;}
+.fbtn:hover{background:var(--bg2);}
+.fbtn.active{background:var(--gold);color:#0A0A0A;border-color:var(--gold);font-weight:600;}
+.fbtn-count{font-size:11px;opacity:0.7;font-family:var(--font-mono);}
+.lib-content{display:flex;flex-direction:column;gap:16px;}
+.admin-panel{background:var(--bg2);border:1px solid var(--gold);padding:24px;border-radius:12px;margin-bottom:32px;}
+.ap-title{font-family:var(--font-serif);font-size:18px;font-weight:700;margin-bottom:16px;color:var(--text);}
+.ap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;}
+.ap-field{display:flex;flex-direction:column;gap:6px;}
+.ap-lbl{font-size:12px;color:var(--muted);font-weight:500;}
+.ap-input,.ap-select{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:6px;font-size:14px;font-family:var(--font-sans);outline:none;transition:border-color 0.2s;}
+.ap-input:focus,.ap-select:focus{border-color:var(--gold);}
+.ap-actions{display:flex;justify-content:between;align-items:center;}
+.ap-msg{font-size:13px;font-weight:500;}
+.ap-msg.err{color:#C0564A;}
+.ap-msg.ok{color:#4A9C7A;}
+.res-card{background:var(--card);border:1px solid var(--border);padding:20px;border-radius:12px;display:flex;align-items:center;justify-content:between;gap:20px;transition:border-color 0.2s;}
+.res-card:hover{border-color:rgba(212,175,55,0.25);}
+.res-left{display:flex;align-items:center;gap:16px;min-width:0;}
+.res-icon{width:44px;height:44px;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.15);color:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.res-details{min-width:0;}
+.res-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.res-meta{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.res-dot{width:4px;height:4px;background:var(--border);border-radius:50%;}
+.res-tag{background:var(--bg4);padding:2px 8px;border-radius:4px;font-size:11px;font-family:var(--font-mono);font-weight:500;}
+.res-right{display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.empty-state{text-align:center;padding:64px 24px;background:var(--bg2);border-radius:12px;border:1px dashed var(--border);color:var(--muted);font-size:14px;}
+.lb-section{background:linear-gradient(180deg,var(--bg),var(--bg2));}
+.lb-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:48px;align-items:start;}
+.lb-form-box{background:var(--card);border:1px solid var(--border);padding:32px;border-radius:16px;}
+.lb-table-box{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.lb-table{width:100%;border-collapse:collapse;text-align:left;}
+.lb-table th{background:var(--bg4);padding:16px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border);}
+.lb-table td{padding:16px;font-size:14px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.lb-rank-cell{font-family:var(--font-serif);font-size:18px;font-weight:700;color:var(--gold);width:60px;}
+.lb-name-cell{font-weight:600;color:var(--text);}
+.lb-tests{font-family:var(--font-mono);font-size:13px;color:var(--muted);}
+.lb-badge-cell{background:rgba(74,156,122,0.1);color:#4A9C7A;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase;}
+.d-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px;max-width:680px;margin:0 auto;}
+.d-title{font-family:var(--font-serif);font-size:28px;font-weight:700;margin-bottom:8px;text-align:center;}
+.d-desc{font-size:14px;color:var(--muted);text-align:center;margin-bottom:32px;}
+.d-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.d-full{grid-column: span 2;}
+.d-btn-group{display:flex;gap:10px;}
+.d-btn-group .fbtn{flex:1;text-align:center;justify-content:center;}
+.d-submit{width:100%;background:var(--text);color:var(--bg);border:none;padding:14px;border-radius:8px;font-weight:600;font-size:15px;cursor:pointer;margin-top:16px;transition:opacity 0.2s;}
+.d-submit:hover{opacity:0.9;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--card);border:1px solid var(--border);width:90%;max-width:360px;padding:32px;border-radius:16px;text-align:center;}
+.modal-icon{font-size:32px;margin-bottom:16px;color:var(--gold);}
+.modal-title{font-family:var(--font-serif);font-size:20px;font-weight:700;margin-bottom:8px;}
+.modal-desc{font-size:13px;color:var(--muted);margin-bottom:20px;}
+footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);color:var(--muted);font-size:14px;}
+.f-flex{display:flex;justify-content:between;align-items:center;flex-wrap:wrap;gap:24px;}
+.f-left{display:flex;flex-direction:column;gap:8px;}
+.f-brand{font-family:var(--font-serif);font-weight:700;font-size:18px;color:var(--text);text-decoration:none;}
+.f-links{display:flex;gap:24px;}
+.f-links a{color:var(--muted);text-decoration:none;transition:color 0.2s;}
+.f-links a:hover{color:var(--text);}
+@media(max-width:968px){
+  .hero-grid,.lib-grid,.lb-grid{grid-template-columns:1fr;}
+  .s-header{flex-direction:column;align-items:flex-start;gap:16px;}
+  .v-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:640px){
+  .v-grid{grid-template-columns:1fr;}
+  .d-grid{grid-template-columns:1fr;}
+  .d-full{grid-column:span 1;}
+  .h-ctas{flex-direction:column;}
+  .h-title{font-size:40px;}
+}
 </style>
 </head>
 <body>
 
-<div class="math-bg" id="mathBg"></div>
-
-<button id="adminCornerBtn" class="admin-corner-btn">&#128274; Admin</button>
-<div id="adminModalOverlay" class="admin-modal-overlay">
-  <div class="admin-modal">
-    <div class="lock-icon">&#128274;</div>
-    <div style="color:var(--cream);font-weight:600;">Admin Access</div>
-    <div class="hint">Enter PIN to add or remove resources</div>
-    <input type="password" id="pinInput" placeholder="PIN" maxlength="20" />
-    <div style="display:flex; gap:10px; margin-top:10px;">
-      <button class="btn small" id="unlockBtn" style="flex:1;">Unlock</button>
-      <button class="btn ghost small" id="cancelModalBtn" style="flex:1;">Cancel</button>
+<header>
+  <div class="p-wrap h-flex">
+    <div class="h-left">
+      <a href="#" class="brand">TMS<span class="brand-dot"></span></a>
+      <nav>
+        <a href="#videos">Lectures</a>
+        <a href="#library">Library</a>
+        <a href="#leaderboard">Leaderboard</a>
+        <a href="#doubt">Doubt Box</a>
+      </nav>
     </div>
-    <div id="lockMsg" class="lock-msg"></div>
+    <div class="h-right">
+      <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">☀️</button>
+      <button class="admin-btn" id="adminToggle" onclick="handleAdminToggle()">🔒 Admin</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="p-wrap hero-grid">
+    <div>
+      <div class="h-badge">⚡ IIT JEE Premium Hub</div>
+      <h1 class="h-title">The Mathematical Scientist</h1>
+      <p class="h-desc">High-yield chapter-wise mathematics notes, hand-crafted test series, and comprehensive PYQ packages curated specially for JEE Main & Advanced aspirants.</p>
+      <div class="h-ctas">
+        <a href="#library" class="btn-p">Explore Library</a>
+        <a href="https://www.youtube.com/@jitesh_iitian_kgp" target="_blank" class="btn-s">Watch Lectures</a>
+      </div>
+    </div>
+    <div>
+      <div class="h-stats">
+        <div class="stat-item"><span class="stat-val" id="statNotes">0</span><span class="stat-lbl">Notes</span></div>
+        <div class="stat-item"><span class="stat-val" id="statPyqs">0</span><span class="stat-lbl">PYQs</span></div>
+        <div class="stat-item"><span class="stat-val" id="statTests">0</span><span class="stat-lbl">Tests</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="videos">
+  <div class="p-wrap">
+    <div class="s-header">
+      <div class="s-title-area">
+        <span class="s-tag">Live Stream</span>
+        <h2 class="s-title">Latest Lectures</h2>
+      </div>
+      <a href="https://www.youtube.com/@jitesh_iitian_kgp" target="_blank" class="btn-s" style="padding:10px 20px; font-size:14px;">View Channel</a>
+    </div>
+    <div class="v-grid" id="videoGrid">
+      <div class="v-status" id="videoStatus">Loading dynamic live feed...</div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="library">
+  <div class="p-wrap">
+    <div class="s-header">
+      <div class="s-title-area">
+        <span class="s-tag">Repository</span>
+        <h2 class="s-title">Study Resources</h2>
+      </div>
+    </div>
+
+    <div class="admin-panel" id="adminPanel" style="display:none;">
+      <div class="ap-title">Link New Resource Asset</div>
+      <div class="ap-grid">
+        <div class="ap-field">
+          <label class="ap-lbl">Asset Title</label>
+          <input type="text" id="resTitle" class="ap-input" placeholder="e.g., Matrices & Determinants Notes Sheet">
+        </div>
+        <div class="ap-field">
+          <label class="ap-lbl">Material Category</label>
+          <select id="resCategory" class="ap-select">
+            <option>Notes</option>
+            <option>PYQ</option>
+            <option>Test Series</option>
+            <option>Rankers Book</option>
+          </select>
+        </div>
+        <div class="ap-field">
+          <label class="ap-lbl">Chapter / Topic</label>
+          <select id="resChapter" class="ap-select">
+            <option>Set Theory</option>
+            <option>Integral Calculus</option>
+            <option>Differential Equations</option>
+            <option>General Mathematics</option>
+          </select>
+        </div>
+      </div>
+      <div class="ap-grid" style="grid-template-columns: 1fr; margin-bottom: 20px;">
+        <div class="ap-field">
+          <label class="ap-lbl">Resource Link (Google Drive / Direct URL)</label>
+          <input type="url" id="resLink" class="ap-input" placeholder="https://drive.google.com/...">
+        </div>
+      </div>
+      <div class="ap-actions">
+        <button class="btn-p" style="padding:10px 24px; font-size:14px;" onclick="addResourceAsset()">Link Resource</button>
+        <span class="ap-msg" id="apMsg"></span>
+      </div>
+    </div>
+
+    <div class="lib-grid">
+      <div class="lib-sidebar">
+        <div class="filter-group">
+          <span class="filter-lbl">Categories</span>
+          <button class="fbtn active" data-cat="All" onclick="setCategoryFilter(this,'All')">All Categories <span class="fbtn-count" id="c-all">0</span></button>
+          <button class="fbtn" data-cat="Notes" onclick="setCategoryFilter(this,'Notes')">Chapter Notes <span class="fbtn-count" id="c-notes">0</span></button>
+          <button class="fbtn" data-cat="PYQ" onclick="setCategoryFilter(this,'PYQ')">JEE PYQs <span class="fbtn-count" id="c-pyq">0</span></button>
+          <button class="fbtn" data-cat="Test Series" onclick="setCategoryFilter(this,'Test Series')">Test Series <span class="fbtn-count" id="c-test">0</span></button>
+          <button class="fbtn" data-cat="Rankers Book" onclick="setCategoryFilter(this,'Rankers Book')">Rankers Books <span class="fbtn-count" id="c-book">0</span></button>
+        </div>
+
+        <div class="filter-group">
+          <span class="filter-lbl">Chapters</span>
+          <button class="fbtn active" data-chap="All" onclick="setChapterFilter(this,'All')">All Chapters</button>
+          <button class="fbtn" data-chap="Set Theory" onclick="setChapterFilter(this,'Set Theory')">Set Theory</button>
+          <button class="fbtn" data-chap="Integral Calculus" onclick="setChapterFilter(this,'Integral Calculus')">Integral Calculus</button>
+          <button class="fbtn" data-chap="Differential Equations" onclick="setChapterFilter(this,'Differential Equations')">Differential Equations</button>
+          <button class="fbtn" data-chap="General Mathematics" onclick="setChapterFilter(this,'General Mathematics')">General Mathematics</button>
+        </div>
+      </div>
+
+      <div class="lib-content" id="resourceContainer">
+        </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="leaderboard">
+  <div class="p-wrap">
+    <div class="s-header">
+      <div class="s-title-area">
+        <span class="s-tag">Hall of Fame</span>
+        <h2 class="s-title">TMS Rankers Leaderboard</h2>
+      </div>
+    </div>
+    <div class="lb-grid">
+      <div class="lb-form-box">
+        <h3 style="margin-bottom:8px;font-family:var(--font-serif);font-size:20px;">Submit Mock Score</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:24px;">Gave a recently uploaded TMS Test Series paper? Share your marks to feature on the live student ranking desk.</p>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div class="ap-field"><label class="ap-lbl">Full Student Name</label><input type="text" id="lbName" class="ap-input" placeholder="Enter your name"></div>
+          <div class="ap-field"><label class="ap-lbl">Score Obtained (Out of 300)</label><input type="number" id="lbScore" class="ap-input" placeholder="e.g., 265" max="300"></div>
+          <button class="btn-p" style="justify-content:center;margin-top:8px;" onclick="submitLeaderboardScore()">Post Score Board</button>
+        </div>
+      </div>
+      <div class="lb-table-box">
+        <table class="lb-table" id="lbTable">
+          <thead><tr><th>Rank</th><th>Aspirant</th><th>Score</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td class="lb-rank-cell">#01</td><td class="lb-name-cell">Aarav Sharma</td><td class="lb-tests">288/300</td><td><span class="lb-badge-cell">Top Ranker 🚀</span></td></tr>
+            <tr><td class="lb-rank-cell">#02</td><td class="lb-name-cell">Isha Patel</td><td class="lb-tests">274/300</td><td><span class="lb-badge-cell">Elite ✨</span></td></tr>
+            <tr><td class="lb-rank-cell">#03</td><td class="lb-name-cell">Sameer Verma</td><td class="lb-tests">265/300</td><td><span class="lb-badge-cell">Elite ✨</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="doubt">
+  <div class="p-wrap">
+    <div class="d-box">
+      <div id="dFormBlock">
+        <h2 class="d-title">Instant Doubt Dispatch Desk</h2>
+        <p class="d-desc">Stuck on a tricky problem or concept? Fill out the structure below to dispatch your inquiry directly to your mentor's priority evaluation desk.</p>
+        <div class="d-grid">
+          <div class="ap-field"><label class="ap-lbl">Your Name</label><input type="text" id="dName" class="ap-input" placeholder="e.g., Rohit Kumar"></div>
+          <div class="ap-field"><label class="ap-lbl">Contact / WhatsApp Link</label><input type="text" id="dContact" class="ap-input" placeholder="For solution updates"></div>
+          <div class="ap-field d-full"><label class="ap-lbl">Core Domain Topic Area</label><select id="dTopic" class="ap-select"><option>Set Theory</option><option>Integral Calculus</option><option>Differential Equations</option><option>Other JEE Domain</option></select></div>
+          <div class="ap-field d-full"><label class="ap-lbl">Chapter Name &amp; Question Context</label><input type="text" id="dChapter" class="ap-input" placeholder="e.g., Definite Integration Properties Ex-2 Q14"></div>
+          <div class="ap-field d-full"><label class="ap-lbl">Describe Your Doubt / Theoretical Friction Block</label><textarea id="dDoubt" class="ap-input" rows="4" placeholder="Explain where you are getting stuck..." style="resize:vertical;"></textarea></div>
+          <div class="ap-field d-full"><label class="ap-lbl">Priority Level Badge</label><div class="d-btn-group"><button class="fbtn active" onclick="setDoubtPriority(this,'Normal')">Normal</button><button class="fbtn" onclick="setDoubtPriority(this,'High 🔥')">Urgent Focus 🔥</button></div></div>
+        </div>
+        <button class="d-submit" onclick="submitAspirantDoubt()">Dispatch Doubt Package &rarr;</button>
+      </div>
+      <div id="dSuccess" style="display:none; text-align:center; padding:32px 0;">
+        <div style="font-size:48px; margin-bottom:16px;">🚀</div>
+        <h3 style="font-family:var(--font-serif); font-size:24px; margin-bottom:8px;">Doubt Dispatched Successfully!</h3>
+        <p style="color:var(--muted); font-size:14px; max-width:400px; margin:0 auto 24px;">Your conceptual framework friction layout has been compiled. Redirecting you to draft the dispatch secure channel...</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="modal-overlay" id="adminModal">
+  <div class="modal-box">
+    <div class="modal-icon">🔒</div>
+    <div class="modal-title">Instructor Authorization</div>
+    <div class="modal-desc">Provide management credential code PIN sequence to alter linked resource assets index.</div>
+    <input type="password" id="adminPin" class="ap-input" placeholder="Management secure key PIN" style="text-align:center; margin-bottom:16px;">
+    <div style="display:flex; gap:12px;">
+      <button class="btn-s" style="flex:1; padding:10px;" onclick="closeAdminAuthenticationModal()">Abort</button>
+      <button class="btn-p" style="flex:1; padding:10px; justify-content:center;" onclick="verifyAdminCredentialToken()">Unlock</button>
+    </div>
+    <div id="modalErr" style="color:#C0564A; font-size:12px; margin-top:12px; font-weight:500; display:none;">Invalid Pin Sequence.</div>
   </div>
 </div>
 
-<section class="hero">
-  <div class="hero-caption">
-    <div class="kicker">IIT JEE Main &amp; JEE Advanced</div>
-    <h1>The Mathematical Scientist</h1>
-    <p>Notes, previous year questions and test series, all in one place. Updated directly by your instructor — check back anytime for the latest additions.</p>
-
-    <div class="hero-stats">
-      <div class="stat">
-        <div class="stat-num" id="statNotes">0</div>
-        <div class="stat-label">Notes</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num" id="statPyq">0</div>
-        <div class="stat-label">PYQ Sets</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num" id="statTest">0</div>
-        <div class="stat-label">Test Series</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num" id="statVideos">0</div>
-        <div class="stat-label">Videos</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="rule"></div>
-
-<section>
-  <div class="wrap">
-    <div class="channel-cta">
-      <div class="cta-text">
-        <div class="label">Subscribe on YouTube</div>
-        <div class="name">The Mathematical Scientist</div>
-      </div>
-      <a class="btn" id="channelLinkBtn" href="#" target="_blank" rel="noopener">Visit My YouTube Channel &rarr;</a>
-    </div>
-  </div>
-</section>
-
-<section class="alt">
-  <div class="wrap">
-    <div class="eyebrow">Fresh From The Channel</div>
-    <h2 class="section-title">Recent Uploads</h2>
-    <p class="section-sub">Always up to date — pulled live from the channel, no manual updates needed.</p>
-
-    <div class="uploads-col" style="max-width:760px;margin:0 auto;">
-      <div id="playlistStatus" class="playlist-status">Loading recent uploads&hellip;</div>
-      <div id="playlistGrid" class="playlist-grid-scroll" style="max-height:none;"></div>
-      <div class="playlist-footer">
-        <a class="btn ghost small" id="playlistMoreBtn" href="#" target="_blank" rel="noopener">See full playlist on YouTube &rarr;</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="rule"></div>
-
-<section class="alt">
-  <div class="wrap">
-    <div class="eyebrow">Resource Library</div>
-    <h2 class="section-title">JEE Topic-wise Repository</h2>
-    <p class="section-sub">Browse freely below by Topic or Resource type. Adding new material requires the admin PIN.</p>
-
-    <div id="adminBar" class="admin-bar" style="display:none;">
-      <span class="tag">&#9679; Admin mode active</span>
-      <button class="btn ghost small" id="lockAgainBtn">Lock again</button>
-    </div>
-
-    <div id="uploadForm" class="upload-form" style="display:none;">
-      <h3>Add a Resource Link</h3>
-      <div class="form-row">
-        <div class="form-field">
-          <label>Title</label>
-          <input type="text" id="resTitle" placeholder="e.g. Set Theory Shortcut Tricks" />
-        </div>
-        <div class="form-field">
-          <label>Category</label>
-          <select id="resCategory">
-            <option>Notes</option>
-            <option>Video Link</option>
-            <option>PYQ</option>
-            <option>Test Series</option>
-            <option>Books</option>
-          </select>
-        </div>
-        <div class="form-field">
-          <label>Topic Section</label>
-          <select id="resTopic">
-            <option value="Set Theory">Set Theory</option>
-            <option value="Integral Calculus">Integral Calculus</option>
-            <option value="Differential Equations">Differential Equations</option>
-            <option value="General">Other / General</option>
-          </select>
-        </div>
-      </div>
-
-      <div id="linkSourceBlock" class="form-row full">
-        <div class="form-field">
-          <label>Resource Link (YouTube or PDF/Drive Link)</label>
-          <input type="url" id="resLink" placeholder="https://..." />
-          <div class="hint">Paste the full video URL or Google Drive notes link here.</div>
-        </div>
-      </div>
-
-      <div style="display:flex; gap:12px; margin-top:6px;">
-        <button class="btn" id="addResourceBtn">Add Resource</button>
-        <span id="addMsg" class="lock-msg"></span>
-      </div>
-    </div>
-
-    <div class="resources">
-      <div class="tabs" id="tabBar">
-        <button class="tab active" data-filter="All">All Topics</button>
-        <button class="tab" data-filter="Set Theory">Set Theory</button>
-        <button class="tab" data-filter="Integral Calculus">Integral Calculus</button>
-        <button class="tab" data-filter="Differential Equations">Differential Equations</button>
-        <button class="tab" data-filter="General">General</button>
-      </div>
-      <div id="resList" class="res-list">
-        <div class="empty-state">Loading resources&hellip;</div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <footer>
-  <div class="flogo">The Mathematical Scientist</div>
-  <div class="fsub">&copy; <span id="year"></span> The Mathematical Scientist. All rights reserved.</div>
-  <div class="fsocial">
-    <a id="footerChannelLink" href="#" target="_blank" rel="noopener">YouTube</a>
+  <div class="p-wrap f-flex">
+    <div class="f-left">
+      <a href="#" class="f-brand">The Mathematical Scientist</a>
+      <div>Premium JEE Learning Framework Core Console.</div>
+    </div>
+    <div class="f-links">
+      <a href="https://www.youtube.com/@jitesh_iitian_kgp" target="_blank">YouTube Channel</a>
+      <a href="#library">Repository Library</a>
+      <a href="#leaderboard">Rankers Desk</a>
+    </div>
   </div>
 </footer>
 
 <script>
-/* =========================================================================
-   CONFIG — edit these values for your channel.
-   ========================================================================= */
+/* CONFIG MANAGEMENT BLOCK */
 const CONFIG = {
-  channelUrl: "https://www.youtube.com/@jitesh_iitian_kgp",
   channelId: "UCl2gZwzlidIpBzQy_jMZGsg",
-  fallbackVideoId: "dQw4w9WgXcQ",
-  uploadPin: "TMS2026",
-  videoCount: null
+  adminPin: "TMS2026",
+  channelUrl: "https://www.youtube.com/@jitesh_iitian_kgp"
 };
-/* ========================================================================= */
 
-document.getElementById('year').textContent = new Date().getFullYear();
-document.getElementById('channelLinkBtn').href = CONFIG.channelUrl;
-document.getElementById('footerChannelLink').href = CONFIG.channelUrl;
+// YAHAN SE SAARE PRE-SEEDED QUESTIONS AUR DEMO LINKS KO HATA DIYA GAYA HAI (EMPTY REPOSITORY)
+let resourceDatabaseIndex = [];
 
-if(CONFIG.videoCount !== null && CONFIG.videoCount !== undefined){
-  document.getElementById('statVideos').textContent = CONFIG.videoCount;
+let activeCategoryFilter = "All";
+let activeChapterFilter = "All";
+let isInstructorAuthenticated = false;
+let currentDoubtPriorityLevel = "Normal";
+
+window.addEventListener('DOMContentLoaded', () => {
+  renderResourceGridLibrary();
+  synchronizeYouTubeLiveFeed();
+});
+
+function toggleTheme(){
+  const b = document.body;
+  const current = b.getAttribute('data-theme');
+  const target = current === 'dark' ? 'light' : 'dark';
+  b.setAttribute('data-theme', target);
+  document.getElementById('themeToggle').textContent = target === 'dark' ? '☀️' : '🌙';
 }
 
-/* ---------------- floating math background ---------------- */
-(function(){
-  const glyphs = ["∫f(x)dx","limₓ→₀ sinx/x = 1","e^{iπ}+1=0","d/dx(sinx)=cosx","Σ 1/n²=π²/6","∇·F=ρ/ε₀","f'(x)","∂²u/∂x²"];
-  const box = document.getElementById('mathBg');
-  for(let i=0;i<10;i++){
-    const s = document.createElement('span');
-    s.textContent = glyphs[i % glyphs.length];
-    s.style.top = (Math.random()*100)+'%';
-    s.style.left = (Math.random()*90)+'%';
-    s.style.transform = `rotate(${(Math.random()*10-5)}deg)`;
-    box.appendChild(s);
+function handleAdminToggle(){
+  if(isInstructorAuthenticated) {
+    isInstructorAuthenticated = false;
+    document.getElementById('adminToggle').classList.remove('active');
+    document.getElementById('adminToggle').textContent = "🔒 Admin";
+    document.getElementById('adminPanel').style.display = "none";
+    renderResourceGridLibrary();
+  } else {
+    openAdminAuthenticationModal();
   }
-})();
+}
 
-/* ---------------- YouTube: recent uploads feed ---------------- */
-const uploadsPlaylistId = CONFIG.channelId ? ("UU" + CONFIG.channelId.slice(2)) : "";
+function openAdminAuthenticationModal(){
+  document.getElementById('adminPin').value = '';
+  document.getElementById('modalErr').style.display = 'none';
+  document.getElementById('adminModal').classList.add('open');
+  document.getElementById('adminPin').focus();
+}
 
-document.getElementById('playlistMoreBtn').href = uploadsPlaylistId
-  ? `https://www.youtube.com/playlist?list=${uploadsPlaylistId}`
-  : CONFIG.channelUrl;
+function closeAdminAuthenticationModal(){
+  document.getElementById('adminModal').classList.remove('open');
+}
 
-async function loadChannelFeed(){
-  const grid = document.getElementById('playlistGrid');
-  const status = document.getElementById('playlistStatus');
+function verifyAdminCredentialToken(){
+  const pin = document.getElementById('adminPin').value;
+  if(pin === CONFIG.adminPin) {
+    isInstructorAuthenticated = true;
+    document.getElementById('adminToggle').classList.add('active');
+    document.getElementById('adminToggle').textContent = "🔓 Admin Active";
+    document.getElementById('adminPanel').style.display = "block";
+    closeAdminAuthenticationModal();
+    renderResourceGridLibrary();
+    document.getElementById('adminPanel').scrollIntoView({behavior:'smooth', block:'center'});
+  } else {
+    document.getElementById('modalErr').style.display = 'block';
+  }
+}
 
-  if (!CONFIG.channelId){
-    status.textContent = "Add your channelId in the CONFIG block to enable this.";
+function setCategoryFilter(btn, cat){
+  document.querySelectorAll('#library .filter-group:nth-child(1) .fbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeCategoryFilter = cat;
+  renderResourceGridLibrary();
+}
+
+function setChapterFilter(btn, chap){
+  document.querySelectorAll('#library .filter-group:nth-child(2) .fbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeChapterFilter = chap;
+  renderResourceGridLibrary();
+}
+
+function calculateDynamicStatsCounter() {
+  const count = (cat) => resourceDatabaseIndex.filter(r => r.category === cat).length;
+  
+  document.getElementById('statNotes').textContent = count('Notes');
+  document.getElementById('statPyqs').textContent = count('PYQ');
+  document.getElementById('statTests').textContent = count('Test Series');
+
+  document.getElementById('c-all').textContent = resourceDatabaseIndex.length;
+  document.getElementById('c-notes').textContent = count('Notes');
+  document.getElementById('c-pyq').textContent = count('PYQ');
+  document.getElementById('c-test').textContent = count('Test Series');
+  document.getElementById('c-book').textContent = count('Rankers Book');
+}
+
+function renderResourceGridLibrary() {
+  calculateDynamicStatsCounter();
+  const box = document.getElementById('resourceContainer');
+  
+  let dataset = resourceDatabaseIndex.filter(r => {
+    const matchCat = (activeCategoryFilter === "All" || r.category === activeCategoryFilter);
+    const matchChap = (activeChapterFilter === "All" || r.chapter === activeChapterFilter);
+    return matchCat && matchChap;
+  });
+
+  if(dataset.length === 0) {
+    box.innerHTML = `<div class="empty-state">No linked assets mapped matching current parameters. ${isInstructorAuthenticated ? 'Link standard elements above.' : ''}</div>`;
     return;
   }
 
-  const rssUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://www.youtube.com/feeds/videos.xml?channel_id=${CONFIG.channelId}`)}`;
+  box.innerHTML = '';
+  dataset.slice().reverse().forEach(r => {
+    const c = document.createElement('div');
+    c.className = "res-card";
+    
+    let emoji = "📝";
+    if(r.category === 'PYQ') emoji = "❓";
+    if(r.category === 'Test Series') emoji = "🏆";
+    if(r.category === 'Rankers Book') emoji = "📚";
 
-  try{
-    const res = await fetch(rssUrl);
-    if(!res.ok) throw new Error("feed unavailable");
-    const text = await res.text();
-    const xml = new DOMParser().parseFromString(text, "text/xml");
-    const entries = Array.from(xml.querySelectorAll("entry")).slice(0, 12);
+    c.innerHTML = `
+      <div class="res-left">
+        <div class="res-icon">${emoji}</div>
+        <div class="res-details">
+          <div class="res-title" title="${r.title}">${r.title}</div>
+          <div class="res-meta">
+            <span class="res-tag">${r.category}</span>
+            <div class="res-dot"></div>
+            <span>${r.chapter}</span>
+            <div class="res-dot"></div>
+            <span>${new Date(r.timestamp).toLocaleDateString('en-IN', {day:'numeric', month:'short'})}</span>
+          </div>
+        </div>
+      </div>
+      <div class="res-right">
+        <a href="${r.url}" target="_blank" class="btn-s" style="padding:8px 16px; font-size:13px; text-decoration:none;">Open Asset</a>
+        ${isInstructorAuthenticated ? `<button class="btn-s" style="padding:8px 12px; font-size:13px; color:#C0564A; border-color:rgba(192,86,74,0.2);" onclick="removeResourceAsset('${r.id}')">Delete</button>` : ''}
+      </div>
+    `;
+    box.appendChild(c);
+  });
+}
 
-    if(entries.length === 0){
-      if(document.getElementById('statVideos') && (CONFIG.videoCount === null || CONFIG.videoCount === undefined)){
-        document.getElementById('statVideos').textContent = 0;
-      }
-      status.textContent = "No videos uploaded yet — check back soon!";
+function addResourceAsset() {
+  const title = document.getElementById('resTitle').value.trim();
+  const category = document.getElementById('resCategory').value;
+  const chapter = document.getElementById('resChapter').value;
+  const url = document.getElementById('resLink').value.trim();
+  const msg = document.getElementById('apMsg');
+
+  if(!title || !url) {
+    msg.textContent = "All mapping identity input fields are requested.";
+    msg.className = "ap-msg err";
+    return;
+  }
+
+  const asset = {
+    id: "asset_" + Date.now(),
+    title, category, chapter, url,
+    timestamp: new Date().toISOString()
+  };
+
+  resourceDatabaseIndex.push(asset);
+  msg.textContent = "Resource indexed safely.";
+  msg.className = "ap-msg ok";
+
+  document.getElementById('resTitle').value = '';
+  document.getElementById('resLink').value = '';
+  
+  renderResourceGridLibrary();
+  setTimeout(() => { msg.textContent = ''; }, 3000);
+}
+
+function removeResourceAsset(id) {
+  if(!confirm("Purge selected asset pointer from local system matrix list?")) return;
+  resourceDatabaseIndex = resourceDatabaseIndex.filter(r => r.id !== id);
+  renderResourceGridLibrary();
+}
+
+function submitLeaderboardScore() {
+  const name = document.getElementById('lbName').value.trim();
+  const score = document.getElementById('lbScore').value.trim();
+  if(!name || !score) { alert('Aspirant parameters mismatch!'); return; }
+  
+  const table = document.getElementById('lbTable').querySelector('tbody');
+  const r = document.createElement('tr');
+  r.innerHTML = `<td class="lb-rank-cell">--</td><td class="lb-name-cell">${name}</td><td class="lb-tests">${score}/300</td><td><span class="lb-badge-cell">Verified ⭐</span></td></tr>`;
+  table.appendChild(r);
+  
+  document.getElementById('lbName').value = '';
+  document.getElementById('lbScore').value = '';
+  alert(`Score cataloged for review layout, ${name}!`);
+}
+
+function setDoubtPriority(btn, pr) {
+  currentDoubtPriorityLevel = pr;
+  document.querySelectorAll('#doubt .d-btn-group .fbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function submitAspirantDoubt() {
+  const name = document.getElementById('dName').value.trim();
+  const doubt = document.getElementById('dDoubt').value.trim();
+  if(!name || !doubt) { alert('Identity data packets cannot remain unfilled.'); return; }
+
+  document.getElementById('dFormBlock').style.display = 'none';
+  document.getElementById('dSuccess').style.display = 'block';
+
+  const topic = document.getElementById('dTopic').value;
+  const contact = document.getElementById('dContact').value;
+  const chapter = document.getElementById('dChapter').value;
+
+  setTimeout(() => {
+    window.location.href = `mailto:jiteshkumarjatav2020@gmail.com?subject=TMS Doubt Package [${currentDoubtPriorityLevel}]&body=Aspirant Name: ${name}%0AContact: ${contact}%0ADomain Area: ${topic}%0AContext Chapter: ${chapter}%0A%0ATheoretical Block friction Details:%0A${encodeURIComponent(doubt)}`;
+  }, 1200);
+}
+
+async function synchronizeYouTubeLiveFeed() {
+  const grid = document.getElementById('videoGrid');
+  const status = document.getElementById('videoStatus');
+  if(!CONFIG.channelId) { status.textContent = "Channel pointer parameters missing."; return; }
+
+  const target = `https://www.youtube.com/feeds/videos.xml?channel_id=${CONFIG.channelId}`;
+  const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`;
+
+  try {
+    const res = await fetch(proxy);
+    if(!res.ok) throw new Error("stream channel down");
+    const xmlText = await res.text();
+    const dom = new DOMParser().parseFromString(xmlText, "text/xml");
+    const elements = Array.from(dom.querySelectorAll("entry")).slice(0, 3);
+
+    if(elements.length === 0) {
+      status.textContent = "Broadcast matrix empty.";
       return;
     }
 
-    if(CONFIG.videoCount === null || CONFIG.videoCount === undefined){
-      const statVideos = document.getElementById('statVideos');
-      if(statVideos) statVideos.textContent = entries.length;
-    }
-
-    grid.innerHTML = "";
-    entries.forEach(entry => {
-      const videoId = entry.querySelector("videoId")?.textContent
-        || entry.getElementsByTagNameNS("*","videoId")[0]?.textContent;
-      const title = entry.querySelector("title")?.textContent || "Untitled";
-      const published = entry.querySelector("published")?.textContent;
-      const dateStr = published ? new Date(published).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : "";
-      const thumb = videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : "";
-
-      const card = document.createElement('a');
-      card.className = "pv-row";
-      card.href = videoId ? `https://www.youtube.com/watch?v=${videoId}` : CONFIG.channelUrl;
-      card.target = "_blank"; card.rel = "noopener";
-      card.innerHTML = `
-        <img class="thumb" src="${thumb}" alt="${title}" loading="lazy" />
-        <div class="pv-body">
-          <div class="pv-title">${title}</div>
-          <div class="pv-date">${dateStr}</div>
-        </div>`;
-      grid.appendChild(card);
+    grid.innerHTML = '';
+    elements.forEach(el => {
+      const id = el.querySelector("videoId")?.textContent || el.getElementsByTagNameNS("*","videoId")[0]?.textContent;
+      const title = el.querySelector("title")?.textContent || "Core Lecture Focus Setup";
+      const pub = el.querySelector("published")?.textContent;
+      const date = pub ? new Date(pub).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) : '';
+      
+      const link = document.createElement('a');
+      link.className = "v-card";
+      link.href = id ? `https://www.youtube.com/watch?v=${id}` : CONFIG.channelUrl;
+      link.target = "_blank";
+      link.innerHTML = `
+        <div class="v-thumb-wrap" style="position:relative;">
+          <img class="v-thumb" src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="thumbnail">
+          <div class="v-play"><div class="v-play-icon">▶</div></div>
+        </div>
+        <div class="v-info">
+          <div class="v-date">${date}</div>
+          <div class="v-title">${title}</div>
+        </div>
+      `;
+      grid.appendChild(link);
     });
     status.style.display = "none";
-  }catch(err){
-    status.textContent = "Couldn't load the live feed right now — try the channel link below.";
-    grid.innerHTML = "";
+  } catch(e) {
+    status.textContent = "Live sync down. Visit streaming domain console directly.";
   }
 }
-loadChannelFeed();
-
-/* ========================================================================
-   LINK-ONLY TOPIC-WISE RESOURCE LIBRARY STATE & LOGIC
-   ======================================================================== */
-let isAdmin = false;
-let currentFilter = "All";
-
-// Pre-seeded Demo Content for JEE Topics (Notes and Video Links)
-let memoryResources = [
-  { id: "demo_1", title: "Set Theory — Complete JEE Main & Advanced Notes", category: "Notes", topic: "Set Theory", dateAdded: new Date().toISOString(), dataOrUrl: "https://drive.google.com" },
-  { id: "demo_2", title: "Integral Calculus — Definite Integration Video Lecture", category: "Video Link", topic: "Integral Calculus", dateAdded: new Date().toISOString(), dataOrUrl: "https://youtube.com" },
-  { id: "demo_3", title: "Differential Equations — Homogeneous Forms & PYQs", category: "Notes", topic: "Differential Equations", dateAdded: new Date().toISOString(), dataOrUrl: "https://drive.google.com" }
-];
-
-function iconFor(cat){
-  return {Notes:"📝", "Video Link":"🎥", PYQ:"❓", "Test Series":"🏆", Books:"📚"}[cat] || "📁";
-}
-
-function updateHeroStats(list){
-  const countCat = (cat) => list.filter(r => r.category === cat).length;
-  const setStat = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
-  setStat('statNotes', countCat('Notes'));
-  setStat('statPyq', countCat('PYQ'));
-  setStat('statTest', countCat('Test Series'));
-}
-
-function renderResources(){
-  updateHeroStats(memoryResources);
-  const container = document.getElementById('resList');
-  
-  // Filter items based on Topic selected
-  const filtered = currentFilter === "All" ? memoryResources : memoryResources.filter(r => r.topic === currentFilter);
-
-  if(filtered.length === 0){
-    container.innerHTML = `<div class="empty-state">No links uploaded in <strong>${currentFilter}</strong> yet${isAdmin ? " — add one above!" : "."}</div>`;
-    return;
-  }
-
-  container.innerHTML = "";
-  filtered.slice().reverse().forEach(r => {
-    const item = document.createElement('div');
-    item.className = "res-item";
-    const dateStr = new Date(r.dateAdded).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
-    item.innerHTML = `
-      <div class="res-icon">${iconFor(r.category)}</div>
-      <div class="res-info">
-        <div class="res-title">${r.title}</div>
-        <div class="res-meta">${r.category} &middot; Section: <strong>${r.topic}</strong> &middot; ${dateStr}</div>
-      </div>
-      <div class="res-actions">
-        <a class="btn ghost small" href="${r.dataOrUrl}" target="_blank" rel="noopener">Open ${r.category === 'Video Link' ? 'Video' : 'Link'}</a>
-        ${isAdmin ? `<button class="btn danger small" data-remove="${r.id}">Remove</button>` : ""}
-      </div>`;
-    container.appendChild(item);
-  });
-
-  // Wire up remove handlers
-  container.querySelectorAll('[data-remove]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if(!confirm("Remove this topic resource link?")) return;
-      const id = btn.getAttribute('data-remove');
-      memoryResources = memoryResources.filter(x => x.id !== id);
-      renderResources();
-    });
-  });
-}
-
-document.getElementById('tabBar').addEventListener('click', (e) => {
-  if(e.target.classList.contains('tab')){
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    e.target.classList.add('active');
-    currentFilter = e.target.dataset.filter;
-    renderResources();
-  }
-});
-
-/* ---- admin unlock logic ---- */
-const cornerBtn = document.getElementById('adminCornerBtn');
-const modalOverlay = document.getElementById('adminModalOverlay');
-
-function openAdminModal(){
-  document.getElementById('pinInput').value = "";
-  document.getElementById('lockMsg').textContent = "";
-  document.getElementById('lockMsg').className = "lock-msg";
-  modalOverlay.classList.add('open');
-  document.getElementById('pinInput').focus();
-}
-function closeAdminModal(){
-  modalOverlay.classList.remove('open');
-}
-
-cornerBtn.addEventListener('click', () => {
-  if(isAdmin){
-    isAdmin = false;
-    cornerBtn.textContent = "\uD83D\uDD12 Admin";
-    cornerBtn.classList.remove('active');
-    document.getElementById('adminBar').style.display = "none";
-    document.getElementById('uploadForm').style.display = "none";
-    renderResources();
-  } else {
-    openAdminModal();
-  }
-});
-document.getElementById('cancelModalBtn').addEventListener('click', closeAdminModal);
-modalOverlay.addEventListener('click', (e) => {
-  if(e.target === modalOverlay) closeAdminModal();
-});
-
-document.getElementById('unlockBtn').addEventListener('click', () => {
-  const val = document.getElementById('pinInput').value;
-  const msg = document.getElementById('lockMsg');
-  if(val === CONFIG.uploadPin){
-    isAdmin = true;
-    cornerBtn.textContent = "\uD83D\uDD13 Admin mode";
-    cornerBtn.classList.add('active');
-    document.getElementById('adminBar').style.display = "flex";
-    document.getElementById('uploadForm').style.display = "block";
-    closeAdminModal();
-    renderResources();
-    document.getElementById('adminBar').scrollIntoView({behavior:'smooth', block:'center'});
-  } else {
-    msg.textContent = "Incorrect PIN.";
-    msg.className = "lock-msg err";
-  }
-});
-document.getElementById('pinInput').addEventListener('keydown', (e) => {
-  if(e.key === 'Enter') document.getElementById('unlockBtn').click();
-});
-document.getElementById('lockAgainBtn').addEventListener('click', () => {
-  cornerBtn.click();
-});
-
-/* ---- add-resource via link form ---- */
-document.getElementById('addResourceBtn').addEventListener('click', () => {
-  const title = document.getElementById('resTitle').value.trim();
-  const category = document.getElementById('resCategory').value;
-  const topic = document.getElementById('resTopic').value;
-  const link = document.getElementById('resLink').value.trim();
-  const addMsg = document.getElementById('addMsg');
-  addMsg.className = "lock-msg";
-
-  if(!title){
-    addMsg.textContent = "Please add a title."; addMsg.className = "lock-msg err"; return;
-  }
-  if(!link){
-    addMsg.textContent = "Please paste a link."; addMsg.className = "lock-msg err"; return;
-  }
-
-  const id = "res_" + Date.now() + "_" + Math.random().toString(36).slice(2,8);
-  let entry = { 
-    id, 
-    title, 
-    category, 
-    topic,
-    dateAdded: new Date().toISOString(),
-    type: "link",
-    dataOrUrl: link
-  };
-
-  memoryResources.push(entry);
-
-  addMsg.textContent = "Resource linked successfully to " + topic; addMsg.className = "lock-msg ok";
-  document.getElementById('resTitle').value = "";
-  document.getElementById('resLink').value = "";
-  renderResources();
-});
-
-renderResources();
 </script>
 </body>
 </html>
