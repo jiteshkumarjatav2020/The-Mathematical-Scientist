@@ -173,7 +173,7 @@
     background:rgba(14,32,56,0.5);
   }
   .upload-form h3{ font-family:'Playfair Display',serif; margin:0 0 18px; color:var(--cream); font-size:1.1rem; }
-  .form-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:14px; }
+  .form-row{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:14px; }
   .form-row.full{ grid-template-columns:1fr; }
   .form-field label{ display:block; font-size:0.78rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
   .form-field input[type=text], .form-field input[type=url], .form-field select{
@@ -215,7 +215,7 @@
   footer .fsocial a{ color:var(--muted); font-size:0.85rem; text-decoration:none; border-bottom:1px solid transparent; }
   footer .fsocial a:hover{ color:var(--gold); border-color:var(--gold); }
 
-  @media (max-width:640px){
+  @media (max-width:768px){
     .form-row{ grid-template-columns:1fr; }
     .channel-cta{ flex-direction:column; text-align:center; }
     .channel-cta .cta-text{ text-align:center; }
@@ -303,8 +303,8 @@
 <section class="alt">
   <div class="wrap">
     <div class="eyebrow">Resource Library</div>
-    <h2 class="section-title">Notes &middot; PYQs &middot; Test Series &middot; Books &middot; PDFs</h2>
-    <p class="section-sub">Browse freely below. Adding new material requires the admin PIN.</p>
+    <h2 class="section-title">JEE Topic-wise Repository</h2>
+    <p class="section-sub">Browse freely below by Topic or Resource type. Adding new material requires the admin PIN.</p>
 
     <div id="adminBar" class="admin-bar" style="display:none;">
       <span class="tag">&#9679; Admin mode active</span>
@@ -316,25 +316,34 @@
       <div class="form-row">
         <div class="form-field">
           <label>Title</label>
-          <input type="text" id="resTitle" placeholder="e.g. Class 11 Sets — Full Notes" />
+          <input type="text" id="resTitle" placeholder="e.g. Set Theory Shortcut Tricks" />
         </div>
         <div class="form-field">
           <label>Category</label>
           <select id="resCategory">
             <option>Notes</option>
+            <option>Video Link</option>
             <option>PYQ</option>
             <option>Test Series</option>
             <option>Books</option>
-            <option>PDFs</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Topic Section</label>
+          <select id="resTopic">
+            <option value="Set Theory">Set Theory</option>
+            <option value="Integral Calculus">Integral Calculus</option>
+            <option value="Differential Equations">Differential Equations</option>
+            <option value="General">Other / General</option>
           </select>
         </div>
       </div>
 
       <div id="linkSourceBlock" class="form-row full">
         <div class="form-field">
-          <label>Resource Link</label>
-          <input type="url" id="resLink" placeholder="https://drive.google.com/..." />
-          <div class="hint">Make sure link sharing is set to "Anyone with the link". Google Drive, OneDrive or any public URL works well.</div>
+          <label>Resource Link (YouTube or PDF/Drive Link)</label>
+          <input type="url" id="resLink" placeholder="https://..." />
+          <div class="hint">Paste the full video URL or Google Drive notes link here.</div>
         </div>
       </div>
 
@@ -346,12 +355,11 @@
 
     <div class="resources">
       <div class="tabs" id="tabBar">
-        <button class="tab active" data-cat="All">All</button>
-        <button class="tab" data-cat="Notes">Notes</button>
-        <button class="tab" data-cat="PYQ">PYQ</button>
-        <button class="tab" data-cat="Test Series">Test Series</button>
-        <button class="tab" data-cat="Books">Books</button>
-        <button class="tab" data-cat="PDFs">PDFs</button>
+        <button class="tab active" data-filter="All">All Topics</button>
+        <button class="tab" data-filter="Set Theory">Set Theory</button>
+        <button class="tab" data-filter="Integral Calculus">Integral Calculus</button>
+        <button class="tab" data-filter="Differential Equations">Differential Equations</button>
+        <button class="tab" data-filter="General">General</button>
       </div>
       <div id="resList" class="res-list">
         <div class="empty-state">Loading resources&hellip;</div>
@@ -415,15 +423,14 @@ async function loadChannelFeed(){
   const status = document.getElementById('playlistStatus');
 
   if (!CONFIG.channelId){
-    status.textContent = "Add your channelId in the CONFIG block at the bottom of the page source to enable this.";
+    status.textContent = "Add your channelId in the CONFIG block to enable this.";
     return;
   }
 
-  const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${CONFIG.channelId}`;
-  const proxied = `https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`;
+  const rssUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://www.youtube.com/feeds/videos.xml?channel_id=${CONFIG.channelId}`)}`;
 
   try{
-    const res = await fetch(proxied);
+    const res = await fetch(rssUrl);
     if(!res.ok) throw new Error("feed unavailable");
     const text = await res.text();
     const xml = new DOMParser().parseFromString(text, "text/xml");
@@ -472,31 +479,39 @@ async function loadChannelFeed(){
 loadChannelFeed();
 
 /* ========================================================================
-   RUNTIME LINK-ONLY RESOURCE LIBRARY
+   LINK-ONLY TOPIC-WISE RESOURCE LIBRARY STATE & LOGIC
    ======================================================================== */
 let isAdmin = false;
 let currentFilter = "All";
-let memoryResources = []; // Dynamic local array storage for running application state
+
+// Pre-seeded Demo Content for JEE Topics (Notes and Video Links)
+let memoryResources = [
+  { id: "demo_1", title: "Set Theory — Complete JEE Main & Advanced Notes", category: "Notes", topic: "Set Theory", dateAdded: new Date().toISOString(), dataOrUrl: "https://drive.google.com" },
+  { id: "demo_2", title: "Integral Calculus — Definite Integration Video Lecture", category: "Video Link", topic: "Integral Calculus", dateAdded: new Date().toISOString(), dataOrUrl: "https://youtube.com" },
+  { id: "demo_3", title: "Differential Equations — Homogeneous Forms & PYQs", category: "Notes", topic: "Differential Equations", dateAdded: new Date().toISOString(), dataOrUrl: "https://drive.google.com" }
+];
 
 function iconFor(cat){
-  return {Notes:"N", PYQ:"Q", "Test Series":"T", Books:"B", PDFs:"P"}[cat] || "F";
+  return {Notes:"📝", "Video Link":"🎥", PYQ:"❓", "Test Series":"🏆", Books:"📚"}[cat] || "📁";
 }
 
 function updateHeroStats(list){
-  const count = (cat) => list.filter(r => r.category === cat).length;
+  const countCat = (cat) => list.filter(r => r.category === cat).length;
   const setStat = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
-  setStat('statNotes', count('Notes'));
-  setStat('statPyq', count('PYQ'));
-  setStat('statTest', count('Test Series'));
+  setStat('statNotes', countCat('Notes'));
+  setStat('statPyq', countCat('PYQ'));
+  setStat('statTest', countCat('Test Series'));
 }
 
 function renderResources(){
   updateHeroStats(memoryResources);
   const container = document.getElementById('resList');
-  const filtered = currentFilter === "All" ? memoryResources : memoryResources.filter(r => r.category === currentFilter);
+  
+  // Filter items based on Topic selected
+  const filtered = currentFilter === "All" ? memoryResources : memoryResources.filter(r => r.topic === currentFilter);
 
   if(filtered.length === 0){
-    container.innerHTML = `<div class="empty-state">No resources here yet${isAdmin ? " — add the first one above." : "."}</div>`;
+    container.innerHTML = `<div class="empty-state">No links uploaded in <strong>${currentFilter}</strong> yet${isAdmin ? " — add one above!" : "."}</div>`;
     return;
   }
 
@@ -509,19 +524,19 @@ function renderResources(){
       <div class="res-icon">${iconFor(r.category)}</div>
       <div class="res-info">
         <div class="res-title">${r.title}</div>
-        <div class="res-meta">${r.category} &middot; ${dateStr}</div>
+        <div class="res-meta">${r.category} &middot; Section: <strong>${r.topic}</strong> &middot; ${dateStr}</div>
       </div>
       <div class="res-actions">
-        <a class="btn ghost small" href="${r.dataOrUrl}" target="_blank" rel="noopener">Open Link</a>
+        <a class="btn ghost small" href="${r.dataOrUrl}" target="_blank" rel="noopener">Open ${r.category === 'Video Link' ? 'Video' : 'Link'}</a>
         ${isAdmin ? `<button class="btn danger small" data-remove="${r.id}">Remove</button>` : ""}
       </div>`;
     container.appendChild(item);
   });
 
-  // wire up link removals
+  // Wire up remove handlers
   container.querySelectorAll('[data-remove]').forEach(btn => {
     btn.addEventListener('click', () => {
-      if(!confirm("Remove this resource link?")) return;
+      if(!confirm("Remove this topic resource link?")) return;
       const id = btn.getAttribute('data-remove');
       memoryResources = memoryResources.filter(x => x.id !== id);
       renderResources();
@@ -533,12 +548,12 @@ document.getElementById('tabBar').addEventListener('click', (e) => {
   if(e.target.classList.contains('tab')){
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     e.target.classList.add('active');
-    currentFilter = e.target.dataset.cat;
+    currentFilter = e.target.dataset.filter;
     renderResources();
   }
 });
 
-/* ---- admin unlock via fixed corner button + modal ---- */
+/* ---- admin unlock logic ---- */
 const cornerBtn = document.getElementById('adminCornerBtn');
 const modalOverlay = document.getElementById('adminModalOverlay');
 
@@ -594,10 +609,11 @@ document.getElementById('lockAgainBtn').addEventListener('click', () => {
   cornerBtn.click();
 });
 
-/* ---- add-resource form ---- */
+/* ---- add-resource via link form ---- */
 document.getElementById('addResourceBtn').addEventListener('click', () => {
   const title = document.getElementById('resTitle').value.trim();
   const category = document.getElementById('resCategory').value;
+  const topic = document.getElementById('resTopic').value;
   const link = document.getElementById('resLink').value.trim();
   const addMsg = document.getElementById('addMsg');
   addMsg.className = "lock-msg";
@@ -614,6 +630,7 @@ document.getElementById('addResourceBtn').addEventListener('click', () => {
     id, 
     title, 
     category, 
+    topic,
     dateAdded: new Date().toISOString(),
     type: "link",
     dataOrUrl: link
@@ -621,7 +638,7 @@ document.getElementById('addResourceBtn').addEventListener('click', () => {
 
   memoryResources.push(entry);
 
-  addMsg.textContent = "Link Added Successfully."; addMsg.className = "lock-msg ok";
+  addMsg.textContent = "Resource linked successfully to " + topic; addMsg.className = "lock-msg ok";
   document.getElementById('resTitle').value = "";
   document.getElementById('resLink').value = "";
   renderResources();
