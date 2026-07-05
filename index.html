@@ -6,7 +6,8 @@
 <title>The Mathematical Scientist – TMS</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-[data-theme="dark"]{--bg:#0A0A0A;--bg2:#111111;--bg3:#1A1A1A;--bg4:#222222;--text:#F5F5F5;--muted:#888888;--border:rgba(255,255,255,0.07);--card:#1A1A1A;--card2:#222222;}\n[data-theme="light"]{--bg:#F4F4F0;--bg2:#EBEBEB;--bg3:#FFFFFF;--bg4:#F0F0EB;--text:#1A1A1A;--muted:#666666;--border:rgba(0,0,0,0.1);--card:#FFFFFF;--card2:#F4F4F0;}
+[data-theme="dark"]{--bg:#0A0A0A;--bg2:#111111;--bg3:#1A1A1A;--bg4:#222222;--text:#F5F5F5;--muted:#888888;--border:rgba(255,255,255,0.07);--card:#1A1A1A;--card2:#222222;}
+[data-theme="light"]{--bg:#F4F4F0;--bg2:#EBEBEB;--bg3:#FFFFFF;--bg4:#F0F0EB;--text:#1A1A1A;--muted:#666666;--border:rgba(0,0,0,0.1);--card:#FFFFFF;--card2:#F4F4F0;}
 :root{--gold:#D4AF37;--gold-light:#F0D06B;--gold-dark:#AA8513;--font-serif:'Playfair Display',serif;--font-sans:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:var(--font-sans);line-height:1.5;overflow-x:hidden;}
@@ -142,9 +143,9 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
       <a href="#" class="brand">TMS<span class="brand-dot"></span></a>
       <nav>
         <a href="#videos">Lectures</a>
+        <a href="#video-library">Video Topics</a>
+        <a href="#test-series">Test Series</a>
         <a href="#library">Library</a>
-        <a href="#leaderboard">Leaderboard</a>
-        <a href="#doubt">Doubt Box</a>
       </nav>
     </div>
     <div class="h-right">
@@ -217,12 +218,7 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
         </div>
         <div class="ap-field">
           <label class="ap-lbl">Chapter / Topic</label>
-          <select id="resChapter" class="ap-select">
-            <option>Set Theory</option>
-            <option>Integral Calculus</option>
-            <option>Differential Equations</option>
-            <option>General Mathematics</option>
-          </select>
+          <select id="resChapter" class="ap-select"></select>
         </div>
       </div>
       <div class="ap-grid" style="grid-template-columns: 1fr; margin-bottom: 20px;">
@@ -248,13 +244,8 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
           <button class="fbtn" data-cat="Rankers Book" onclick="setCategoryFilter(this,'Rankers Book')">Rankers Books <span class="fbtn-count" id="c-book">0</span></button>
         </div>
 
-        <div class="filter-group">
+        <div class="filter-group" id="resourceChapterFilters" style="max-height:520px;overflow-y:auto;">
           <span class="filter-lbl">Chapters</span>
-          <button class="fbtn active" data-chap="All" onclick="setChapterFilter(this,'All')">All Chapters</button>
-          <button class="fbtn" data-chap="Set Theory" onclick="setChapterFilter(this,'Set Theory')">Set Theory</button>
-          <button class="fbtn" data-chap="Integral Calculus" onclick="setChapterFilter(this,'Integral Calculus')">Integral Calculus</button>
-          <button class="fbtn" data-chap="Differential Equations" onclick="setChapterFilter(this,'Differential Equations')">Differential Equations</button>
-          <button class="fbtn" data-chap="General Mathematics" onclick="setChapterFilter(this,'General Mathematics')">General Mathematics</button>
         </div>
       </div>
 
@@ -264,59 +255,96 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
   </div>
 </section>
 
-<section class="section" id="leaderboard">
+<section class="section" id="video-library">
   <div class="p-wrap">
     <div class="s-header">
       <div class="s-title-area">
-        <span class="s-tag">Hall of Fame</span>
-        <h2 class="s-title">TMS Rankers Leaderboard</h2>
+        <span class="s-tag">Topic Wise</span>
+        <h2 class="s-title">Video Lectures by Chapter</h2>
       </div>
     </div>
-    <div class="lb-grid">
-      <div class="lb-form-box">
-        <h3 style="margin-bottom:8px;font-family:var(--font-serif);font-size:20px;">Submit Mock Score</h3>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:24px;">Gave a recently uploaded TMS Test Series paper? Share your marks to feature on the live student ranking desk.</p>
-        <div style="display:flex;flex-direction:column;gap:16px;">
-          <div class="ap-field"><label class="ap-lbl">Full Student Name</label><input type="text" id="lbName" class="ap-input" placeholder="Enter your name"></div>
-          <div class="ap-field"><label class="ap-lbl">Score Obtained (Out of 300)</label><input type="number" id="lbScore" class="ap-input" placeholder="e.g., 265" max="300"></div>
-          <button class="btn-p" style="justify-content:center;margin-top:8px;" onclick="submitLeaderboardScore()">Post Score Board</button>
+
+    <div class="admin-panel" id="videoAdminPanel" style="display:none;">
+      <div class="ap-title">Link New Video (Topic Wise)</div>
+      <div class="ap-grid">
+        <div class="ap-field">
+          <label class="ap-lbl">Sub-Topic / Lecture Name</label>
+          <input type="text" id="vidTitle" class="ap-input" placeholder="e.g., Variable Separable Form">
+        </div>
+        <div class="ap-field">
+          <label class="ap-lbl">Chapter / Topic</label>
+          <select id="vidChapter" class="ap-select"></select>
+        </div>
+        <div class="ap-field">
+          <label class="ap-lbl">YouTube Video Link</label>
+          <input type="url" id="vidLink" class="ap-input" placeholder="https://www.youtube.com/watch?v=...">
         </div>
       </div>
-      <div class="lb-table-box">
-        <table class="lb-table" id="lbTable">
-          <thead><tr><th>Rank</th><th>Aspirant</th><th>Score</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td class="lb-rank-cell">#01</td><td class="lb-name-cell">Aarav Sharma</td><td class="lb-tests">288/300</td><td><span class="lb-badge-cell">Top Ranker 🚀</span></td></tr>
-            <tr><td class="lb-rank-cell">#02</td><td class="lb-name-cell">Isha Patel</td><td class="lb-tests">274/300</td><td><span class="lb-badge-cell">Elite ✨</span></td></tr>
-            <tr><td class="lb-rank-cell">#03</td><td class="lb-name-cell">Sameer Verma</td><td class="lb-tests">265/300</td><td><span class="lb-badge-cell">Elite ✨</span></td></tr>
-          </tbody>
-        </table>
+      <div class="ap-grid" style="grid-template-columns: 1fr; margin-bottom: 20px;">
+        <div class="ap-field">
+          <label class="ap-lbl">Notes Link (optional, Google Drive / PDF)</label>
+          <input type="url" id="vidNotesLink" class="ap-input" placeholder="https://drive.google.com/...">
+        </div>
       </div>
+      <div class="ap-actions">
+        <button class="btn-p" style="padding:10px 24px; font-size:14px;" onclick="addVideoAsset()">Link Video</button>
+        <span class="ap-msg" id="vidApMsg"></span>
+      </div>
+    </div>
+
+    <div class="lib-grid">
+      <div class="lib-sidebar">
+        <div class="filter-group" id="videoChapterFilters" style="max-height:520px;overflow-y:auto;">
+          <span class="filter-lbl">Chapters</span>
+        </div>
+      </div>
+
+      <div class="lib-content" id="videoLibraryContainer">
+        </div>
     </div>
   </div>
 </section>
 
-<section class="section alt" id="doubt">
+<section class="section alt" id="test-series">
   <div class="p-wrap">
-    <div class="d-box">
-      <div id="dFormBlock">
-        <h2 class="d-title">Instant Doubt Dispatch Desk</h2>
-        <p class="d-desc">Stuck on a tricky problem or concept? Fill out the structure below to dispatch your inquiry directly to your mentor's priority evaluation desk.</p>
-        <div class="d-grid">
-          <div class="ap-field"><label class="ap-lbl">Your Name</label><input type="text" id="dName" class="ap-input" placeholder="e.g., Rohit Kumar"></div>
-          <div class="ap-field"><label class="ap-lbl">Contact / WhatsApp Link</label><input type="text" id="dContact" class="ap-input" placeholder="For solution updates"></div>
-          <div class="ap-field d-full"><label class="ap-lbl">Core Domain Topic Area</label><select id="dTopic" class="ap-select"><option>Set Theory</option><option>Integral Calculus</option><option>Differential Equations</option><option>Other JEE Domain</option></select></div>
-          <div class="ap-field d-full"><label class="ap-lbl">Chapter Name &amp; Question Context</label><input type="text" id="dChapter" class="ap-input" placeholder="e.g., Definite Integration Properties Ex-2 Q14"></div>
-          <div class="ap-field d-full"><label class="ap-lbl">Describe Your Doubt / Theoretical Friction Block</label><textarea id="dDoubt" class="ap-input" rows="4" placeholder="Explain where you are getting stuck..." style="resize:vertical;"></textarea></div>
-          <div class="ap-field d-full"><label class="ap-lbl">Priority Level Badge</label><div class="d-btn-group"><button class="fbtn active" onclick="setDoubtPriority(this,'Normal')">Normal</button><button class="fbtn" onclick="setDoubtPriority(this,'High 🔥')">Urgent Focus 🔥</button></div></div>
+    <div class="s-header">
+      <div class="s-title-area">
+        <span class="s-tag">Topic Wise</span>
+        <h2 class="s-title">Test Series by Chapter</h2>
+      </div>
+    </div>
+
+    <div class="admin-panel" id="testAdminPanel" style="display:none;">
+      <div class="ap-title">Link New Test Series (Topic Wise)</div>
+      <div class="ap-grid">
+        <div class="ap-field">
+          <label class="ap-lbl">Test Title</label>
+          <input type="text" id="testTitle" class="ap-input" placeholder="e.g., Matrices & Determinants Test - 01">
         </div>
-        <button class="d-submit" onclick="submitAspirantDoubt()">Dispatch Doubt Package &rarr;</button>
+        <div class="ap-field">
+          <label class="ap-lbl">Chapter / Topic</label>
+          <select id="testChapter" class="ap-select"></select>
+        </div>
+        <div class="ap-field">
+          <label class="ap-lbl">Test Link (Google Drive / Form / PDF)</label>
+          <input type="url" id="testLink" class="ap-input" placeholder="https://drive.google.com/...">
+        </div>
       </div>
-      <div id="dSuccess" style="display:none; text-align:center; padding:32px 0;">
-        <div style="font-size:48px; margin-bottom:16px;">🚀</div>
-        <h3 style="font-family:var(--font-serif); font-size:24px; margin-bottom:8px;">Doubt Dispatched Successfully!</h3>
-        <p style="color:var(--muted); font-size:14px; max-width:400px; margin:0 auto 24px;">Your conceptual framework friction layout has been compiled. Redirecting you to draft the dispatch secure channel...</p>
+      <div class="ap-actions">
+        <button class="btn-p" style="padding:10px 24px; font-size:14px;" onclick="addTestSeriesAsset()">Link Test</button>
+        <span class="ap-msg" id="testApMsg"></span>
       </div>
+    </div>
+
+    <div class="lib-grid">
+      <div class="lib-sidebar">
+        <div class="filter-group" id="testChapterFilters" style="max-height:520px;overflow-y:auto;">
+          <span class="filter-lbl">Chapters</span>
+        </div>
+      </div>
+
+      <div class="lib-content" id="testSeriesContainer">
+        </div>
     </div>
   </div>
 </section>
@@ -358,17 +386,255 @@ const CONFIG = {
   contactEmail: "jiteshkumarjatav2020@gmail.com"
 };
 
+const CHAPTERS = [
+  "Application of Derivatives","Area Under Curves","Basic of Mathematics","Binomial Theorem",
+  "Circle","Complex Number","Continuity and Differentiability","Definite Integration",
+  "Determinants","Differential Equations","Differentiation","Ellipse","Functions","Hyperbola",
+  "Indefinite Integration","Inverse Trigonometric Functions","Limits",
+  "Limits, Continuity and Differentiability","Matrices","Parabola","Permutation Combination",
+  "Probability","Quadratic Equation","Sequences and Series","Sets and Relations","Statistics",
+  "Straight Lines","Three Dimensional Geometry","Trigonometric Equations",
+  "Trigonometric Ratios and Identities","Vector Algebra"
+];
+
 let resourceDatabaseIndex = [];
+let videoLibraryIndex = [];
+let testSeriesIndex = [];
 
 let activeCategoryFilter = "All";
 let activeChapterFilter = "All";
+let activeVideoChapterFilter = "All";
+let activeTestChapterFilter = "All";
 let isInstructorAuthenticated = false;
-let currentDoubtPriorityLevel = "Normal";
+
+function populateChapterControls(){
+  const resSelect = document.getElementById('resChapter');
+  const vidSelect = document.getElementById('vidChapter');
+  const testSelect = document.getElementById('testChapter');
+  CHAPTERS.forEach(ch => {
+    resSelect.insertAdjacentHTML('beforeend', `<option>${ch}</option>`);
+    vidSelect.insertAdjacentHTML('beforeend', `<option>${ch}</option>`);
+    testSelect.insertAdjacentHTML('beforeend', `<option>${ch}</option>`);
+  });
+
+  const resFilterBox = document.getElementById('resourceChapterFilters');
+  let resHtml = `<button class="fbtn active" data-chap="All" onclick="setChapterFilter(this,'All')">All Chapters</button>`;
+  CHAPTERS.forEach(ch => {
+    resHtml += `<button class="fbtn" data-chap="${ch}" onclick="setChapterFilter(this,'${ch.replace(/'/g,"\\'")}')">${ch}</button>`;
+  });
+  resFilterBox.insertAdjacentHTML('beforeend', resHtml);
+
+  const vidFilterBox = document.getElementById('videoChapterFilters');
+  let vidHtml = `<button class="fbtn active" data-vchap="All" onclick="setVideoChapterFilter(this,'All')">All Chapters <span class="fbtn-count" data-vcount="All">0</span></button>`;
+  CHAPTERS.forEach(ch => {
+    vidHtml += `<button class="fbtn" data-vchap="${ch}" onclick="setVideoChapterFilter(this,'${ch.replace(/'/g,"\\'")}')">${ch} <span class="fbtn-count" data-vcount="${ch}">0</span></button>`;
+  });
+  vidFilterBox.insertAdjacentHTML('beforeend', vidHtml);
+
+  const testFilterBox = document.getElementById('testChapterFilters');
+  let testHtml = `<button class="fbtn active" data-tchap="All" onclick="setTestChapterFilter(this,'All')">All Chapters <span class="fbtn-count" data-tcount="All">0</span></button>`;
+  CHAPTERS.forEach(ch => {
+    testHtml += `<button class="fbtn" data-tchap="${ch}" onclick="setTestChapterFilter(this,'${ch.replace(/'/g,"\\'")}')">${ch} <span class="fbtn-count" data-tcount="${ch}">0</span></button>`;
+  });
+  testFilterBox.insertAdjacentHTML('beforeend', testHtml);
+}
 
 window.addEventListener('DOMContentLoaded', () => {
+  populateChapterControls();
   renderResourceGridLibrary();
+  renderVideoLibraryGrid();
+  renderTestSeriesGrid();
   synchronizeYouTubeLiveFeed();
 });
+
+function extractYouTubeVideoId(url){
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=)([\w-]{11})/,
+    /(?:youtu\.be\/)([\w-]{11})/,
+    /(?:youtube\.com\/embed\/)([\w-]{11})/,
+    /(?:youtube\.com\/shorts\/)([\w-]{11})/
+  ];
+  for(const p of patterns){
+    const m = url.match(p);
+    if(m) return m[1];
+  }
+  return null;
+}
+
+function setVideoChapterFilter(btn, chap){
+  document.querySelectorAll('#videoChapterFilters .fbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeVideoChapterFilter = chap;
+  renderVideoLibraryGrid();
+}
+
+function renderVideoLibraryGrid(){
+  const count = (chap) => videoLibraryIndex.filter(v => v.chapter === chap).length;
+  document.querySelectorAll('#videoChapterFilters .fbtn-count').forEach(span => {
+    const key = span.getAttribute('data-vcount');
+    span.textContent = key === 'All' ? videoLibraryIndex.length : count(key);
+  });
+
+  const box = document.getElementById('videoLibraryContainer');
+  let dataset = videoLibraryIndex.filter(v => (activeVideoChapterFilter === "All" || v.chapter === activeVideoChapterFilter));
+
+  if(dataset.length === 0){
+    box.innerHTML = `<div class="empty-state">No videos linked yet for this chapter. ${isInstructorAuthenticated ? 'Link a video above.' : ''}</div>`;
+    return;
+  }
+
+  box.innerHTML = '';
+  dataset.slice().reverse().forEach(v => {
+    const c = document.createElement('div');
+    c.className = "res-card";
+    c.innerHTML = `
+      <div class="res-left">
+        <div class="res-icon">▶️</div>
+        <div class="res-details">
+          <div class="res-title" title="${v.title}">${v.title}</div>
+          <div class="res-meta">
+            <span class="res-tag">${v.chapter}</span>
+            <div class="res-dot"></div>
+            <span>${new Date(v.timestamp).toLocaleDateString('en-IN', {day:'numeric', month:'short'})}</span>
+          </div>
+        </div>
+      </div>
+      <div class="res-right">
+        <a href="${v.url}" target="_blank" class="btn-s" style="padding:8px 16px; font-size:13px; text-decoration:none;">Watch</a>
+        ${v.notesUrl ? `<a href="${v.notesUrl}" target="_blank" class="btn-s" style="padding:8px 16px; font-size:13px; text-decoration:none; color:var(--gold); border-color:rgba(212,175,55,0.3);">Notes</a>` : ''}
+        ${isInstructorAuthenticated ? `<button class="btn-s" style="padding:8px 12px; font-size:13px; color:#C0564A; border-color:rgba(192,86,74,0.2);" onclick="removeVideoAsset('${v.id}')">Delete</button>` : ''}
+      </div>
+    `;
+    box.appendChild(c);
+  });
+}
+
+function addVideoAsset(){
+  const title = document.getElementById('vidTitle').value.trim();
+  const chapter = document.getElementById('vidChapter').value;
+  const rawUrl = document.getElementById('vidLink').value.trim();
+  const rawNotesUrl = document.getElementById('vidNotesLink').value.trim();
+  const msg = document.getElementById('vidApMsg');
+
+  if(!title || !rawUrl){
+    msg.textContent = "Sub-topic naam aur video link dono zaroori hai.";
+    msg.className = "ap-msg err";
+    return;
+  }
+
+  const vid = extractYouTubeVideoId(rawUrl);
+  if(!vid){
+    msg.textContent = "Valid YouTube link daalo.";
+    msg.className = "ap-msg err";
+    return;
+  }
+
+  const cleanUrl = `https://www.youtube.com/watch?v=${vid}`;
+
+  videoLibraryIndex.push({
+    id: "video_" + Date.now(),
+    title, chapter, url: cleanUrl,
+    notesUrl: rawNotesUrl || null,
+    timestamp: new Date().toISOString()
+  });
+
+  msg.textContent = "Video topic wise link ho gaya.";
+  msg.className = "ap-msg ok";
+
+  document.getElementById('vidTitle').value = '';
+  document.getElementById('vidLink').value = '';
+  document.getElementById('vidNotesLink').value = '';
+
+  renderVideoLibraryGrid();
+  setTimeout(() => { msg.textContent = ''; }, 3000);
+}
+
+function removeVideoAsset(id){
+  if(!confirm("Is video link ko list se hatana hai?")) return;
+  videoLibraryIndex = videoLibraryIndex.filter(v => v.id !== id);
+  renderVideoLibraryGrid();
+}
+
+function setTestChapterFilter(btn, chap){
+  document.querySelectorAll('#testChapterFilters .fbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeTestChapterFilter = chap;
+  renderTestSeriesGrid();
+}
+
+function renderTestSeriesGrid(){
+  const count = (chap) => testSeriesIndex.filter(t => t.chapter === chap).length;
+  document.querySelectorAll('#testChapterFilters .fbtn-count').forEach(span => {
+    const key = span.getAttribute('data-tcount');
+    span.textContent = key === 'All' ? testSeriesIndex.length : count(key);
+  });
+
+  const box = document.getElementById('testSeriesContainer');
+  let dataset = testSeriesIndex.filter(t => (activeTestChapterFilter === "All" || t.chapter === activeTestChapterFilter));
+
+  if(dataset.length === 0){
+    box.innerHTML = `<div class="empty-state">No test series linked yet for this chapter. ${isInstructorAuthenticated ? 'Link a test above.' : ''}</div>`;
+    return;
+  }
+
+  box.innerHTML = '';
+  dataset.slice().reverse().forEach(t => {
+    const c = document.createElement('div');
+    c.className = "res-card";
+    c.innerHTML = `
+      <div class="res-left">
+        <div class="res-icon">🏆</div>
+        <div class="res-details">
+          <div class="res-title" title="${t.title}">${t.title}</div>
+          <div class="res-meta">
+            <span class="res-tag">${t.chapter}</span>
+            <div class="res-dot"></div>
+            <span>${new Date(t.timestamp).toLocaleDateString('en-IN', {day:'numeric', month:'short'})}</span>
+          </div>
+        </div>
+      </div>
+      <div class="res-right">
+        <a href="${t.url}" target="_blank" class="btn-s" style="padding:8px 16px; font-size:13px; text-decoration:none;">Open Test</a>
+        ${isInstructorAuthenticated ? `<button class="btn-s" style="padding:8px 12px; font-size:13px; color:#C0564A; border-color:rgba(192,86,74,0.2);" onclick="removeTestSeriesAsset('${t.id}')">Delete</button>` : ''}
+      </div>
+    `;
+    box.appendChild(c);
+  });
+}
+
+function addTestSeriesAsset(){
+  const title = document.getElementById('testTitle').value.trim();
+  const chapter = document.getElementById('testChapter').value;
+  const url = document.getElementById('testLink').value.trim();
+  const msg = document.getElementById('testApMsg');
+
+  if(!title || !url){
+    msg.textContent = "Test title aur link dono zaroori hai.";
+    msg.className = "ap-msg err";
+    return;
+  }
+
+  testSeriesIndex.push({
+    id: "test_" + Date.now(),
+    title, chapter, url,
+    timestamp: new Date().toISOString()
+  });
+
+  msg.textContent = "Test series topic wise link ho gaya.";
+  msg.className = "ap-msg ok";
+
+  document.getElementById('testTitle').value = '';
+  document.getElementById('testLink').value = '';
+
+  renderTestSeriesGrid();
+  setTimeout(() => { msg.textContent = ''; }, 3000);
+}
+
+function removeTestSeriesAsset(id){
+  if(!confirm("Is test series link ko list se hatana hai?")) return;
+  testSeriesIndex = testSeriesIndex.filter(t => t.id !== id);
+  renderTestSeriesGrid();
+}
 
 function toggleTheme(){
   const b = document.body;
@@ -384,7 +650,11 @@ function handleAdminToggle(){
     document.getElementById('adminToggle').classList.remove('active');
     document.getElementById('adminToggle').textContent = "🔒 Admin";
     document.getElementById('adminPanel').style.display = "none";
+    document.getElementById('videoAdminPanel').style.display = "none";
+    document.getElementById('testAdminPanel').style.display = "none";
     renderResourceGridLibrary();
+    renderVideoLibraryGrid();
+    renderTestSeriesGrid();
   } else {
     openAdminAuthenticationModal();
   }
@@ -408,8 +678,12 @@ function verifyAdminCredentialToken(){
     document.getElementById('adminToggle').classList.add('active');
     document.getElementById('adminToggle').textContent = "🔓 Admin Active";
     document.getElementById('adminPanel').style.display = "block";
+    document.getElementById('videoAdminPanel').style.display = "block";
+    document.getElementById('testAdminPanel').style.display = "block";
     closeAdminAuthenticationModal();
     renderResourceGridLibrary();
+    renderVideoLibraryGrid();
+    renderTestSeriesGrid();
     document.getElementById('adminPanel').scrollIntoView({behavior:'smooth', block:'center'});
   } else {
     document.getElementById('modalErr').style.display = 'block';
@@ -424,7 +698,7 @@ function setCategoryFilter(btn, cat){
 }
 
 function setChapterFilter(btn, chap){
-  document.querySelectorAll('#library .filter-group:nth-child(2) .fbtn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#resourceChapterFilters .fbtn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   activeChapterFilter = chap;
   renderResourceGridLibrary();
@@ -526,44 +800,6 @@ function removeResourceAsset(id) {
   if(!confirm("Purge selected asset pointer from local system matrix list?")) return;
   resourceDatabaseIndex = resourceDatabaseIndex.filter(r => r.id !== id);
   renderResourceGridLibrary();
-}
-
-function submitLeaderboardScore() {
-  const name = document.getElementById('lbName').value.trim();
-  const score = document.getElementById('lbScore').value.trim();
-  if(!name || !score) { alert('Aspirant parameters mismatch!'); return; }
-  
-  const table = document.getElementById('lbTable').querySelector('tbody');
-  const r = document.createElement('tr');
-  r.innerHTML = `<td class="lb-rank-cell">--</td><td class="lb-name-cell">${name}</td><td class="lb-tests">${score}/300</td><td><span class="lb-badge-cell">Verified ⭐</span></td></tr>`;
-  table.appendChild(r);
-  
-  document.getElementById('lbName').value = '';
-  document.getElementById('lbScore').value = '';
-  alert(`Score cataloged for review layout, ${name}!`);
-}
-
-function setDoubtPriority(btn, pr) {
-  currentDoubtPriorityLevel = pr;
-  document.querySelectorAll('#doubt .d-btn-group .fbtn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
-
-function submitAspirantDoubt() {
-  const name = document.getElementById('dName').value.trim();
-  const doubt = document.getElementById('dDoubt').value.trim();
-  if(!name || !doubt) { alert('Identity data packets cannot remain unfilled.'); return; }
-
-  document.getElementById('dFormBlock').style.display = 'none';
-  document.getElementById('dSuccess').style.display = 'block';
-
-  const topic = document.getElementById('dTopic').value;
-  const contact = document.getElementById('dContact').value;
-  const chapter = document.getElementById('dChapter').value;
-
-  setTimeout(() => {
-    window.location.href = `mailto:${CONFIG.contactEmail}?subject=TMS Doubt Package [${currentDoubtPriorityLevel}]&body=Aspirant Name: ${name}%0AContact: ${contact}%0ADomain Area: ${topic}%0AContext Chapter: ${chapter}%0A%0ATheoretical Block friction Details:%0A${encodeURIComponent(doubt)}`;
-  }, 1200);
 }
 
 async function synchronizeYouTubeLiveFeed() {
