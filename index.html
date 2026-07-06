@@ -37,7 +37,7 @@ nav a:hover{color:var(--text);}
 .btn-p:hover{background:var(--gold-light);transform:translateY(-1px);}
 .btn-s{background:none;border:1px solid var(--border);color:var(--text);text-decoration:none;padding:14px 28px;border-radius:24px;font-weight:500;font-size:15px;transition:background 0.2s;}
 .btn-s:hover{background:var(--bg2);}
-.h-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;background:var(--bg2);padding:32px;border-radius:16px;border:1px solid var(--border);}
+.h-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;background:var(--bg2);padding:32px;border-radius:16px;border:1px solid var(--border);}
 .stat-item{display:flex;flex-direction:column;gap:4px;}
 .stat-val{font-family:var(--font-serif);font-size:36px;font-weight:700;color:var(--text);}
 .stat-lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
@@ -247,6 +247,7 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
       <div class="h-stats">
         <div class="stat-item"><span class="stat-val" id="statNotes">0</span><span class="stat-lbl">Notes</span></div>
         <div class="stat-item"><span class="stat-val" id="statPyqs">0</span><span class="stat-lbl">PYQs</span></div>
+        <div class="stat-item"><span class="stat-val" id="statVideos">0</span><span class="stat-lbl">Videos</span></div>
         <div class="stat-item"><span class="stat-val" id="statTests">0</span><span class="stat-lbl">Tests</span></div>
       </div>
     </div>
@@ -725,12 +726,12 @@ const TMS_STORAGE_KEY = "tms_site_data_v1";
       stuck on one device's localStorage.
 */
 const firebaseConfig = {
-  apiKey: "AIzaSyA9cE4ctqdgzd-CI-aHZFsmaz8pDujhEeQ",
-  authDomain: "the-mathematical-scientist.firebaseapp.com",
-  projectId: "the-mathematical-scientist",
-  storageBucket: "the-mathematical-scientist.firebasestorage.app",
-  messagingSenderId: "1067104902834",
-  appId: "1:1067104902834:web:08d6a45d346d0e1f2a33ab"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 let db = null;
@@ -892,6 +893,7 @@ function setVideoChapterFilter(btn, chap){
 }
 
 function renderVideoLibraryGrid(){
+  updateHeroStats();
   const count = (chap) => videoLibraryIndex.filter(v => v.chapter === chap).length;
   document.querySelectorAll('#videoChapterFilters .fbtn-count').forEach(span => {
     const key = span.getAttribute('data-vcount');
@@ -988,6 +990,7 @@ function setTestChapterFilter(btn, chap){
 }
 
 function renderTestSeriesGrid(){
+  updateHeroStats();
   const count = (chap) => testSeriesIndex.filter(t => t.chapter === chap).length;
   document.querySelectorAll('#testChapterFilters .fbtn-count').forEach(span => {
     const key = span.getAttribute('data-tcount');
@@ -1677,18 +1680,24 @@ function setChapterFilter(btn, chap){
   renderResourceGridLibrary();
 }
 
+function updateHeroStats() {
+  const notesCount = resourceDatabaseIndex.filter(r => r.category === 'Notes').length;
+  const pyqCount = resourceDatabaseIndex.filter(r => r.category === 'PYQ').length;
+  document.getElementById('statNotes').textContent = notesCount;
+  document.getElementById('statPyqs').textContent = pyqCount;
+  document.getElementById('statVideos').textContent = videoLibraryIndex.length;
+  document.getElementById('statTests').textContent = testSeriesIndex.length;
+}
+
 function calculateDynamicStatsCounter() {
   const count = (cat) => resourceDatabaseIndex.filter(r => r.category === cat).length;
-  
-  document.getElementById('statNotes').textContent = count('Notes');
-  document.getElementById('statPyqs').textContent = count('PYQ');
-  document.getElementById('statTests').textContent = count('Test Series');
 
   document.getElementById('c-all').textContent = resourceDatabaseIndex.length;
   document.getElementById('c-notes').textContent = count('Notes');
   document.getElementById('c-pyq').textContent = count('PYQ');
   document.getElementById('c-test').textContent = count('Test Series');
   document.getElementById('c-book').textContent = count('Rankers Book');
+  updateHeroStats();
 }
 
 function renderResourceGridLibrary() {
