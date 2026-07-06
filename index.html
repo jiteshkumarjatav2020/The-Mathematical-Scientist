@@ -114,6 +114,83 @@ nav a:hover{color:var(--text);}
 .modal-icon{font-size:32px;margin-bottom:16px;color:var(--gold);}
 .modal-title{font-family:var(--font-serif);font-size:20px;font-weight:700;margin-bottom:8px;}
 .modal-desc{font-size:13px;color:var(--muted);margin-bottom:20px;}
+
+.tr-overlay{display:none;position:fixed;inset:0;background:var(--bg);z-index:300;flex-direction:column;}
+.tr-overlay.open{display:flex;}
+.tr-header{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border);background:var(--bg2);gap:16px;flex-wrap:wrap;}
+.tr-title{font-family:var(--font-serif);font-weight:700;font-size:16px;}
+.tr-timer{font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--gold);background:rgba(212,175,55,0.1);padding:6px 16px;border-radius:8px;border:1px solid rgba(212,175,55,0.2);}
+.tr-header-actions{display:flex;gap:10px;align-items:center;}
+.tr-body{flex:1;display:flex;overflow:hidden;}
+.tr-qarea{flex:1;padding:32px;overflow-y:auto;max-width:760px;margin:0 auto;width:100%;}
+.tr-qnum{font-family:var(--font-mono);color:var(--gold);font-size:13px;font-weight:600;margin-bottom:12px;}
+.tr-qtext{font-size:18px;font-weight:500;line-height:1.5;margin-bottom:28px;}
+.tr-options{display:flex;flex-direction:column;gap:12px;}
+.tr-option{display:flex;align-items:center;gap:14px;padding:16px 18px;border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.15s;background:var(--card);}
+.tr-option:hover{border-color:rgba(212,175,55,0.4);}
+.tr-option.selected{border-color:var(--gold);background:rgba(212,175,55,0.08);}
+.tr-opt-letter{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
+.tr-option.selected .tr-opt-letter{background:var(--gold);border-color:var(--gold);color:#0A0A0A;}
+.tr-footer{display:flex;justify-content:space-between;align-items:center;padding:16px 32px;border-top:1px solid var(--border);background:var(--bg2);flex-wrap:wrap;gap:12px;}
+.tr-footer-left,.tr-footer-right{display:flex;gap:10px;flex-wrap:wrap;}
+.tr-sidebar{width:280px;border-left:1px solid var(--border);background:var(--bg2);padding:20px;overflow-y:auto;flex-shrink:0;}
+.tr-legend{display:flex;flex-direction:column;gap:8px;font-size:11px;color:var(--muted);margin-bottom:20px;}
+.tr-legend-item{display:flex;align-items:center;gap:8px;}
+.tr-legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+.tr-palette{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.tr-pbtn{aspect-ratio:1;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.tr-pbtn.not-answered{background:#C0564A;border-color:#C0564A;color:#fff;}
+.tr-pbtn.answered{background:#4A9C7A;border-color:#4A9C7A;color:#fff;}
+.tr-pbtn.marked{background:#8B5CF6;border-color:#8B5CF6;color:#fff;}
+.tr-pbtn.answered-marked{background:#8B5CF6;border-color:#4A9C7A;color:#fff;box-shadow:inset 0 0 0 2px #4A9C7A;}
+.tr-pbtn.current{outline:2px solid var(--gold);outline-offset:2px;}
+.calc-panel{display:none;position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:0;width:400px;z-index:350;box-shadow:0 12px 40px rgba(0,0,0,0.4);overflow:hidden;}
+.calc-panel.open{display:block;}
+.calc-titlebar{display:flex;align-items:center;justify-content:space-between;background:var(--bg4);padding:12px 16px;border-bottom:1px solid var(--border);}
+.calc-title{font-family:var(--font-serif);font-weight:700;font-size:14px;color:var(--text);display:flex;align-items:center;gap:8px;}
+.calc-title .brand-dot{width:5px;height:5px;background:var(--gold);border-radius:50%;}
+.calc-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:2px 6px;border-radius:4px;}
+.calc-close:hover{background:var(--bg2);color:var(--text);}
+.calc-body{padding:14px 16px 16px;}
+.calc-expr{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:var(--font-mono);font-size:12px;color:var(--muted);text-align:right;min-height:16px;margin-bottom:6px;word-break:break-all;}
+.calc-display{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:var(--font-mono);font-size:26px;font-weight:600;text-align:right;margin-bottom:10px;min-height:32px;word-break:break-all;color:var(--text);}
+.calc-modebar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;}
+.calc-angle{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--muted);}
+.calc-angle label{display:flex;align-items:center;gap:4px;cursor:pointer;}
+.calc-angle input{accent-color:var(--gold);cursor:pointer;}
+.calc-mem{display:flex;gap:4px;}
+.calc-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;}
+.calc-btn{background:var(--bg4);border:1px solid var(--border);color:var(--text);padding:9px 0;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.calc-btn:hover{background:var(--bg2);}
+.calc-btn.fn{font-size:11px;color:var(--muted);}
+.calc-btn.fn:hover{color:var(--text);}
+.calc-btn.op{color:var(--gold);}
+.calc-btn.mem{font-size:11px;color:var(--gold);}
+.calc-btn.danger{background:rgba(192,86,74,0.12);color:#C0564A;border-color:rgba(192,86,74,0.25);}
+.calc-btn.danger:hover{background:rgba(192,86,74,0.22);}
+.calc-btn.eq{background:var(--gold);color:#0A0A0A;grid-row:span 2;}
+.calc-btn.wide{grid-column:span 2;}
+@media(max-width:480px){
+  .calc-panel{width:calc(100vw - 32px);right:16px;bottom:16px;}
+  .calc-grid{gap:4px;}
+  .calc-btn{font-size:11px;padding:8px 0;}
+}
+.tr-result{max-width:640px;margin:40px auto;padding:0 24px;}
+.result-hero{text-align:center;margin-bottom:32px;}
+.result-score{font-family:var(--font-serif);font-size:56px;font-weight:900;color:var(--gold);}
+.result-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px;}
+.result-stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 12px;text-align:center;}
+.result-stat-val{font-family:var(--font-serif);font-size:24px;font-weight:700;}
+.result-stat-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;}
+.review-q{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;}
+.review-opt{padding:10px 14px;border-radius:6px;margin-top:6px;font-size:13px;border:1px solid var(--border);}
+.review-opt.correct-ans{border-color:#4A9C7A;background:rgba(74,156,122,0.1);}
+.review-opt.wrong-ans{border-color:#C0564A;background:rgba(192,86,74,0.1);}
+@media(max-width:768px){
+  .tr-sidebar{display:none;}
+  .tr-body{flex-direction:column;}
+  .result-stats-grid{grid-template-columns:repeat(2,1fr);}
+}
 footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);color:var(--muted);font-size:14px;}
 .f-flex{display:flex;justify-content:between;align-items:center;flex-wrap:wrap;gap:24px;}
 .f-left{display:flex;flex-direction:column;gap:8px;}
@@ -315,7 +392,7 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
     </div>
 
     <div class="admin-panel" id="testAdminPanel" style="display:none;">
-      <div class="ap-title">Link New Test Series (Topic Wise)</div>
+      <div class="ap-title">Create New Test (Topic Wise)</div>
       <div class="ap-grid">
         <div class="ap-field">
           <label class="ap-lbl">Test Title</label>
@@ -326,14 +403,100 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
           <select id="testChapter" class="ap-select"></select>
         </div>
         <div class="ap-field">
-          <label class="ap-lbl">Test Link (Google Drive / Form / PDF)</label>
-          <input type="url" id="testLink" class="ap-input" placeholder="https://drive.google.com/...">
+          <label class="ap-lbl">Duration (minutes)</label>
+          <input type="number" id="testDuration" class="ap-input" placeholder="30" value="30" min="1">
+        </div>
+      </div>
+      <div class="ap-grid">
+        <div class="ap-field">
+          <label class="ap-lbl">Marks for Correct Answer</label>
+          <input type="number" id="testMarksCorrect" class="ap-input" placeholder="4" value="4" step="0.5">
+        </div>
+        <div class="ap-field">
+          <label class="ap-lbl">Negative Marks for Wrong Answer</label>
+          <input type="number" id="testMarksWrong" class="ap-input" placeholder="1" value="1" step="0.5">
+        </div>
+        <div class="ap-field">
+          <label class="ap-lbl">External Link (optional, Drive/PDF/Form)</label>
+          <input type="url" id="testLink" class="ap-input" placeholder="https://drive.google.com/... (optional)">
         </div>
       </div>
       <div class="ap-actions">
-        <button class="btn-p" style="padding:10px 24px; font-size:14px;" onclick="addTestSeriesAsset()">Link Test</button>
+        <button class="btn-p" style="padding:10px 24px; font-size:14px;" onclick="addTestSeriesAsset()">Create Test</button>
         <span class="ap-msg" id="testApMsg"></span>
       </div>
+
+      <div style="border-top:1px solid var(--border); margin:24px 0 16px;"></div>
+
+      <div class="ap-title">Add Question to a Test</div>
+      <div class="ap-grid" style="grid-template-columns: 1fr 1fr; margin-bottom:16px;">
+        <div class="ap-field">
+          <label class="ap-lbl">Select Test</label>
+          <select id="qTestSelect" class="ap-select" onchange="updateQuestionCountDisplay()"></select>
+        </div>
+        <div class="ap-field">
+          <label class="ap-lbl">Question Type</label>
+          <select id="qType" class="ap-select" onchange="onQuestionTypeChange()">
+            <option value="MCQ">MCQ — Single Correct</option>
+            <option value="MSQ">MSQ — Multiple Correct</option>
+            <option value="NAT">NAT — Numerical Answer</option>
+          </select>
+        </div>
+      </div>
+      <div class="ap-grid" style="grid-template-columns: 1fr; margin-bottom:16px;">
+        <div class="ap-field">
+          <label class="ap-lbl">Question Text</label>
+          <textarea id="qText" class="ap-input" rows="2" placeholder="Enter the question..." style="resize:vertical;"></textarea>
+        </div>
+      </div>
+
+      <div id="qOptionsWrapper">
+        <div class="ap-grid">
+          <div class="ap-field"><label class="ap-lbl">Option A</label><input type="text" id="qOptA" class="ap-input"></div>
+          <div class="ap-field"><label class="ap-lbl">Option B</label><input type="text" id="qOptB" class="ap-input"></div>
+          <div class="ap-field"><label class="ap-lbl">Option C</label><input type="text" id="qOptC" class="ap-input"></div>
+        </div>
+        <div class="ap-grid">
+          <div class="ap-field"><label class="ap-lbl">Option D</label><input type="text" id="qOptD" class="ap-input"></div>
+          <div class="ap-field" id="qMcqCorrectField">
+            <label class="ap-lbl">Correct Option</label>
+            <select id="qCorrect" class="ap-select">
+              <option value="0">Option A</option>
+              <option value="1">Option B</option>
+              <option value="2">Option C</option>
+              <option value="3">Option D</option>
+            </select>
+          </div>
+          <div class="ap-field" id="qMsqCorrectField" style="display:none;">
+            <label class="ap-lbl">Correct Options (select all that apply)</label>
+            <div style="display:flex;gap:14px;flex-wrap:wrap;padding:10px 0;">
+              <label style="display:flex;align-items:center;gap:6px;font-size:13px;"><input type="checkbox" id="qCorrectA"> A</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:13px;"><input type="checkbox" id="qCorrectB"> B</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:13px;"><input type="checkbox" id="qCorrectC"> C</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:13px;"><input type="checkbox" id="qCorrectD"> D</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="qNatWrapper" style="display:none;">
+        <div class="ap-grid">
+          <div class="ap-field">
+            <label class="ap-lbl">Correct Numerical Answer</label>
+            <input type="number" id="qNatAnswer" class="ap-input" step="any" placeholder="e.g., 42">
+          </div>
+          <div class="ap-field">
+            <label class="ap-lbl">Tolerance (+/-, optional)</label>
+            <input type="number" id="qNatTolerance" class="ap-input" step="any" placeholder="0" value="0">
+          </div>
+        </div>
+      </div>
+
+      <div class="ap-actions">
+        <button class="btn-p" style="padding:10px 24px; font-size:14px;" onclick="addQuestionToTest()">Add Question</button>
+        <span class="ap-msg" id="qApMsg"></span>
+      </div>
+      <div id="qCountDisplay" style="font-size:12px;color:var(--muted);margin-top:8px;"></div>
     </div>
 
     <div class="lib-grid">
@@ -377,6 +540,139 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
   </div>
 </footer>
 
+<div class="tr-overlay" id="testRunnerOverlay">
+  <div class="tr-header">
+    <div class="tr-title" id="trTitle">Test Title</div>
+    <div class="tr-timer" id="trTimer">00:00</div>
+    <div class="tr-header-actions">
+      <button class="btn-s" style="padding:8px 16px;font-size:13px;" onclick="toggleCalculator()">🧮 Calculator</button>
+      <button class="btn-p" style="padding:8px 16px;font-size:13px;" onclick="confirmSubmitTest()">Submit Test</button>
+    </div>
+  </div>
+  <div class="tr-body" id="trBody">
+    <div class="tr-qarea" id="trQArea"></div>
+    <div class="tr-sidebar">
+      <div class="tr-legend">
+        <div class="tr-legend-item"><span class="tr-legend-dot" style="background:#C0564A;"></span>Not Answered</div>
+        <div class="tr-legend-item"><span class="tr-legend-dot" style="background:#4A9C7A;"></span>Answered</div>
+        <div class="tr-legend-item"><span class="tr-legend-dot" style="background:#8B5CF6;"></span>Marked for Review</div>
+        <div class="tr-legend-item"><span class="tr-legend-dot" style="background:var(--bg4);border:1px solid var(--border);"></span>Not Visited</div>
+      </div>
+      <div class="tr-palette" id="trPalette"></div>
+    </div>
+  </div>
+  <div class="tr-footer">
+    <div class="tr-footer-left">
+      <button class="btn-s" style="padding:10px 18px;font-size:13px;" onclick="trPrevQuestion()">◀ Previous</button>
+      <button class="btn-s" style="padding:10px 18px;font-size:13px;" onclick="trClearResponse()">Clear Response</button>
+    </div>
+    <div class="tr-footer-right">
+      <button class="btn-s" style="padding:10px 18px;font-size:13px;" onclick="trMarkForReviewNext()">Mark for Review &amp; Next</button>
+      <button class="btn-p" style="padding:10px 18px;font-size:13px;" onclick="trSaveAndNext()">Save &amp; Next ▶</button>
+    </div>
+  </div>
+</div>
+
+<div class="tr-overlay" id="testResultOverlay">
+  <div class="tr-header">
+    <div class="tr-title">Test Result</div>
+    <div class="tr-header-actions">
+      <button class="btn-s" style="padding:8px 16px;font-size:13px;" onclick="closeTestResult()">Close</button>
+    </div>
+  </div>
+  <div class="tr-qarea" style="max-width:900px;overflow-y:auto;flex:1;">
+    <div class="tr-result" id="trResultContent"></div>
+  </div>
+</div>
+
+<div class="calc-panel" id="calcPanel">
+  <div class="calc-titlebar">
+    <div class="calc-title"><span class="brand-dot"></span>Scientific Calculator</div>
+    <button class="calc-close" onclick="toggleCalculator()">✕</button>
+  </div>
+  <div class="calc-body">
+    <div class="calc-expr" id="calcExprLine">&nbsp;</div>
+    <div class="calc-display" id="calcDisplay">0</div>
+    <div class="calc-modebar">
+      <div class="calc-angle">
+        <label><input type="radio" name="calcAngle" value="deg" checked onchange="calcSetAngleMode('deg')">Deg</label>
+        <label><input type="radio" name="calcAngle" value="rad" onchange="calcSetAngleMode('rad')">Rad</label>
+      </div>
+      <div class="calc-mem">
+        <button class="calc-btn mem" onclick="calcMC()">MC</button>
+        <button class="calc-btn mem" onclick="calcMR()">MR</button>
+        <button class="calc-btn mem" onclick="calcMS()">MS</button>
+        <button class="calc-btn mem" onclick="calcMPlus()">M+</button>
+        <button class="calc-btn mem" onclick="calcMMinus()">M-</button>
+      </div>
+    </div>
+    <div class="calc-grid">
+      <button class="calc-btn fn" onclick="calcUnary('sinh')">sinh</button>
+      <button class="calc-btn fn" onclick="calcUnary('cosh')">cosh</button>
+      <button class="calc-btn fn" onclick="calcUnary('tanh')">tanh</button>
+      <button class="calc-btn danger" onclick="calcBackspace()">⌫</button>
+
+      <button class="calc-btn fn" onclick="calcUnary('asinh')">sinh⁻¹</button>
+      <button class="calc-btn fn" onclick="calcUnary('acosh')">cosh⁻¹</button>
+      <button class="calc-btn fn" onclick="calcUnary('atanh')">tanh⁻¹</button>
+      <button class="calc-btn fn" onclick="calcUnary('log2')">log₂x</button>
+      <button class="calc-btn fn" onclick="calcUnary('ln')">ln</button>
+      <button class="calc-btn fn" onclick="calcUnary('log')">log</button>
+
+      <button class="calc-btn fn" onclick="calcInsertConst('pi')">π</button>
+      <button class="calc-btn fn" onclick="calcInsertConst('e')">e</button>
+      <button class="calc-btn fn" onclick="calcUnary('fact')">n!</button>
+      <button class="calc-btn fn" onclick="calcSetOperator('logyx')">log_y x</button>
+      <button class="calc-btn fn" onclick="calcUnary('exp')">eˣ</button>
+      <button class="calc-btn fn" onclick="calcUnary('pow10')">10ˣ</button>
+
+      <button class="calc-btn fn" onclick="calcUnary('sin')">sin</button>
+      <button class="calc-btn fn" onclick="calcUnary('cos')">cos</button>
+      <button class="calc-btn fn" onclick="calcUnary('tan')">tan</button>
+      <button class="calc-btn fn" onclick="calcSetOperator('pow')">xʸ</button>
+      <button class="calc-btn fn" onclick="calcUnary('cube')">x³</button>
+      <button class="calc-btn fn" onclick="calcUnary('sq')">x²</button>
+
+      <button class="calc-btn fn" onclick="calcUnary('asin')">sin⁻¹</button>
+      <button class="calc-btn fn" onclick="calcUnary('acos')">cos⁻¹</button>
+      <button class="calc-btn fn" onclick="calcUnary('atan')">tan⁻¹</button>
+      <button class="calc-btn fn" onclick="calcUnary('sqrt')">√x</button>
+      <button class="calc-btn fn" onclick="calcUnary('cbrt')">³√x</button>
+      <button class="calc-btn fn" onclick="calcUnary('abs')">|x|</button>
+
+      <button class="calc-btn danger" onclick="calcClearAll()">C</button>
+      <button class="calc-btn" onclick="calcUnary('negate')">+/-</button>
+      <button class="calc-btn" onclick="calcSetOperator('mod')">mod</button>
+      <button class="calc-btn" onclick="calcDigit('7')">7</button>
+      <button class="calc-btn" onclick="calcDigit('8')">8</button>
+      <button class="calc-btn" onclick="calcDigit('9')">9</button>
+
+      <button class="calc-btn op" onclick="calcSetOperator('/')">÷</button>
+      <button class="calc-btn" onclick="calcUnary('percent')">%</button>
+      <button class="calc-btn" onclick="calcUnary('recip')">1/x</button>
+      <button class="calc-btn" onclick="calcDigit('4')">4</button>
+      <button class="calc-btn" onclick="calcDigit('5')">5</button>
+      <button class="calc-btn" onclick="calcDigit('6')">6</button>
+
+      <button class="calc-btn op" onclick="calcSetOperator('*')">×</button>
+      <button class="calc-btn" onclick="calcSetOperator('yroot')">ʸ√x</button>
+      <button class="calc-btn" onclick="calcDigit('1')">1</button>
+      <button class="calc-btn" onclick="calcDigit('2')">2</button>
+      <button class="calc-btn" onclick="calcDigit('3')">3</button>
+      <button class="calc-btn op" onclick="calcSetOperator('-')">−</button>
+
+      <button class="calc-btn wide" onclick="calcDigit('0')">0</button>
+      <button class="calc-btn" onclick="calcDigit('.')">.</button>
+      <button class="calc-btn op" onclick="calcSetOperator('+')">+</button>
+      <button class="calc-btn eq" onclick="calcEquals()">=</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase (Firestore Database) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 <script>
 /* CONFIG MANAGEMENT BLOCK */
 const CONFIG = {
@@ -401,6 +697,131 @@ let resourceDatabaseIndex = [];
 let videoLibraryIndex = [];
 let testSeriesIndex = [];
 
+const TMS_STORAGE_KEY = "tms_site_data_v1";
+
+/* ===== FIREBASE / FIRESTORE SETUP =====
+   Setup steps (one-time, free):
+   1. Go to https://console.firebase.google.com -> "Add project" (free Spark plan is enough).
+   2. In the project: Build -> Firestore Database -> Create database -> Start in "test mode"
+      for now (you can lock it down later with the rules shown below).
+   3. Project settings (gear icon, top-left) -> General tab -> "Your apps" -> Add app -> Web (</>)
+      -> copy the firebaseConfig object it gives you and paste it below, replacing the placeholder.
+   4. Recommended Firestore Rules (Firestore Database -> Rules tab):
+        rules_version = '2';
+        service cloud.firestore {
+          match /databases/{database}/documents {
+            match /tms/siteData {
+              allow read: if true;
+              allow write: if true;
+              // NOTE: this allows anyone to write. Since this site only has a
+              // client-side PIN (not real auth), true write-protection needs
+              // Firebase Authentication. Good enough for now since the PIN
+              // already gates the admin UI that triggers writes.
+            }
+          }
+        }
+   5. Save this file, re-upload/redeploy — all data (resources, videos, tests,
+      questions) will now sync live across every device/browser instead of being
+      stuck on one device's localStorage.
+*/
+const firebaseConfig = {
+  apiKey: "AIzaSyA9cE4ctqdgzd-CI-aHZFsmaz8pDujhEeQ",
+  authDomain: "the-mathematical-scientist.firebaseapp.com",
+  projectId: "the-mathematical-scientist",
+  storageBucket: "the-mathematical-scientist.firebasestorage.app",
+  messagingSenderId: "1067104902834",
+  appId: "1:1067104902834:web:08d6a45d346d0e1f2a33ab"
+};
+
+let db = null;
+let firestoreReady = false;
+let firestoreUnsubscribe = null;
+
+function tmsDocRef(){
+  return db.collection('tms').doc('siteData');
+}
+
+function initFirestore(){
+  try {
+    if(firebaseConfig.apiKey === "YOUR_API_KEY"){
+      console.warn("[TMS] Firebase not configured yet — running on local-only storage. Fill in firebaseConfig to enable cross-device sync.");
+      return false;
+    }
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    return true;
+  } catch(e){
+    console.error("[TMS] Firebase init failed, falling back to local storage:", e);
+    return false;
+  }
+}
+
+function saveAllData(){
+  try {
+    localStorage.setItem(TMS_STORAGE_KEY, JSON.stringify({
+      resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex
+    }));
+  } catch(e){
+    console.error("Local save failed:", e);
+  }
+  if(firestoreReady){
+    tmsDocRef().set({
+      resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(e => console.error("[TMS] Cloud save failed:", e));
+  }
+}
+
+function loadLocalCache(){
+  try {
+    const raw = localStorage.getItem(TMS_STORAGE_KEY);
+    if(!raw) return;
+    const parsed = JSON.parse(raw);
+    resourceDatabaseIndex = parsed.resourceDatabaseIndex || [];
+    videoLibraryIndex = parsed.videoLibraryIndex || [];
+    testSeriesIndex = parsed.testSeriesIndex || [];
+    testSeriesIndex.forEach(t => { if(!t.questions) t.questions = []; });
+  } catch(e){
+    console.error("Local cache load failed:", e);
+  }
+}
+
+function refreshAllDataViews(){
+  renderResourceGridLibrary();
+  renderVideoLibraryGrid();
+  renderTestSeriesGrid();
+  populateTestSelectorForQuestions();
+}
+
+function initCloudSync(){
+  loadLocalCache();
+  refreshAllDataViews();
+
+  firestoreReady = initFirestore();
+  if(!firestoreReady) return;
+
+  firestoreUnsubscribe = tmsDocRef().onSnapshot((doc) => {
+    if(doc.exists){
+      const data = doc.data();
+      resourceDatabaseIndex = data.resourceDatabaseIndex || [];
+      videoLibraryIndex = data.videoLibraryIndex || [];
+      testSeriesIndex = data.testSeriesIndex || [];
+      testSeriesIndex.forEach(t => { if(!t.questions) t.questions = []; });
+      try {
+        localStorage.setItem(TMS_STORAGE_KEY, JSON.stringify({
+          resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex
+        }));
+      } catch(e){}
+      refreshAllDataViews();
+    } else {
+      // First run ever — no cloud doc exists yet, push whatever we have locally.
+      saveAllData();
+    }
+  }, (err) => {
+    console.error("[TMS] Cloud sync error:", err);
+  });
+}
+
 let activeCategoryFilter = "All";
 let activeChapterFilter = "All";
 let activeVideoChapterFilter = "All";
@@ -411,6 +832,9 @@ function populateChapterControls(){
   const resSelect = document.getElementById('resChapter');
   const vidSelect = document.getElementById('vidChapter');
   const testSelect = document.getElementById('testChapter');
+
+  testSelect.insertAdjacentHTML('beforeend', `<option value="Full Syllabus">🌐 Full Syllabus (All Chapters)</option>`);
+
   CHAPTERS.forEach(ch => {
     resSelect.insertAdjacentHTML('beforeend', `<option>${ch}</option>`);
     vidSelect.insertAdjacentHTML('beforeend', `<option>${ch}</option>`);
@@ -433,6 +857,7 @@ function populateChapterControls(){
 
   const testFilterBox = document.getElementById('testChapterFilters');
   let testHtml = `<button class="fbtn active" data-tchap="All" onclick="setTestChapterFilter(this,'All')">All Chapters <span class="fbtn-count" data-tcount="All">0</span></button>`;
+  testHtml += `<button class="fbtn" data-tchap="Full Syllabus" onclick="setTestChapterFilter(this,'Full Syllabus')">🌐 Full Syllabus <span class="fbtn-count" data-tcount="Full Syllabus">0</span></button>`;
   CHAPTERS.forEach(ch => {
     testHtml += `<button class="fbtn" data-tchap="${ch}" onclick="setTestChapterFilter(this,'${ch.replace(/'/g,"\\'")}')">${ch} <span class="fbtn-count" data-tcount="${ch}">0</span></button>`;
   });
@@ -441,9 +866,7 @@ function populateChapterControls(){
 
 window.addEventListener('DOMContentLoaded', () => {
   populateChapterControls();
-  renderResourceGridLibrary();
-  renderVideoLibraryGrid();
-  renderTestSeriesGrid();
+  initCloudSync();
   synchronizeYouTubeLiveFeed();
 });
 
@@ -517,14 +940,14 @@ function addVideoAsset(){
   const msg = document.getElementById('vidApMsg');
 
   if(!title || !rawUrl){
-    msg.textContent = "Sub-topic naam aur video link dono zaroori hai.";
+    msg.textContent = "Sub-topic name and video link are both required.";
     msg.className = "ap-msg err";
     return;
   }
 
   const vid = extractYouTubeVideoId(rawUrl);
   if(!vid){
-    msg.textContent = "Valid YouTube link daalo.";
+    msg.textContent = "Please enter a valid YouTube link.";
     msg.className = "ap-msg err";
     return;
   }
@@ -538,7 +961,7 @@ function addVideoAsset(){
     timestamp: new Date().toISOString()
   });
 
-  msg.textContent = "Video topic wise link ho gaya.";
+  msg.textContent = "Video linked successfully.";
   msg.className = "ap-msg ok";
 
   document.getElementById('vidTitle').value = '';
@@ -546,13 +969,15 @@ function addVideoAsset(){
   document.getElementById('vidNotesLink').value = '';
 
   renderVideoLibraryGrid();
+  saveAllData();
   setTimeout(() => { msg.textContent = ''; }, 3000);
 }
 
 function removeVideoAsset(id){
-  if(!confirm("Is video link ko list se hatana hai?")) return;
+  if(!confirm("Remove this video link from the list?")) return;
   videoLibraryIndex = videoLibraryIndex.filter(v => v.id !== id);
   renderVideoLibraryGrid();
+  saveAllData();
 }
 
 function setTestChapterFilter(btn, chap){
@@ -573,7 +998,7 @@ function renderTestSeriesGrid(){
   let dataset = testSeriesIndex.filter(t => (activeTestChapterFilter === "All" || t.chapter === activeTestChapterFilter));
 
   if(dataset.length === 0){
-    box.innerHTML = `<div class="empty-state">No test series linked yet for this chapter. ${isInstructorAuthenticated ? 'Link a test above.' : ''}</div>`;
+    box.innerHTML = `<div class="empty-state">No test series created yet for this chapter. ${isInstructorAuthenticated ? 'Create a test above.' : ''}</div>`;
     return;
   }
 
@@ -581,20 +1006,27 @@ function renderTestSeriesGrid(){
   dataset.slice().reverse().forEach(t => {
     const c = document.createElement('div');
     c.className = "res-card";
+    const qCount = (t.questions || []).length;
+    const isFullSyllabus = t.chapter === 'Full Syllabus';
     c.innerHTML = `
       <div class="res-left">
-        <div class="res-icon">🏆</div>
+        <div class="res-icon">${isFullSyllabus ? '🌐' : '🏆'}</div>
         <div class="res-details">
           <div class="res-title" title="${t.title}">${t.title}</div>
           <div class="res-meta">
-            <span class="res-tag">${t.chapter}</span>
+            <span class="res-tag" style="${isFullSyllabus ? 'background:rgba(212,175,55,0.15);color:var(--gold);' : ''}">${isFullSyllabus ? 'Full Syllabus' : t.chapter}</span>
+            <div class="res-dot"></div>
+            <span>${qCount} Question${qCount === 1 ? '' : 's'}</span>
+            <div class="res-dot"></div>
+            <span>${t.durationMinutes || 30} min</span>
             <div class="res-dot"></div>
             <span>${new Date(t.timestamp).toLocaleDateString('en-IN', {day:'numeric', month:'short'})}</span>
           </div>
         </div>
       </div>
       <div class="res-right">
-        <a href="${t.url}" target="_blank" class="btn-s" style="padding:8px 16px; font-size:13px; text-decoration:none;">Open Test</a>
+        ${qCount > 0 ? `<button class="btn-p" style="padding:8px 16px; font-size:13px;" onclick="startTest('${t.id}')">Start Test</button>` : ''}
+        ${t.url ? `<a href="${t.url}" target="_blank" class="btn-s" style="padding:8px 16px; font-size:13px; text-decoration:none;">Open Link</a>` : ''}
         ${isInstructorAuthenticated ? `<button class="btn-s" style="padding:8px 12px; font-size:13px; color:#C0564A; border-color:rgba(192,86,74,0.2);" onclick="removeTestSeriesAsset('${t.id}')">Delete</button>` : ''}
       </div>
     `;
@@ -606,35 +1038,576 @@ function addTestSeriesAsset(){
   const title = document.getElementById('testTitle').value.trim();
   const chapter = document.getElementById('testChapter').value;
   const url = document.getElementById('testLink').value.trim();
+  const durationMinutes = parseInt(document.getElementById('testDuration').value) || 30;
+  const marksCorrect = parseFloat(document.getElementById('testMarksCorrect').value) || 4;
+  const marksWrong = parseFloat(document.getElementById('testMarksWrong').value) || 1;
   const msg = document.getElementById('testApMsg');
 
-  if(!title || !url){
-    msg.textContent = "Test title aur link dono zaroori hai.";
+  if(!title){
+    msg.textContent = "Test title is required.";
     msg.className = "ap-msg err";
     return;
   }
 
   testSeriesIndex.push({
     id: "test_" + Date.now(),
-    title, chapter, url,
+    title, chapter, url, durationMinutes, marksCorrect, marksWrong,
+    questions: [],
     timestamp: new Date().toISOString()
   });
 
-  msg.textContent = "Test series topic wise link ho gaya.";
+  msg.textContent = "Test created successfully. Now add questions to it below.";
   msg.className = "ap-msg ok";
 
   document.getElementById('testTitle').value = '';
   document.getElementById('testLink').value = '';
 
+  populateTestSelectorForQuestions();
   renderTestSeriesGrid();
-  setTimeout(() => { msg.textContent = ''; }, 3000);
+  saveAllData();
+  setTimeout(() => { msg.textContent = ''; }, 4000);
 }
 
 function removeTestSeriesAsset(id){
-  if(!confirm("Is test series link ko list se hatana hai?")) return;
+  if(!confirm("Delete this test completely, including all its questions?")) return;
   testSeriesIndex = testSeriesIndex.filter(t => t.id !== id);
+  populateTestSelectorForQuestions();
   renderTestSeriesGrid();
+  saveAllData();
 }
+
+function populateTestSelectorForQuestions(){
+  const sel = document.getElementById('qTestSelect');
+  if(!sel) return;
+  const prevValue = sel.value;
+  sel.innerHTML = testSeriesIndex.length === 0
+    ? `<option value="">-- Please create a test first --</option>`
+    : testSeriesIndex.map(t => `<option value="${t.id}">${t.title} (${t.chapter})</option>`).join('');
+  if(testSeriesIndex.some(t => t.id === prevValue)) sel.value = prevValue;
+  updateQuestionCountDisplay();
+}
+
+function updateQuestionCountDisplay(){
+  const sel = document.getElementById('qTestSelect');
+  const display = document.getElementById('qCountDisplay');
+  if(!sel || !display) return;
+  const test = testSeriesIndex.find(t => t.id === sel.value);
+  display.textContent = test ? `Questions added so far: ${(test.questions || []).length}` : '';
+}
+
+function onQuestionTypeChange(){
+  const type = document.getElementById('qType').value;
+  document.getElementById('qOptionsWrapper').style.display = (type === 'NAT') ? 'none' : 'block';
+  document.getElementById('qNatWrapper').style.display = (type === 'NAT') ? 'block' : 'none';
+  document.getElementById('qMcqCorrectField').style.display = (type === 'MCQ') ? 'flex' : 'none';
+  document.getElementById('qMsqCorrectField').style.display = (type === 'MSQ') ? 'flex' : 'none';
+}
+
+function addQuestionToTest(){
+  const testId = document.getElementById('qTestSelect').value;
+  const type = document.getElementById('qType').value;
+  const text = document.getElementById('qText').value.trim();
+  const msg = document.getElementById('qApMsg');
+
+  const test = testSeriesIndex.find(t => t.id === testId);
+  if(!test){
+    msg.textContent = "Please select or create a test first.";
+    msg.className = "ap-msg err";
+    return;
+  }
+  if(!text){
+    msg.textContent = "Question text is required.";
+    msg.className = "ap-msg err";
+    return;
+  }
+
+  const questionObj = {
+    id: "q_" + Date.now() + "_" + Math.floor(Math.random()*1000),
+    type, text
+  };
+
+  if(type === 'MCQ' || type === 'MSQ'){
+    const optA = document.getElementById('qOptA').value.trim();
+    const optB = document.getElementById('qOptB').value.trim();
+    const optC = document.getElementById('qOptC').value.trim();
+    const optD = document.getElementById('qOptD').value.trim();
+    if(!optA || !optB || !optC || !optD){
+      msg.textContent = "All four options are required.";
+      msg.className = "ap-msg err";
+      return;
+    }
+    questionObj.options = [optA, optB, optC, optD];
+
+    if(type === 'MCQ'){
+      questionObj.correct = parseInt(document.getElementById('qCorrect').value);
+    } else {
+      const correctSet = [];
+      if(document.getElementById('qCorrectA').checked) correctSet.push(0);
+      if(document.getElementById('qCorrectB').checked) correctSet.push(1);
+      if(document.getElementById('qCorrectC').checked) correctSet.push(2);
+      if(document.getElementById('qCorrectD').checked) correctSet.push(3);
+      if(correctSet.length === 0){
+        msg.textContent = "Select at least one correct option for MSQ.";
+        msg.className = "ap-msg err";
+        return;
+      }
+      questionObj.correct = correctSet;
+    }
+  } else if(type === 'NAT'){
+    const natAnswer = document.getElementById('qNatAnswer').value.trim();
+    if(natAnswer === ''){
+      msg.textContent = "Correct numerical answer is required.";
+      msg.className = "ap-msg err";
+      return;
+    }
+    questionObj.correctValue = parseFloat(natAnswer);
+    questionObj.tolerance = parseFloat(document.getElementById('qNatTolerance').value) || 0;
+  }
+
+  test.questions.push(questionObj);
+
+  msg.textContent = "Question added successfully.";
+  msg.className = "ap-msg ok";
+
+  document.getElementById('qText').value = '';
+  document.getElementById('qOptA').value = '';
+  document.getElementById('qOptB').value = '';
+  document.getElementById('qOptC').value = '';
+  document.getElementById('qOptD').value = '';
+  document.getElementById('qCorrect').value = '0';
+  document.getElementById('qCorrectA').checked = false;
+  document.getElementById('qCorrectB').checked = false;
+  document.getElementById('qCorrectC').checked = false;
+  document.getElementById('qCorrectD').checked = false;
+  document.getElementById('qNatAnswer').value = '';
+  document.getElementById('qNatTolerance').value = '0';
+
+  updateQuestionCountDisplay();
+  renderTestSeriesGrid();
+  saveAllData();
+  setTimeout(() => { msg.textContent = ''; }, 3000);
+}
+
+/* ===== TEST RUNNER (Online Exam System) ===== */
+let trCurrentTest = null;
+let trAnswers = {};
+let trMarked = new Set();
+let trVisited = new Set();
+let trCurrentIndex = 0;
+let trRemainingSeconds = 0;
+let trTimerHandle = null;
+
+function startTest(testId){
+  const test = testSeriesIndex.find(t => t.id === testId);
+  if(!test || !test.questions || test.questions.length === 0) return;
+
+  trCurrentTest = test;
+  trAnswers = {};
+  trMarked = new Set();
+  trVisited = new Set();
+  trCurrentIndex = 0;
+  trRemainingSeconds = (test.durationMinutes || 30) * 60;
+
+  document.getElementById('trTitle').textContent = test.title;
+  document.getElementById('testRunnerOverlay').classList.add('open');
+
+  trRenderQuestion();
+  trRenderPalette();
+  trUpdateTimerDisplay();
+
+  if(trTimerHandle) clearInterval(trTimerHandle);
+  trTimerHandle = setInterval(() => {
+    trRemainingSeconds--;
+    trUpdateTimerDisplay();
+    if(trRemainingSeconds <= 0){
+      clearInterval(trTimerHandle);
+      submitTest(true);
+    }
+  }, 1000);
+}
+
+function trUpdateTimerDisplay(){
+  const m = Math.floor(trRemainingSeconds / 60).toString().padStart(2,'0');
+  const s = (trRemainingSeconds % 60).toString().padStart(2,'0');
+  document.getElementById('trTimer').textContent = `${m}:${s}`;
+}
+
+function trIsAnswered(i){
+  const a = trAnswers[i];
+  if(a === undefined || a === null) return false;
+  if(Array.isArray(a)) return a.length > 0;
+  if(typeof a === 'string') return a.trim() !== '';
+  return true;
+}
+
+function trRenderQuestion(){
+  const q = trCurrentTest.questions[trCurrentIndex];
+  trVisited.add(trCurrentIndex);
+  const selected = trAnswers[trCurrentIndex];
+  const letters = ['A','B','C','D'];
+  const typeLabels = { MCQ: 'Single Correct', MSQ: 'Multiple Correct (select all that apply)', NAT: 'Numerical Answer' };
+
+  let bodyHtml = '';
+  if(q.type === 'NAT'){
+    bodyHtml = `
+      <div style="max-width:280px;">
+        <input type="number" step="any" class="ap-input" style="font-size:16px;padding:14px;" placeholder="Enter your numerical answer"
+          value="${selected !== undefined && selected !== null ? selected : ''}" oninput="trSetNatAnswer(this.value)">
+      </div>
+    `;
+  } else {
+    const selectedArr = q.type === 'MSQ' ? (selected || []) : null;
+    bodyHtml = `
+      <div class="tr-options">
+        ${q.options.map((opt, i) => {
+          const isSel = q.type === 'MSQ' ? selectedArr.includes(i) : selected === i;
+          return `
+          <div class="tr-option ${isSel ? 'selected' : ''}" onclick="trSelectOption(${i})">
+            <span class="tr-opt-letter" style="${q.type === 'MSQ' ? 'border-radius:6px;' : ''}">${letters[i]}</span>
+            <span>${opt}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  document.getElementById('trQArea').innerHTML = `
+    <div class="tr-qnum">Question ${trCurrentIndex + 1} of ${trCurrentTest.questions.length} &middot; <span style="color:var(--muted);">${q.type || 'MCQ'} — ${typeLabels[q.type] || typeLabels.MCQ}</span></div>
+    <div class="tr-qtext">${q.text}</div>
+    ${bodyHtml}
+  `;
+  trRenderPalette();
+}
+
+function trRenderPalette(){
+  const box = document.getElementById('trPalette');
+  box.innerHTML = trCurrentTest.questions.map((q, i) => {
+    let cls = 'tr-pbtn';
+    const isAnswered = trIsAnswered(i);
+    const isMarked = trMarked.has(i);
+    if(isAnswered && isMarked) cls += ' answered-marked';
+    else if(isMarked) cls += ' marked';
+    else if(isAnswered) cls += ' answered';
+    else if(trVisited.has(i)) cls += ' not-answered';
+    if(i === trCurrentIndex) cls += ' current';
+    return `<button class="${cls}" onclick="trGoToQuestion(${i})">${i + 1}</button>`;
+  }).join('');
+}
+
+function trGoToQuestion(i){
+  trCurrentIndex = i;
+  trRenderQuestion();
+}
+
+function trSelectOption(i){
+  const q = trCurrentTest.questions[trCurrentIndex];
+  if(q.type === 'MSQ'){
+    let arr = trAnswers[trCurrentIndex] || [];
+    arr = arr.includes(i) ? arr.filter(x => x !== i) : [...arr, i];
+    trAnswers[trCurrentIndex] = arr;
+  } else {
+    trAnswers[trCurrentIndex] = i;
+  }
+  trRenderQuestion();
+}
+
+function trSetNatAnswer(value){
+  trAnswers[trCurrentIndex] = value;
+  trRenderPalette();
+}
+
+function trSaveAndNext(){
+  if(trCurrentIndex < trCurrentTest.questions.length - 1){
+    trCurrentIndex++;
+    trRenderQuestion();
+  } else {
+    trRenderPalette();
+  }
+}
+
+function trMarkForReviewNext(){
+  trMarked.add(trCurrentIndex);
+  trSaveAndNext();
+}
+
+function trClearResponse(){
+  delete trAnswers[trCurrentIndex];
+  trRenderQuestion();
+}
+
+function trPrevQuestion(){
+  if(trCurrentIndex > 0){
+    trCurrentIndex--;
+    trRenderQuestion();
+  }
+}
+
+function confirmSubmitTest(){
+  const unanswered = trCurrentTest.questions.length - Object.keys(trAnswers).length;
+  const msg = unanswered > 0
+    ? `${unanswered} question(s) are still unanswered. Do you want to submit the test?`
+    : `Do you want to submit the test?`;
+  if(confirm(msg)) submitTest(false);
+}
+
+function submitTest(autoSubmitted){
+  if(trTimerHandle) clearInterval(trTimerHandle);
+
+  let correctCount = 0, wrongCount = 0, unattempted = 0, totalMarks = 0;
+  const perQuestionReview = [];
+  const letters = ['A','B','C','D'];
+
+  trCurrentTest.questions.forEach((q, i) => {
+    const given = trAnswers[i];
+    const answered = trIsAnswered(i);
+    let status;
+
+    if(!answered){
+      unattempted++;
+      status = 'unattempted';
+    } else {
+      let isCorrect = false;
+      if(q.type === 'MSQ'){
+        const givenSet = [...given].sort();
+        const correctSet = [...q.correct].sort();
+        isCorrect = givenSet.length === correctSet.length && givenSet.every((v, idx) => v === correctSet[idx]);
+      } else if(q.type === 'NAT'){
+        const num = parseFloat(given);
+        isCorrect = !isNaN(num) && Math.abs(num - q.correctValue) <= (Number(q.tolerance) || 0) + 1e-9;
+      } else {
+        isCorrect = given === q.correct;
+      }
+
+      if(isCorrect){
+        correctCount++;
+        totalMarks += Number(trCurrentTest.marksCorrect || 4);
+        status = 'correct';
+      } else {
+        wrongCount++;
+        totalMarks -= Number(trCurrentTest.marksWrong || 1);
+        status = 'wrong';
+      }
+    }
+    perQuestionReview.push({q, given, status});
+  });
+
+  const maxMarks = trCurrentTest.questions.length * Number(trCurrentTest.marksCorrect || 4);
+
+  document.getElementById('trResultContent').innerHTML = `
+    <div class="result-hero">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:8px;">${trCurrentTest.title}${autoSubmitted ? ' — Time Up, Auto-Submitted' : ''}</div>
+      <div class="result-score">${totalMarks.toFixed(1)} <span style="font-size:22px;color:var(--muted);">/ ${maxMarks}</span></div>
+    </div>
+    <div class="result-stats-grid">
+      <div class="result-stat"><div class="result-stat-val" style="color:#4A9C7A;">${correctCount}</div><div class="result-stat-lbl">Correct</div></div>
+      <div class="result-stat"><div class="result-stat-val" style="color:#C0564A;">${wrongCount}</div><div class="result-stat-lbl">Wrong</div></div>
+      <div class="result-stat"><div class="result-stat-val" style="color:var(--muted);">${unattempted}</div><div class="result-stat-lbl">Unattempted</div></div>
+      <div class="result-stat"><div class="result-stat-val">${trCurrentTest.questions.length}</div><div class="result-stat-lbl">Total Qs</div></div>
+    </div>
+    <h3 style="font-family:var(--font-serif);margin-bottom:16px;">Answer Review</h3>
+    ${perQuestionReview.map((r, i) => {
+      let answerHtml = '';
+      if(r.q.type === 'NAT'){
+        const givenDisplay = (r.given !== undefined && r.given !== null && r.given !== '') ? r.given : 'Not attempted';
+        answerHtml = `<div class="review-opt ${r.status === 'correct' ? 'correct-ans' : (r.status === 'wrong' ? 'wrong-ans' : '')}">Your Answer: ${givenDisplay} &nbsp;|&nbsp; Correct Answer: ${r.q.correctValue}${r.q.tolerance ? ' &plusmn; ' + r.q.tolerance : ''}</div>`;
+      } else {
+        const correctSet = r.q.type === 'MSQ' ? r.q.correct : [r.q.correct];
+        const givenSet = r.q.type === 'MSQ' ? (r.given || []) : (r.given !== undefined ? [r.given] : []);
+        answerHtml = r.q.options.map((opt, oi) => {
+          let cls = 'review-opt';
+          const isCorrectOpt = correctSet.includes(oi);
+          const isGivenOpt = givenSet.includes(oi);
+          if(isCorrectOpt) cls += ' correct-ans';
+          else if(isGivenOpt) cls += ' wrong-ans';
+          return `<div class="${cls}">${letters[oi]}. ${opt} ${isCorrectOpt ? '✓ Correct Answer' : (isGivenOpt ? '✗ Your Answer' : '')}</div>`;
+        }).join('');
+      }
+      return `
+      <div class="review-q">
+        <div style="font-weight:600;margin-bottom:10px;">Q${i+1}. [${r.q.type || 'MCQ'}] ${r.q.text}</div>
+        ${answerHtml}
+      </div>`;
+    }).join('')}
+  `;
+
+  document.getElementById('testRunnerOverlay').classList.remove('open');
+  document.getElementById('testResultOverlay').classList.add('open');
+  document.getElementById('calcPanel').classList.remove('open');
+}
+
+function closeTestResult(){
+  document.getElementById('testResultOverlay').classList.remove('open');
+  trCurrentTest = null;
+}
+
+/* ===== SCIENTIFIC CALCULATOR ===== */
+let calcDisplay = '0';
+let calcExprLine = '';
+let calcMemory = 0;
+let calcAcc = null;
+let calcPendingOp = null;
+let calcAngleMode = 'deg';
+let calcNewEntry = true;
+
+const CALC_OP_SYMBOL = {'+':'+','-':'−','*':'×','/':'÷','mod':'mod','pow':'xʸ','yroot':'ʸ√x','logyx':'log_y x'};
+const CALC_FN_LABEL = {sin:'sin',cos:'cos',tan:'tan',asin:'sin⁻¹',acos:'cos⁻¹',atan:'tan⁻¹',
+  sinh:'sinh',cosh:'cosh',tanh:'tanh',asinh:'sinh⁻¹',acosh:'cosh⁻¹',atanh:'tanh⁻¹',
+  log:'log',ln:'ln',log2:'log₂',exp:'eˣ',pow10:'10ˣ',sq:'sq',cube:'cube',sqrt:'√',cbrt:'³√',
+  recip:'1/x',fact:'n!',abs:'|x|',negate:'+/-',percent:'%'};
+
+function calcToRad(x){ return calcAngleMode === 'deg' ? x * Math.PI / 180 : x; }
+function calcFromRad(x){ return calcAngleMode === 'deg' ? x * 180 / Math.PI : x; }
+
+function calcFormatNum(n){
+  if(n === null || n === undefined || !isFinite(n)) return 'Error';
+  if(Object.is(n, -0)) n = 0;
+  let s = parseFloat(n.toPrecision(12)).toString();
+  if(s.length > 16) s = n.toExponential(6);
+  return s;
+}
+
+function calcFactorial(n){
+  n = Math.round(n);
+  if(n < 0 || n > 170) return NaN;
+  let r = 1;
+  for(let i = 2; i <= n; i++) r *= i;
+  return r;
+}
+
+function calcRefreshUI(){
+  document.getElementById('calcDisplay').textContent = calcDisplay;
+  document.getElementById('calcExprLine').innerHTML = calcExprLine || '&nbsp;';
+}
+
+function toggleCalculator(){
+  document.getElementById('calcPanel').classList.toggle('open');
+}
+
+function calcSetAngleMode(mode){
+  calcAngleMode = mode;
+}
+
+function calcDigit(d){
+  if(calcNewEntry){
+    calcDisplay = (d === '.') ? '0.' : d;
+    calcNewEntry = false;
+  } else {
+    if(d === '.' && calcDisplay.includes('.')) return;
+    if(calcDisplay === '0' && d !== '.') calcDisplay = d;
+    else calcDisplay += d;
+  }
+  calcRefreshUI();
+}
+
+function calcClearAll(){
+  calcDisplay = '0';
+  calcExprLine = '';
+  calcAcc = null;
+  calcPendingOp = null;
+  calcNewEntry = true;
+  calcRefreshUI();
+}
+
+function calcBackspace(){
+  if(calcNewEntry) return;
+  calcDisplay = calcDisplay.slice(0, -1);
+  if(calcDisplay === '' || calcDisplay === '-') { calcDisplay = '0'; calcNewEntry = true; }
+  calcRefreshUI();
+}
+
+function calcInsertConst(which){
+  calcDisplay = which === 'pi' ? calcFormatNum(Math.PI) : calcFormatNum(Math.E);
+  calcNewEntry = true;
+  calcRefreshUI();
+}
+
+function calcCompute(a, b, op){
+  switch(op){
+    case '+': return a + b;
+    case '-': return a - b;
+    case '*': return a * b;
+    case '/': return b === 0 ? NaN : a / b;
+    case 'mod': return b === 0 ? NaN : a % b;
+    case 'pow': return Math.pow(a, b);
+    case 'yroot': return a === 0 ? NaN : Math.pow(b, 1 / a);
+    case 'logyx': return Math.log(b) / Math.log(a);
+    default: return b;
+  }
+}
+
+function calcSetOperator(op){
+  const current = parseFloat(calcDisplay);
+  if(calcAcc !== null && calcPendingOp && !calcNewEntry){
+    calcAcc = calcCompute(calcAcc, current, calcPendingOp);
+    calcDisplay = calcFormatNum(calcAcc);
+  } else {
+    calcAcc = current;
+  }
+  calcPendingOp = op;
+  calcExprLine = calcFormatNum(calcAcc) + ' ' + (CALC_OP_SYMBOL[op] || op);
+  calcNewEntry = true;
+  calcRefreshUI();
+}
+
+function calcEquals(){
+  if(calcPendingOp === null || calcAcc === null){
+    calcRefreshUI();
+    return;
+  }
+  const b = parseFloat(calcDisplay);
+  const result = calcCompute(calcAcc, b, calcPendingOp);
+  calcExprLine = calcFormatNum(calcAcc) + ' ' + (CALC_OP_SYMBOL[calcPendingOp] || calcPendingOp) + ' ' + calcFormatNum(b) + ' =';
+  calcDisplay = calcFormatNum(result);
+  calcAcc = null;
+  calcPendingOp = null;
+  calcNewEntry = true;
+  calcRefreshUI();
+}
+
+function calcUnary(op){
+  const x = parseFloat(calcDisplay);
+  let r;
+  switch(op){
+    case 'sin': r = Math.sin(calcToRad(x)); break;
+    case 'cos': r = Math.cos(calcToRad(x)); break;
+    case 'tan': r = Math.tan(calcToRad(x)); break;
+    case 'asin': r = calcFromRad(Math.asin(x)); break;
+    case 'acos': r = calcFromRad(Math.acos(x)); break;
+    case 'atan': r = calcFromRad(Math.atan(x)); break;
+    case 'sinh': r = Math.sinh(x); break;
+    case 'cosh': r = Math.cosh(x); break;
+    case 'tanh': r = Math.tanh(x); break;
+    case 'asinh': r = Math.asinh(x); break;
+    case 'acosh': r = Math.acosh(x); break;
+    case 'atanh': r = Math.atanh(x); break;
+    case 'log': r = Math.log10(x); break;
+    case 'ln': r = Math.log(x); break;
+    case 'log2': r = Math.log2(x); break;
+    case 'exp': r = Math.exp(x); break;
+    case 'pow10': r = Math.pow(10, x); break;
+    case 'sq': r = x * x; break;
+    case 'cube': r = x * x * x; break;
+    case 'sqrt': r = Math.sqrt(x); break;
+    case 'cbrt': r = Math.cbrt(x); break;
+    case 'recip': r = x === 0 ? NaN : 1 / x; break;
+    case 'fact': r = calcFactorial(x); break;
+    case 'abs': r = Math.abs(x); break;
+    case 'negate': r = -x; break;
+    case 'percent': r = x / 100; break;
+    default: r = x;
+  }
+  calcExprLine = (CALC_FN_LABEL[op] || op) + '(' + calcFormatNum(x) + ') =';
+  calcDisplay = calcFormatNum(r);
+  calcNewEntry = true;
+  calcRefreshUI();
+}
+
+function calcMC(){ calcMemory = 0; }
+function calcMR(){ calcDisplay = calcFormatNum(calcMemory); calcNewEntry = true; calcRefreshUI(); }
+function calcMS(){ calcMemory = parseFloat(calcDisplay) || 0; }
+function calcMPlus(){ calcMemory += parseFloat(calcDisplay) || 0; }
+function calcMMinus(){ calcMemory -= parseFloat(calcDisplay) || 0; }
+
 
 function toggleTheme(){
   const b = document.body;
@@ -793,13 +1766,15 @@ function addResourceAsset() {
   document.getElementById('resLink').value = '';
   
   renderResourceGridLibrary();
+  saveAllData();
   setTimeout(() => { msg.textContent = ''; }, 3000);
 }
 
 function removeResourceAsset(id) {
-  if(!confirm("Purge selected asset pointer from local system matrix list?")) return;
+  if(!confirm("Remove this resource from the list?")) return;
   resourceDatabaseIndex = resourceDatabaseIndex.filter(r => r.id !== id);
   renderResourceGridLibrary();
+  saveAllData();
 }
 
 async function synchronizeYouTubeLiveFeed() {
