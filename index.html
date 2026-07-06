@@ -517,11 +517,23 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
   <div class="modal-box">
     <div class="modal-icon">🔒</div>
     <div class="modal-title">Instructor Authorization</div>
-    <div class="modal-desc">Provide management credential code PIN sequence to alter linked resource assets index.</div>
-    <input type="password" id="adminPin" class="ap-input" placeholder="Management secure key PIN" style="text-align:center; margin-bottom:16px;">
+    <div class="modal-desc" id="adminModalDesc">Sign in with your authorized Google account, then enter the management PIN to unlock admin controls.</div>
+
+    <div id="googleSignInStep">
+      <button class="btn-p" style="width:100%; justify-content:center; margin-bottom:14px;" onclick="signInWithGoogleAdmin()">
+        <span style="display:inline-flex;align-items:center;gap:8px;">🔐 Sign in with Google</span>
+      </button>
+      <div id="googleAuthStatus" style="font-size:12px;color:var(--muted);margin-bottom:8px;"></div>
+    </div>
+
+    <div id="pinStep" style="display:none;">
+      <div id="signedInAs" style="font-size:12px;color:var(--gold);margin-bottom:12px;font-weight:600;"></div>
+      <input type="password" id="adminPin" class="ap-input" placeholder="Management secure key PIN" style="text-align:center; margin-bottom:16px;">
+    </div>
+
     <div style="display:flex; gap:12px;">
       <button class="btn-s" style="flex:1; padding:10px;" onclick="closeAdminAuthenticationModal()">Abort</button>
-      <button class="btn-p" style="flex:1; padding:10px; justify-content:center;" onclick="verifyAdminCredentialToken()">Unlock</button>
+      <button class="btn-p" id="unlockBtn" style="flex:1; padding:10px; justify-content:center; display:none;" onclick="verifyAdminCredentialToken()">Unlock</button>
     </div>
     <div id="modalErr" style="color:#C0564A; font-size:12px; margin-top:12px; font-weight:500; display:none;">Invalid Pin Sequence.</div>
   </div>
@@ -670,15 +682,17 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
   </div>
 </div>
 
-<!-- Firebase (Firestore Database) -->
+<!-- Firebase (Firestore Database + Authentication) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
 <script>
 /* CONFIG MANAGEMENT BLOCK */
 const CONFIG = {
   channelId: "UCl2gZwzlidIpBzQy_jMZGsg",
   adminPin: "TMS2026",
+  adminEmail: "jiteshkumarjatav2020@gmail.com",
   channelUrl: "https://www.youtube.com/@jitesh_iitian_kgp",
   contactEmail: "jiteshkumarjatav2020@gmail.com"
 };
@@ -701,29 +715,18 @@ let testSeriesIndex = [];
 const TMS_STORAGE_KEY = "tms_site_data_v1";
 
 /* ===== FIREBASE / FIRESTORE SETUP =====
-   Setup steps (one-time, free):
-   1. Go to https://console.firebase.google.com -> "Add project" (free Spark plan is enough).
-   2. In the project: Build -> Firestore Database -> Create database -> Start in "test mode"
-      for now (you can lock it down later with the rules shown below).
-   3. Project settings (gear icon, top-left) -> General tab -> "Your apps" -> Add app -> Web (</>)
-      -> copy the firebaseConfig object it gives you and paste t below, replacing the placeholder.
-   4. Recommended Firestore Rules (Firestore Database -> Rules tab):
+   Recommended Firestore Rules (Firestore Database -> Rules tab):
         rules_version = '2';
         service cloud.firestore {
           match /databases/{database}/documents {
             match /tms/siteData {
               allow read: if true;
-              allow write: if true;
-              // NOTE: this allows anyone to write. Since this site only has a
-              // client-side PIN (not real auth), true write-protection needs
-              // Firebase Authentication. Good enough for now since the PIN
-              // already gates the admin UI that triggers writes.
+              allow write: if request.auth != null
+                           && request.auth.token.email == "jiteshkumarjatav2020@gmail.com"
+                           && request.auth.token.email_verified == true;
             }
           }
         }
-   5. Save this file, re-upload/redeploy — all data (resources, videos, tests,
-      questions) will now sync live across every device/browser instead of being
-      stuck on one device's localStorage.
 */
 const firebaseConfig = {
   apiKey: "AIzaSyA9cE4ctqdgzd-CI-aHZFsmaz8pDujhEeQ",
@@ -736,8 +739,10 @@ const firebaseConfig = {
 };
 
 let db = null;
+let auth = null;
 let firestoreReady = false;
 let firestoreUnsubscribe = null;
+let currentFirebaseUser = null;
 
 function tmsDocRef(){
   return db.collection('tms').doc('siteData');
@@ -746,11 +751,12 @@ function tmsDocRef(){
 function initFirestore(){
   try {
     if(firebaseConfig.apiKey === "YOUR_API_KEY"){
-      console.warn("[TMS] Firebase not configured yet — running on local-only storage. Fill in firebaseConfig to enable cross-device sync.");
+      console.warn("[TMS] Firebase not configured yet — running on local-only storage.");
       return false;
     }
     firebase.initializeApp(firebaseConfig);
     db = firebase.firestore();
+    auth = firebase.auth();
     return true;
   } catch(e){
     console.error("[TMS] Firebase init failed, falling back to local storage:", e);
@@ -770,7 +776,10 @@ function saveAllData(){
     tmsDocRef().set({
       resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).catch(e => console.error("[TMS] Cloud save failed:", e));
+    }).catch(e => {
+      console.error("[TMS] Cloud save failed:", e);
+      alert("Cloud save failed — you may not be signed in as the authorized admin, or the change wasn't saved to the cloud. Local copy on this device was still updated.");
+    });
   }
 }
 
@@ -802,6 +811,10 @@ function initCloudSync(){
   firestoreReady = initFirestore();
   if(!firestoreReady) return;
 
+  auth.onAuthStateChanged((user) => {
+    currentFirebaseUser = user;
+  });
+
   firestoreUnsubscribe = tmsDocRef().onSnapshot((doc) => {
     if(doc.exists){
       const data = doc.data();
@@ -816,7 +829,6 @@ function initCloudSync(){
       } catch(e){}
       refreshAllDataViews();
     } else {
-      // First run ever — no cloud doc exists yet, push whatever we have locally.
       saveAllData();
     }
   }, (err) => {
@@ -1624,6 +1636,7 @@ function toggleTheme(){
 function handleAdminToggle(){
   if(isInstructorAuthenticated) {
     isInstructorAuthenticated = false;
+    if(auth) auth.signOut();
     document.getElementById('adminToggle').classList.remove('active');
     document.getElementById('adminToggle').textContent = "🔒 Admin";
     document.getElementById('adminPanel').style.display = "none";
@@ -1640,15 +1653,53 @@ function handleAdminToggle(){
 function openAdminAuthenticationModal(){
   document.getElementById('adminPin').value = '';
   document.getElementById('modalErr').style.display = 'none';
+  document.getElementById('pinStep').style.display = 'none';
+  document.getElementById('googleSignInStep').style.display = 'block';
+  document.getElementById('googleAuthStatus').textContent = '';
+  document.getElementById('unlockBtn').style.display = 'none';
   document.getElementById('adminModal').classList.add('open');
-  document.getElementById('adminPin').focus();
 }
 
 function closeAdminAuthenticationModal(){
   document.getElementById('adminModal').classList.remove('open');
 }
 
+function signInWithGoogleAdmin(){
+  if(!auth){
+    document.getElementById('googleAuthStatus').textContent = "Firebase Auth not initialized.";
+    return;
+  }
+  const statusEl = document.getElementById('googleAuthStatus');
+  statusEl.textContent = "Opening Google sign-in...";
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider)
+    .then((result) => {
+      const user = result.user;
+      currentFirebaseUser = user;
+      if(user.email !== CONFIG.adminEmail){
+        statusEl.textContent = "This Google account is not authorized as admin.";
+        auth.signOut();
+        return;
+      }
+      statusEl.textContent = "";
+      document.getElementById('googleSignInStep').style.display = 'none';
+      document.getElementById('pinStep').style.display = 'block';
+      document.getElementById('unlockBtn').style.display = 'block';
+      document.getElementById('signedInAs').textContent = "Signed in as: " + user.email;
+      document.getElementById('adminPin').focus();
+    })
+    .catch((err) => {
+      console.error("[TMS] Google sign-in failed:", err);
+      statusEl.textContent = "Sign-in failed or cancelled. Please try again.";
+    });
+}
+
 function verifyAdminCredentialToken(){
+  if(!currentFirebaseUser || currentFirebaseUser.email !== CONFIG.adminEmail){
+    document.getElementById('modalErr').textContent = "Not signed in with the authorized Google account.";
+    document.getElementById('modalErr').style.display = 'block';
+    return;
+  }
   const pin = document.getElementById('adminPin').value;
   if(pin === CONFIG.adminPin) {
     isInstructorAuthenticated = true;
@@ -1663,6 +1714,7 @@ function verifyAdminCredentialToken(){
     renderTestSeriesGrid();
     document.getElementById('adminPanel').scrollIntoView({behavior:'smooth', block:'center'});
   } else {
+    document.getElementById('modalErr').textContent = "Invalid Pin Sequence.";
     document.getElementById('modalErr').style.display = 'block';
   }
 }
