@@ -706,7 +706,7 @@ const TMS_STORAGE_KEY = "tms_site_data_v1";
    2. In the project: Build -> Firestore Database -> Create database -> Start in "test mode"
       for now (you can lock it down later with the rules shown below).
    3. Project settings (gear icon, top-left) -> General tab -> "Your apps" -> Add app -> Web (</>)
-      -> copy the firebaseConfig object it gives you and paste it below, replacing the placeholder.
+      -> copy the firebaseConfig object it gives you and paste t below, replacing the placeholder.
    4. Recommended Firestore Rules (Firestore Database -> Rules tab):
         rules_version = '2';
         service cloud.firestore {
@@ -726,12 +726,13 @@ const TMS_STORAGE_KEY = "tms_site_data_v1";
       stuck on one device's localStorage.
 */
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyA9cE4ctqdgzd-CI-aHZFsmaz8pDujhEeQ",
+  authDomain: "the-mathematical-scientist.firebaseapp.com",
+  projectId: "the-mathematical-scientist",
+  storageBucket: "the-mathematical-scientist.firebasestorage.app",
+  messagingSenderId: "1067104902834",
+  appId: "1:1067104902834:web:08d6a45d346d0e1f2a33ab",
+  measurementId: "G-EKNDDBGM57"
 };
 
 let db = null;
