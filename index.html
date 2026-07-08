@@ -74,6 +74,9 @@ nav a:hover{color:var(--text);}
 .ap-input,.ap-select{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:6px;font-size:14px;font-family:var(--font-sans);outline:none;transition:border-color 0.2s;}
 .ap-input:focus,.ap-select:focus{border-color:var(--gold);}
 .ap-actions{display:flex;justify-content:between;align-items:center;}
+.chap-mode-toggle{display:flex;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:3px;}
+.chap-mode-btn{background:none;border:none;color:var(--muted);padding:4px 12px;border-radius:16px;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.15s;}
+.chap-mode-btn.active{background:var(--gold);color:#0A0A0A;}
 .ap-msg{font-size:13px;font-weight:500;}
 .ap-msg.err{color:#C0564A;}
 .ap-msg.ok{color:#4A9C7A;}
@@ -295,17 +298,15 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
           </select>
         </div>
         <div class="ap-field">
-          <label class="ap-lbl">Chapter / Topic</label>
-          <select id="resChapter" class="ap-select"></select>
-        </div>
-      </div>
-      <div class="ap-grid" style="grid-template-columns: 1fr; margin-bottom: 12px;">
-        <div class="ap-field">
-          <label class="ap-lbl">Add a Custom Chapter / Topic</label>
-          <div style="display:flex;gap:10px;">
-            <input type="text" id="resCustomChapterInput" class="ap-input" placeholder="Type a new chapter/topic name..." style="flex:1;">
-            <button class="btn-s" style="padding:0 18px;white-space:nowrap;" onclick="addCustomChapter('resChapter')">+ Add Chapter</button>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+            <label class="ap-lbl">Chapter / Topic</label>
+            <div class="chap-mode-toggle" id="resChapterModeToggle">
+              <button type="button" class="chap-mode-btn active" data-mode="existing" onclick="setChapterMode('res','existing')">Chapter</button>
+              <button type="button" class="chap-mode-btn" data-mode="custom" onclick="setChapterMode('res','custom')">Custom</button>
+            </div>
           </div>
+          <select id="resChapter" class="ap-select"></select>
+          <input type="text" id="resChapterCustomInput" class="ap-input" placeholder="Type a new chapter/topic name..." style="display:none;">
         </div>
       </div>
       <div class="ap-grid" style="grid-template-columns: 1fr; margin-bottom: 20px;">
@@ -359,21 +360,19 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
           <input type="text" id="vidTitle" class="ap-input" placeholder="e.g., Variable Separable Form">
         </div>
         <div class="ap-field">
-          <label class="ap-lbl">Chapter / Topic</label>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+            <label class="ap-lbl">Chapter / Topic</label>
+            <div class="chap-mode-toggle" id="vidChapterModeToggle">
+              <button type="button" class="chap-mode-btn active" data-mode="existing" onclick="setChapterMode('vid','existing')">Chapter</button>
+              <button type="button" class="chap-mode-btn" data-mode="custom" onclick="setChapterMode('vid','custom')">Custom</button>
+            </div>
+          </div>
           <select id="vidChapter" class="ap-select"></select>
+          <input type="text" id="vidChapterCustomInput" class="ap-input" placeholder="Type a new chapter/topic name..." style="display:none;">
         </div>
         <div class="ap-field">
           <label class="ap-lbl">YouTube Video Link</label>
           <input type="url" id="vidLink" class="ap-input" placeholder="https://www.youtube.com/watch?v=...">
-        </div>
-      </div>
-      <div class="ap-grid" style="grid-template-columns: 1fr; margin-bottom: 12px;">
-        <div class="ap-field">
-          <label class="ap-lbl">Add a Custom Chapter / Topic</label>
-          <div style="display:flex;gap:10px;">
-            <input type="text" id="vidCustomChapterInput" class="ap-input" placeholder="Type a new chapter/topic name..." style="flex:1;">
-            <button class="btn-s" style="padding:0 18px;white-space:nowrap;" onclick="addCustomChapter('vidChapter')">+ Add Chapter</button>
-          </div>
         </div>
       </div>
       <div class="ap-grid" style="grid-template-columns: 1fr; margin-bottom: 20px;">
@@ -418,21 +417,19 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
           <input type="text" id="testTitle" class="ap-input" placeholder="e.g., Matrices & Determinants Test - 01">
         </div>
         <div class="ap-field">
-          <label class="ap-lbl">Chapter / Topic</label>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+            <label class="ap-lbl">Chapter / Topic</label>
+            <div class="chap-mode-toggle" id="testChapterModeToggle">
+              <button type="button" class="chap-mode-btn active" data-mode="existing" onclick="setChapterMode('test','existing')">Chapter</button>
+              <button type="button" class="chap-mode-btn" data-mode="custom" onclick="setChapterMode('test','custom')">Custom</button>
+            </div>
+          </div>
           <select id="testChapter" class="ap-select"></select>
+          <input type="text" id="testChapterCustomInput" class="ap-input" placeholder="Type a new chapter/topic name..." style="display:none;">
         </div>
         <div class="ap-field">
           <label class="ap-lbl">Duration (minutes)</label>
           <input type="number" id="testDuration" class="ap-input" placeholder="30" value="30" min="1">
-        </div>
-      </div>
-      <div class="ap-grid" style="grid-template-columns: 1fr; margin-bottom: 12px;">
-        <div class="ap-field">
-          <label class="ap-lbl">Add a Custom Chapter / Topic</label>
-          <div style="display:flex;gap:10px;">
-            <input type="text" id="testCustomChapterInput" class="ap-input" placeholder="Type a new chapter/topic name..." style="flex:1;">
-            <button class="btn-s" style="padding:0 18px;white-space:nowrap;" onclick="addCustomChapter('testChapter')">+ Add Chapter</button>
-          </div>
         </div>
       </div>
       <div class="ap-grid">
@@ -925,31 +922,56 @@ let activeTestChapterFilter = "All";
 let isInstructorAuthenticated = false;
 
 /* ===== CUSTOM CHAPTER / TOPIC MANAGEMENT =====
-   Lets an admin type any chapter/topic name and have it appear everywhere
-   (all three "Chapter / Topic" dropdowns + all three filter sidebars). */
-function addCustomChapter(targetSelectId){
-  const inputMap = {
-    resChapter: 'resCustomChapterInput',
-    vidChapter: 'vidCustomChapterInput',
-    testChapter: 'testCustomChapterInput'
-  };
-  const inputId = inputMap[targetSelectId];
-  const input = document.getElementById(inputId);
-  if(!input) return;
-  const name = input.value.trim();
-  if(!name){
-    alert("Please type a chapter/topic name first.");
-    return;
+   "Chapter" (pick from the existing list) and "Custom" (type a brand new one)
+   are mutually exclusive per panel — only one can be active/filled at a time,
+   which prevents duplicate/blank chapter values from sneaking in. */
+const chapterModes = { res: 'existing', vid: 'existing', test: 'existing' };
+
+function setChapterMode(prefix, mode){
+  chapterModes[prefix] = mode;
+
+  const toggleBox = document.getElementById(prefix + 'ChapterModeToggle');
+  if(toggleBox){
+    toggleBox.querySelectorAll('.chap-mode-btn').forEach(b => {
+      b.classList.toggle('active', b.getAttribute('data-mode') === mode);
+    });
   }
-  const exists = getAllChapters().some(c => c.toLowerCase() === name.toLowerCase());
-  if(!exists){
-    customChapters.push(name);
-    saveAllData();
+
+  const select = document.getElementById(prefix + 'Chapter');
+  const customInput = document.getElementById(prefix + 'ChapterCustomInput');
+  if(select) select.style.display = (mode === 'existing') ? 'block' : 'none';
+  if(customInput) customInput.style.display = (mode === 'custom') ? 'block' : 'none';
+
+  // Clear out whichever field just got hidden so the two can never both hold a value
+  if(mode === 'existing' && customInput) customInput.value = '';
+  if(mode === 'custom' && select) select.selectedIndex = 0;
+}
+
+/* Reads whichever of the two (Chapter select vs Custom input) is currently active
+   for a given panel, and — if it's a brand-new custom name — registers it into
+   customChapters so it shows up everywhere from then on. Returns '' if invalid. */
+function getEffectiveChapter(prefix){
+  const mode = chapterModes[prefix];
+  if(mode === 'custom'){
+    const input = document.getElementById(prefix + 'ChapterCustomInput');
+    const name = input ? input.value.trim() : '';
+    if(!name) return '';
+    const exists = getAllChapters().some(c => c.toLowerCase() === name.toLowerCase());
+    if(!exists) customChapters.push(name);
+    return name;
   }
+  const select = document.getElementById(prefix + 'Chapter');
+  return select ? select.value : '';
+}
+
+/* After successfully saving an asset that introduced a new custom chapter,
+   refresh all dropdowns/filters and flip that panel back to "Chapter" mode
+   with the newly added topic pre-selected. */
+function resetChapterModeAfterSave(prefix, chapterUsed){
   rebuildChapterUI();
-  const targetSelect = document.getElementById(targetSelectId);
-  if(targetSelect) targetSelect.value = name;
-  input.value = '';
+  setChapterMode(prefix, 'existing');
+  const select = document.getElementById(prefix + 'Chapter');
+  if(select && chapterUsed) select.value = chapterUsed;
 }
 
 function rebuildChapterUI(){
@@ -1091,13 +1113,21 @@ function renderVideoLibraryGrid(){
 
 function addVideoAsset(){
   const title = document.getElementById('vidTitle').value.trim();
-  const chapter = document.getElementById('vidChapter').value;
+  const chapter = getEffectiveChapter('vid');
   const rawUrl = document.getElementById('vidLink').value.trim();
   const rawNotesUrl = document.getElementById('vidNotesLink').value.trim();
   const msg = document.getElementById('vidApMsg');
 
   if(!title || !rawUrl){
     msg.textContent = "Sub-topic name and video link are both required.";
+    msg.className = "ap-msg err";
+    return;
+  }
+
+  if(!chapter){
+    msg.textContent = chapterModes.vid === 'custom'
+      ? "Please type a custom chapter/topic name."
+      : "Please select a chapter/topic.";
     msg.className = "ap-msg err";
     return;
   }
@@ -1125,6 +1155,7 @@ function addVideoAsset(){
   document.getElementById('vidLink').value = '';
   document.getElementById('vidNotesLink').value = '';
 
+  resetChapterModeAfterSave('vid', chapter);
   renderVideoLibraryGrid();
   saveAllData();
   setTimeout(() => { msg.textContent = ''; }, 3000);
@@ -1194,7 +1225,7 @@ function renderTestSeriesGrid(){
 
 function addTestSeriesAsset(){
   const title = document.getElementById('testTitle').value.trim();
-  const chapter = document.getElementById('testChapter').value;
+  const chapter = getEffectiveChapter('test');
   const url = document.getElementById('testLink').value.trim();
   const durationMinutes = parseInt(document.getElementById('testDuration').value) || 30;
   const marksCorrect = parseFloat(document.getElementById('testMarksCorrect').value) || 4;
@@ -1203,6 +1234,14 @@ function addTestSeriesAsset(){
 
   if(!title){
     msg.textContent = "Test title is required.";
+    msg.className = "ap-msg err";
+    return;
+  }
+
+  if(!chapter){
+    msg.textContent = chapterModes.test === 'custom'
+      ? "Please type a custom chapter/topic name."
+      : "Please select a chapter/topic.";
     msg.className = "ap-msg err";
     return;
   }
@@ -1220,6 +1259,7 @@ function addTestSeriesAsset(){
   document.getElementById('testTitle').value = '';
   document.getElementById('testLink').value = '';
 
+  resetChapterModeAfterSave('test', chapter);
   populateTestSelectorForQuestions();
   renderTestSeriesGrid();
   saveAllData();
@@ -2083,12 +2123,20 @@ function renderResourceGridLibrary() {
 function addResourceAsset() {
   const title = document.getElementById('resTitle').value.trim();
   const category = document.getElementById('resCategory').value;
-  const chapter = document.getElementById('resChapter').value;
+  const chapter = getEffectiveChapter('res');
   const url = document.getElementById('resLink').value.trim();
   const msg = document.getElementById('apMsg');
 
   if(!title || !url) {
     msg.textContent = "All mapping identity input fields are requested.";
+    msg.className = "ap-msg err";
+    return;
+  }
+
+  if(!chapter){
+    msg.textContent = chapterModes.res === 'custom'
+      ? "Please type a custom chapter/topic name."
+      : "Please select a chapter/topic.";
     msg.className = "ap-msg err";
     return;
   }
@@ -2105,7 +2153,8 @@ function addResourceAsset() {
 
   document.getElementById('resTitle').value = '';
   document.getElementById('resLink').value = '';
-  
+
+  resetChapterModeAfterSave('res', chapter);
   renderResourceGridLibrary();
   saveAllData();
   setTimeout(() => { msg.textContent = ''; }, 3000);
