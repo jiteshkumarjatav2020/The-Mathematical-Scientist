@@ -299,6 +299,15 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
           <select id="resChapter" class="ap-select"></select>
         </div>
       </div>
+      <div class="ap-grid" style="grid-template-columns: 1fr; margin-bottom: 12px;">
+        <div class="ap-field">
+          <label class="ap-lbl">Add a Custom Chapter / Topic</label>
+          <div style="display:flex;gap:10px;">
+            <input type="text" id="resCustomChapterInput" class="ap-input" placeholder="Type a new chapter/topic name..." style="flex:1;">
+            <button class="btn-s" style="padding:0 18px;white-space:nowrap;" onclick="addCustomChapter('resChapter')">+ Add Chapter</button>
+          </div>
+        </div>
+      </div>
       <div class="ap-grid" style="grid-template-columns: 1fr; margin-bottom: 20px;">
         <div class="ap-field">
           <label class="ap-lbl">Resource Link (Google Drive / Direct URL)</label>
@@ -358,6 +367,15 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
           <input type="url" id="vidLink" class="ap-input" placeholder="https://www.youtube.com/watch?v=...">
         </div>
       </div>
+      <div class="ap-grid" style="grid-template-columns: 1fr; margin-bottom: 12px;">
+        <div class="ap-field">
+          <label class="ap-lbl">Add a Custom Chapter / Topic</label>
+          <div style="display:flex;gap:10px;">
+            <input type="text" id="vidCustomChapterInput" class="ap-input" placeholder="Type a new chapter/topic name..." style="flex:1;">
+            <button class="btn-s" style="padding:0 18px;white-space:nowrap;" onclick="addCustomChapter('vidChapter')">+ Add Chapter</button>
+          </div>
+        </div>
+      </div>
       <div class="ap-grid" style="grid-template-columns: 1fr; margin-bottom: 20px;">
         <div class="ap-field">
           <label class="ap-lbl">Notes Link (optional, Google Drive / PDF)</label>
@@ -408,6 +426,15 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
           <input type="number" id="testDuration" class="ap-input" placeholder="30" value="30" min="1">
         </div>
       </div>
+      <div class="ap-grid" style="grid-template-columns: 1fr; margin-bottom: 12px;">
+        <div class="ap-field">
+          <label class="ap-lbl">Add a Custom Chapter / Topic</label>
+          <div style="display:flex;gap:10px;">
+            <input type="text" id="testCustomChapterInput" class="ap-input" placeholder="Type a new chapter/topic name..." style="flex:1;">
+            <button class="btn-s" style="padding:0 18px;white-space:nowrap;" onclick="addCustomChapter('testChapter')">+ Add Chapter</button>
+          </div>
+        </div>
+      </div>
       <div class="ap-grid">
         <div class="ap-field">
           <label class="ap-lbl">Marks for Correct Answer</label>
@@ -444,10 +471,43 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
           </select>
         </div>
       </div>
-      <div class="ap-grid" style="grid-template-columns: 1fr; margin-bottom:16px;">
-        <div class="ap-field">
-          <label class="ap-lbl">Question Text</label>
-          <textarea id="qText" class="ap-input" rows="2" placeholder="Enter the question..." style="resize:vertical;"></textarea>
+
+      <div class="ap-field" style="margin-bottom:16px;">
+        <label class="ap-lbl">Question Input Method</label>
+        <div class="d-btn-group">
+          <button type="button" class="fbtn active" id="qModeTypeBtn" onclick="setQuestionInputMode('text')">✍️ Type Question</button>
+          <button type="button" class="fbtn" id="qModeImageBtn" onclick="setQuestionInputMode('image')">🖼️ Upload Question Image</button>
+        </div>
+      </div>
+
+      <div id="qTextModeWrapper">
+        <div class="ap-field" style="margin-bottom:8px;">
+          <label class="ap-lbl">Question Text (supports Math — wrap equations in $...$)</label>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;" id="mathToolbar"></div>
+          <textarea id="qText" class="ap-input" rows="3" placeholder="e.g., Evaluate $\int_{0}^{1} x^2 \,dx$" style="resize:vertical;font-family:var(--font-mono);" oninput="updateMathPreview()"></textarea>
+        </div>
+        <div class="ap-field" style="margin-bottom:16px;">
+          <label class="ap-lbl">Live Preview</label>
+          <div id="qPreview" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;min-height:44px;font-size:15px;color:var(--text);"></div>
+        </div>
+      </div>
+
+      <div id="qImageModeWrapper" style="display:none;">
+        <div class="ap-grid" style="grid-template-columns: 1fr; margin-bottom:12px;">
+          <div class="ap-field">
+            <label class="ap-lbl">Upload Question Image (photo/screenshot of the question)</label>
+            <input type="file" id="qImageFile" class="ap-input" accept="image/*" onchange="handleQuestionImageUpload(event)">
+          </div>
+        </div>
+        <div id="qImagePreviewWrap" style="display:none;margin-bottom:16px;">
+          <img id="qImagePreview" style="max-width:100%;max-height:280px;border-radius:8px;border:1px solid var(--border);">
+          <div style="margin-top:8px;">
+            <button class="btn-s" style="padding:6px 14px;font-size:12px;color:#C0564A;border-color:rgba(192,86,74,0.2);" onclick="clearQuestionImage()">Remove Image</button>
+          </div>
+        </div>
+        <div class="ap-field" style="margin-bottom:16px;">
+          <label class="ap-lbl">Optional Caption / Extra Text</label>
+          <textarea id="qImageCaption" class="ap-input" rows="2" placeholder="Optional short note shown above the image..."></textarea>
         </div>
       </div>
 
@@ -687,6 +747,18 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
+<!-- MathJax (renders LaTeX math typed in $...$ / $$...$$ inside question text) -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+  },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+};
+</script>
+<script id="MathJax-script" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+
 <script>
 /* CONFIG MANAGEMENT BLOCK */
 const CONFIG = {
@@ -707,6 +779,13 @@ const CHAPTERS = [
   "Straight Lines","Three Dimensional Geometry","Trigonometric Equations",
   "Trigonometric Ratios and Identities","Vector Algebra"
 ];
+
+/* User-added custom chapters/topics (persisted alongside the rest of the site data) */
+let customChapters = [];
+
+function getAllChapters(){
+  return CHAPTERS.concat(customChapters);
+}
 
 let resourceDatabaseIndex = [];
 let videoLibraryIndex = [];
@@ -767,14 +846,14 @@ function initFirestore(){
 function saveAllData(){
   try {
     localStorage.setItem(TMS_STORAGE_KEY, JSON.stringify({
-      resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex
+      resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex, customChapters
     }));
   } catch(e){
     console.error("Local save failed:", e);
   }
   if(firestoreReady){
     tmsDocRef().set({
-      resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex,
+      resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex, customChapters,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }).catch(e => {
       console.error("[TMS] Cloud save failed:", e);
@@ -791,6 +870,7 @@ function loadLocalCache(){
     resourceDatabaseIndex = parsed.resourceDatabaseIndex || [];
     videoLibraryIndex = parsed.videoLibraryIndex || [];
     testSeriesIndex = parsed.testSeriesIndex || [];
+    customChapters = parsed.customChapters || [];
     testSeriesIndex.forEach(t => { if(!t.questions) t.questions = []; });
   } catch(e){
     console.error("Local cache load failed:", e);
@@ -798,6 +878,7 @@ function loadLocalCache(){
 }
 
 function refreshAllDataViews(){
+  rebuildChapterUI();
   renderResourceGridLibrary();
   renderVideoLibraryGrid();
   renderTestSeriesGrid();
@@ -821,10 +902,11 @@ function initCloudSync(){
       resourceDatabaseIndex = data.resourceDatabaseIndex || [];
       videoLibraryIndex = data.videoLibraryIndex || [];
       testSeriesIndex = data.testSeriesIndex || [];
+      customChapters = data.customChapters || [];
       testSeriesIndex.forEach(t => { if(!t.questions) t.questions = []; });
       try {
         localStorage.setItem(TMS_STORAGE_KEY, JSON.stringify({
-          resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex
+          resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex, customChapters
         }));
       } catch(e){}
       refreshAllDataViews();
@@ -842,44 +924,104 @@ let activeVideoChapterFilter = "All";
 let activeTestChapterFilter = "All";
 let isInstructorAuthenticated = false;
 
-function populateChapterControls(){
+/* ===== CUSTOM CHAPTER / TOPIC MANAGEMENT =====
+   Lets an admin type any chapter/topic name and have it appear everywhere
+   (all three "Chapter / Topic" dropdowns + all three filter sidebars). */
+function addCustomChapter(targetSelectId){
+  const inputMap = {
+    resChapter: 'resCustomChapterInput',
+    vidChapter: 'vidCustomChapterInput',
+    testChapter: 'testCustomChapterInput'
+  };
+  const inputId = inputMap[targetSelectId];
+  const input = document.getElementById(inputId);
+  if(!input) return;
+  const name = input.value.trim();
+  if(!name){
+    alert("Please type a chapter/topic name first.");
+    return;
+  }
+  const exists = getAllChapters().some(c => c.toLowerCase() === name.toLowerCase());
+  if(!exists){
+    customChapters.push(name);
+    saveAllData();
+  }
+  rebuildChapterUI();
+  const targetSelect = document.getElementById(targetSelectId);
+  if(targetSelect) targetSelect.value = name;
+  input.value = '';
+}
+
+function rebuildChapterUI(){
+  const allChapters = getAllChapters();
+
+  // Preserve currently selected values in the three admin dropdowns
   const resSelect = document.getElementById('resChapter');
   const vidSelect = document.getElementById('vidChapter');
   const testSelect = document.getElementById('testChapter');
+  const prevRes = resSelect ? resSelect.value : null;
+  const prevVid = vidSelect ? vidSelect.value : null;
+  const prevTest = testSelect ? testSelect.value : null;
 
-  testSelect.insertAdjacentHTML('beforeend', `<option value="Full Syllabus">🌐 Full Syllabus (All Chapters)</option>`);
+  if(resSelect) resSelect.innerHTML = allChapters.map(ch => `<option>${ch}</option>`).join('');
+  if(vidSelect) vidSelect.innerHTML = allChapters.map(ch => `<option>${ch}</option>`).join('');
+  if(testSelect){
+    testSelect.innerHTML = `<option value="Full Syllabus">🌐 Full Syllabus (All Chapters)</option>` +
+      allChapters.map(ch => `<option>${ch}</option>`).join('');
+  }
+  if(resSelect && allChapters.includes(prevRes)) resSelect.value = prevRes;
+  if(vidSelect && allChapters.includes(prevVid)) vidSelect.value = prevVid;
+  if(testSelect && (prevTest === 'Full Syllabus' || allChapters.includes(prevTest))) testSelect.value = prevTest;
 
-  CHAPTERS.forEach(ch => {
-    resSelect.insertAdjacentHTML('beforeend', `<option>${ch}</option>`);
-    vidSelect.insertAdjacentHTML('beforeend', `<option>${ch}</option>`);
-    testSelect.insertAdjacentHTML('beforeend', `<option>${ch}</option>`);
-  });
-
+  // Resource filter sidebar
   const resFilterBox = document.getElementById('resourceChapterFilters');
-  let resHtml = `<button class="fbtn active" data-chap="All" onclick="setChapterFilter(this,'All')">All Chapters</button>`;
-  CHAPTERS.forEach(ch => {
-    resHtml += `<button class="fbtn" data-chap="${ch}" onclick="setChapterFilter(this,'${ch.replace(/'/g,"\\'")}')">${ch}</button>`;
-  });
-  resFilterBox.insertAdjacentHTML('beforeend', resHtml);
+  if(resFilterBox){
+    let resHtml = `<span class="filter-lbl">Chapters</span>`;
+    resHtml += `<button class="fbtn ${activeChapterFilter==='All'?'active':''}" data-chap="All" onclick="setChapterFilter(this,'All')">All Chapters</button>`;
+    allChapters.forEach(ch => {
+      resHtml += `<button class="fbtn ${activeChapterFilter===ch?'active':''}" data-chap="${ch}" onclick="setChapterFilter(this,'${ch.replace(/'/g,"\\'")}')">${ch}</button>`;
+    });
+    resFilterBox.innerHTML = resHtml;
+  }
 
+  // Video filter sidebar
   const vidFilterBox = document.getElementById('videoChapterFilters');
-  let vidHtml = `<button class="fbtn active" data-vchap="All" onclick="setVideoChapterFilter(this,'All')">All Chapters <span class="fbtn-count" data-vcount="All">0</span></button>`;
-  CHAPTERS.forEach(ch => {
-    vidHtml += `<button class="fbtn" data-vchap="${ch}" onclick="setVideoChapterFilter(this,'${ch.replace(/'/g,"\\'")}')">${ch} <span class="fbtn-count" data-vcount="${ch}">0</span></button>`;
-  });
-  vidFilterBox.insertAdjacentHTML('beforeend', vidHtml);
+  if(vidFilterBox){
+    let vidHtml = `<span class="filter-lbl">Chapters</span>`;
+    vidHtml += `<button class="fbtn ${activeVideoChapterFilter==='All'?'active':''}" data-vchap="All" onclick="setVideoChapterFilter(this,'All')">All Chapters <span class="fbtn-count" data-vcount="All">0</span></button>`;
+    allChapters.forEach(ch => {
+      vidHtml += `<button class="fbtn ${activeVideoChapterFilter===ch?'active':''}" data-vchap="${ch}" onclick="setVideoChapterFilter(this,'${ch.replace(/'/g,"\\'")}')">${ch} <span class="fbtn-count" data-vcount="${ch}">0</span></button>`;
+    });
+    vidFilterBox.innerHTML = vidHtml;
+  }
 
+  // Test filter sidebar
   const testFilterBox = document.getElementById('testChapterFilters');
-  let testHtml = `<button class="fbtn active" data-tchap="All" onclick="setTestChapterFilter(this,'All')">All Chapters <span class="fbtn-count" data-tcount="All">0</span></button>`;
-  testHtml += `<button class="fbtn" data-tchap="Full Syllabus" onclick="setTestChapterFilter(this,'Full Syllabus')">🌐 Full Syllabus <span class="fbtn-count" data-tcount="Full Syllabus">0</span></button>`;
-  CHAPTERS.forEach(ch => {
-    testHtml += `<button class="fbtn" data-tchap="${ch}" onclick="setTestChapterFilter(this,'${ch.replace(/'/g,"\\'")}')">${ch} <span class="fbtn-count" data-tcount="${ch}">0</span></button>`;
-  });
-  testFilterBox.insertAdjacentHTML('beforeend', testHtml);
+  if(testFilterBox){
+    let testHtml = `<span class="filter-lbl">Chapters</span>`;
+    testHtml += `<button class="fbtn ${activeTestChapterFilter==='All'?'active':''}" data-tchap="All" onclick="setTestChapterFilter(this,'All')">All Chapters <span class="fbtn-count" data-tcount="All">0</span></button>`;
+    testHtml += `<button class="fbtn ${activeTestChapterFilter==='Full Syllabus'?'active':''}" data-tchap="Full Syllabus" onclick="setTestChapterFilter(this,'Full Syllabus')">🌐 Full Syllabus <span class="fbtn-count" data-tcount="Full Syllabus">0</span></button>`;
+    allChapters.forEach(ch => {
+      testHtml += `<button class="fbtn ${activeTestChapterFilter===ch?'active':''}" data-tchap="${ch}" onclick="setTestChapterFilter(this,'${ch.replace(/'/g,"\\'")}')">${ch} <span class="fbtn-count" data-tcount="${ch}">0</span></button>`;
+    });
+    testFilterBox.innerHTML = testHtml;
+  }
+
+  calculateDynamicStatsCounter();
+  updateHeroStats();
+  const vBox = document.getElementById('videoLibraryContainer');
+  const tBox = document.getElementById('testSeriesContainer');
+  if(vBox) renderVideoLibraryGrid();
+  if(tBox) renderTestSeriesGrid();
+}
+
+function populateChapterControls(){
+  rebuildChapterUI();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
   populateChapterControls();
+  buildMathToolbar();
   initCloudSync();
   synchronizeYouTubeLiveFeed();
 });
@@ -1119,10 +1261,116 @@ function onQuestionTypeChange(){
   document.getElementById('qMsqCorrectField').style.display = (type === 'MSQ') ? 'flex' : 'none';
 }
 
+/* ===== QUESTION INPUT MODE: Type vs Upload Image ===== */
+let qInputMode = 'text';
+let qImageDataUrl = null;
+
+function setQuestionInputMode(mode){
+  qInputMode = mode;
+  document.getElementById('qModeTypeBtn').classList.toggle('active', mode === 'text');
+  document.getElementById('qModeImageBtn').classList.toggle('active', mode === 'image');
+  document.getElementById('qTextModeWrapper').style.display = (mode === 'text') ? 'block' : 'none';
+  document.getElementById('qImageModeWrapper').style.display = (mode === 'image') ? 'block' : 'none';
+}
+
+function handleQuestionImageUpload(evt){
+  const file = evt.target.files && evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      // Downscale large images client-side so Firestore documents stay small
+      const MAX_W = 900;
+      let w = img.width, h = img.height;
+      if(w > MAX_W){ h = Math.round(h * (MAX_W / w)); w = MAX_W; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0,0,w,h);
+      ctx.drawImage(img, 0, 0, w, h);
+      qImageDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+      document.getElementById('qImagePreview').src = qImageDataUrl;
+      document.getElementById('qImagePreviewWrap').style.display = 'block';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearQuestionImage(){
+  qImageDataUrl = null;
+  document.getElementById('qImageFile').value = '';
+  document.getElementById('qImagePreviewWrap').style.display = 'none';
+}
+
+/* ===== MATH EDITOR TOOLBAR (inserts LaTeX snippets) ===== */
+const MATH_SNIPPETS = [
+  {label:'x/y', insert:'\\frac{a}{b}'},
+  {label:'√x', insert:'\\sqrt{x}'},
+  {label:'xⁿ', insert:'x^{n}'},
+  {label:'xₙ', insert:'x_{n}'},
+  {label:'∫', insert:'\\int_{a}^{b} f(x)\\,dx'},
+  {label:'Σ', insert:'\\sum_{i=1}^{n}'},
+  {label:'lim', insert:'\\lim_{x \\to a}'},
+  {label:'d/dx', insert:'\\frac{d}{dx}'},
+  {label:'∂', insert:'\\partial'},
+  {label:'π', insert:'\\pi'},
+  {label:'θ', insert:'\\theta'},
+  {label:'∞', insert:'\\infty'},
+  {label:'Matrix', insert:'\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}'},
+  {label:'≤', insert:'\\le'},
+  {label:'≥', insert:'\\ge'},
+  {label:'→', insert:'\\to'}
+];
+
+function buildMathToolbar(){
+  const box = document.getElementById('mathToolbar');
+  if(!box) return;
+  box.innerHTML = MATH_SNIPPETS.map((s,i) =>
+    `<button type="button" class="btn-s" style="padding:5px 10px;font-size:12px;" onclick="insertMathSnippet(${i})">${s.label}</button>`
+  ).join('');
+}
+
+function insertMathSnippet(i){
+  const ta = document.getElementById('qText');
+  if(!ta) return;
+  const snippet = MATH_SNIPPETS[i].insert;
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const before = ta.value.slice(0, start);
+  const after = ta.value.slice(end);
+  // Wrap in $...$ automatically if not already inside a math region on this line
+  const needsWrap = !(before.trim().endsWith('$') && !before.trim().endsWith('$$'));
+  const toInsert = needsWrap ? ('$' + snippet + '$') : snippet;
+  ta.value = before + toInsert + after;
+  ta.focus();
+  const cursorPos = start + toInsert.length;
+  ta.setSelectionRange(cursorPos, cursorPos);
+  updateMathPreview();
+}
+
+let mathPreviewDebounce = null;
+function updateMathPreview(){
+  const ta = document.getElementById('qText');
+  const preview = document.getElementById('qPreview');
+  if(!ta || !preview) return;
+  preview.innerHTML = ta.value || '<span style="color:var(--muted);">Preview will appear here…</span>';
+  if(mathPreviewDebounce) clearTimeout(mathPreviewDebounce);
+  mathPreviewDebounce = setTimeout(() => {
+    typesetMath(preview);
+  }, 250);
+}
+
+function typesetMath(el){
+  if(window.MathJax && window.MathJax.typesetPromise){
+    window.MathJax.typesetPromise([el]).catch(err => console.warn('MathJax typeset error:', err));
+  }
+}
+
 function addQuestionToTest(){
   const testId = document.getElementById('qTestSelect').value;
   const type = document.getElementById('qType').value;
-  const text = document.getElementById('qText').value.trim();
   const msg = document.getElementById('qApMsg');
 
   const test = testSeriesIndex.find(t => t.id === testId);
@@ -1131,15 +1379,32 @@ function addQuestionToTest(){
     msg.className = "ap-msg err";
     return;
   }
-  if(!text){
-    msg.textContent = "Question text is required.";
-    msg.className = "ap-msg err";
-    return;
+
+  let text = '';
+  let questionImage = null;
+
+  if(qInputMode === 'image'){
+    if(!qImageDataUrl){
+      msg.textContent = "Please upload an image for this question, or switch to Type Question.";
+      msg.className = "ap-msg err";
+      return;
+    }
+    questionImage = qImageDataUrl;
+    text = document.getElementById('qImageCaption').value.trim();
+  } else {
+    text = document.getElementById('qText').value.trim();
+    if(!text){
+      msg.textContent = "Question text is required.";
+      msg.className = "ap-msg err";
+      return;
+    }
   }
 
   const questionObj = {
     id: "q_" + Date.now() + "_" + Math.floor(Math.random()*1000),
-    type, text
+    type, text,
+    inputMode: qInputMode,
+    questionImage: questionImage
   };
 
   if(type === 'MCQ' || type === 'MSQ'){
@@ -1186,6 +1451,9 @@ function addQuestionToTest(){
   msg.className = "ap-msg ok";
 
   document.getElementById('qText').value = '';
+  document.getElementById('qImageCaption').value = '';
+  clearQuestionImage();
+  document.getElementById('qPreview').innerHTML = '';
   document.getElementById('qOptA').value = '';
   document.getElementById('qOptB').value = '';
   document.getElementById('qOptC').value = '';
@@ -1287,11 +1555,17 @@ function trRenderQuestion(){
     `;
   }
 
+  const questionImageHtml = q.questionImage
+    ? `<img src="${q.questionImage}" style="max-width:100%;border-radius:10px;border:1px solid var(--border);margin-bottom:16px;display:block;">`
+    : '';
+
   document.getElementById('trQArea').innerHTML = `
     <div class="tr-qnum">Question ${trCurrentIndex + 1} of ${trCurrentTest.questions.length} &middot; <span style="color:var(--muted);">${q.type || 'MCQ'} — ${typeLabels[q.type] || typeLabels.MCQ}</span></div>
-    <div class="tr-qtext">${q.text}</div>
+    ${questionImageHtml}
+    <div class="tr-qtext">${q.text || ''}</div>
     ${bodyHtml}
   `;
+  typesetMath(document.getElementById('trQArea'));
   trRenderPalette();
 }
 
@@ -1438,9 +1712,13 @@ function submitTest(autoSubmitted){
           return `<div class="${cls}">${letters[oi]}. ${opt} ${isCorrectOpt ? '✓ Correct Answer' : (isGivenOpt ? '✗ Your Answer' : '')}</div>`;
         }).join('');
       }
+      const reviewImageHtml = r.q.questionImage
+        ? `<img src="${r.q.questionImage}" style="max-width:100%;border-radius:8px;border:1px solid var(--border);margin-bottom:10px;display:block;">`
+        : '';
       return `
       <div class="review-q">
-        <div style="font-weight:600;margin-bottom:10px;">Q${i+1}. [${r.q.type || 'MCQ'}] ${r.q.text}</div>
+        <div style="font-weight:600;margin-bottom:10px;">Q${i+1}. [${r.q.type || 'MCQ'}] ${r.q.text || ''}</div>
+        ${reviewImageHtml}
         ${answerHtml}
       </div>`;
     }).join('')}
@@ -1449,6 +1727,7 @@ function submitTest(autoSubmitted){
   document.getElementById('testRunnerOverlay').classList.remove('open');
   document.getElementById('testResultOverlay').classList.add('open');
   document.getElementById('calcPanel').classList.remove('open');
+  typesetMath(document.getElementById('trResultContent'));
 }
 
 function closeTestResult(){
