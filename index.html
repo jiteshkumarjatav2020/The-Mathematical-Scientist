@@ -67,6 +67,12 @@ nav a:hover{color:var(--text);}
 .fbtn:hover{background:var(--bg2);}
 .fbtn.active{background:var(--gold);color:#0A0A0A;border-color:var(--gold);font-weight:600;}
 .fbtn-count{font-size:11px;opacity:0.7;font-family:var(--font-mono);}
+.fbtn-row{display:flex;align-items:stretch;gap:6px;}
+.fbtn-row .fbtn{flex:1;min-width:0;}
+.chip-del-btn{background:none;border:1px solid var(--border);color:var(--muted);width:32px;flex-shrink:0;border-radius:8px;cursor:pointer;font-size:12px;transition:all 0.15s;}
+.chip-del-btn:hover{background:rgba(192,86,74,0.14);color:#E07A6E;border-color:rgba(192,86,74,0.3);}
+.add-topic-btn{border-style:dashed;border-color:rgba(212,175,55,0.4);color:var(--gold);justify-content:center;font-weight:600;}
+.add-topic-btn:hover{background:rgba(212,175,55,0.08);}
 .lib-content{display:flex;flex-direction:column;gap:16px;}
 .admin-panel{background:var(--bg2);border:1px solid var(--gold);padding:24px;border-radius:12px;margin-bottom:32px;}
 .ap-title{font-family:var(--font-serif);font-size:18px;font-weight:700;margin-bottom:16px;color:var(--text);}
@@ -149,36 +155,44 @@ nav a:hover{color:var(--text);}
 .tr-pbtn.marked{background:#8B5CF6;border-color:#8B5CF6;color:#fff;}
 .tr-pbtn.answered-marked{background:#8B5CF6;border-color:#4A9C7A;color:#fff;box-shadow:inset 0 0 0 2px #4A9C7A;}
 .tr-pbtn.current{outline:2px solid var(--gold);outline-offset:2px;}
-.calc-panel{display:none;position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:0;width:400px;z-index:350;box-shadow:0 12px 40px rgba(0,0,0,0.4);overflow:hidden;}
-.calc-panel.open{display:block;}
-.calc-titlebar{display:flex;align-items:center;justify-content:space-between;background:var(--bg4);padding:12px 16px;border-bottom:1px solid var(--border);}
-.calc-title{font-family:var(--font-serif);font-weight:700;font-size:14px;color:var(--text);display:flex;align-items:center;gap:8px;}
+.calc-panel{display:none;position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:0;width:460px;max-width:calc(100vw - 32px);max-height:calc(100vh - 48px);z-index:350;box-shadow:0 16px 48px rgba(0,0,0,0.5);overflow:hidden;flex-direction:column;}
+.calc-panel.open{display:flex;}
+.calc-titlebar{display:flex;align-items:center;justify-content:space-between;background:var(--bg4);padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.calc-title{font-family:var(--font-serif);font-weight:700;font-size:15px;color:var(--text);display:flex;align-items:center;gap:8px;}
 .calc-title .brand-dot{width:5px;height:5px;background:var(--gold);border-radius:50%;}
-.calc-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:2px 6px;border-radius:4px;}
+.calc-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;line-height:1;padding:4px 8px;border-radius:6px;}
 .calc-close:hover{background:var(--bg2);color:var(--text);}
-.calc-body{padding:14px 16px 16px;}
-.calc-expr{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:var(--font-mono);font-size:12px;color:var(--muted);text-align:right;min-height:16px;margin-bottom:6px;word-break:break-all;}
-.calc-display{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:var(--font-mono);font-size:26px;font-weight:600;text-align:right;margin-bottom:10px;min-height:32px;word-break:break-all;color:var(--text);}
-.calc-modebar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;}
-.calc-angle{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--muted);}
-.calc-angle label{display:flex;align-items:center;gap:4px;cursor:pointer;}
-.calc-angle input{accent-color:var(--gold);cursor:pointer;}
-.calc-mem{display:flex;gap:4px;}
-.calc-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;}
-.calc-btn{background:var(--bg4);border:1px solid var(--border);color:var(--text);padding:9px 0;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;}
-.calc-btn:hover{background:var(--bg2);}
-.calc-btn.fn{font-size:11px;color:var(--muted);}
-.calc-btn.fn:hover{color:var(--text);}
-.calc-btn.op{color:var(--gold);}
-.calc-btn.mem{font-size:11px;color:var(--gold);}
-.calc-btn.danger{background:rgba(192,86,74,0.12);color:#C0564A;border-color:rgba(192,86,74,0.25);}
-.calc-btn.danger:hover{background:rgba(192,86,74,0.22);}
-.calc-btn.eq{background:var(--gold);color:#0A0A0A;grid-row:span 2;}
+.calc-body{padding:16px 18px 18px;overflow-y:auto;}
+.calc-expr{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:var(--font-mono);font-size:13px;color:var(--muted);text-align:right;min-height:18px;margin-bottom:8px;word-break:break-all;}
+.calc-display{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;font-family:var(--font-mono);font-size:36px;font-weight:600;text-align:right;margin-bottom:14px;min-height:44px;word-break:break-all;color:var(--text);}
+.calc-modebar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+.calc-angle{display:flex;align-items:center;gap:14px;font-size:13px;color:var(--text);}
+.calc-angle label{display:flex;align-items:center;gap:5px;cursor:pointer;}
+.calc-angle input{accent-color:var(--gold);cursor:pointer;width:15px;height:15px;}
+.calc-mem{display:flex;gap:6px;}
+.calc-mem .calc-btn{flex:1;padding:9px 6px;min-height:34px;}
+.calc-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;}
+.calc-btn{background:var(--bg4);border:1px solid var(--border);color:var(--text);padding:13px 0;border-radius:8px;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background 0.12s, transform 0.05s;min-height:44px;}
+.calc-btn:hover{background:var(--bg2);border-color:rgba(212,175,55,0.3);}
+.calc-btn:active{transform:scale(0.95);}
+.calc-btn.fn{font-size:12.5px;font-weight:600;color:var(--text);background:var(--card2);}
+.calc-btn.fn:hover{background:var(--bg2);color:var(--gold);}
+.calc-btn.op{color:var(--gold);font-size:16px;font-weight:700;background:rgba(212,175,55,0.08);border-color:rgba(212,175,55,0.2);}
+.calc-btn.op:hover{background:rgba(212,175,55,0.16);}
+.calc-btn.mem{font-size:12px;font-weight:700;color:var(--gold);background:var(--card2);}
+.calc-btn.danger{background:rgba(192,86,74,0.14);color:#E07A6E;border-color:rgba(192,86,74,0.3);font-weight:700;}
+.calc-btn.danger:hover{background:rgba(192,86,74,0.26);}
+.calc-btn.eq{background:var(--gold);color:#0A0A0A;grid-row:span 2;font-size:20px;font-weight:800;}
+.calc-btn.eq:hover{background:var(--gold-light);}
 .calc-btn.wide{grid-column:span 2;}
 @media(max-width:480px){
-  .calc-panel{width:calc(100vw - 32px);right:16px;bottom:16px;}
-  .calc-grid{gap:4px;}
-  .calc-btn{font-size:11px;padding:8px 0;}
+  .calc-panel{width:calc(100vw - 20px);right:10px;bottom:10px;max-height:calc(100vh - 20px);}
+  .calc-body{padding:12px 12px 14px;}
+  .calc-display{font-size:28px;padding:12px;}
+  .calc-grid{gap:6px;}
+  .calc-btn{font-size:11.5px;padding:11px 0;min-height:40px;}
+  .calc-btn.fn{font-size:10.5px;}
+  .calc-btn.eq{font-size:17px;}
 }
 .tr-result{max-width:640px;margin:40px auto;padding:0 24px;}
 .result-hero{text-align:center;margin-bottom:32px;}
@@ -203,6 +217,9 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
 .f-links{display:flex;gap:24px;}
 .f-links a{color:var(--muted);text-decoration:none;transition:color 0.2s;}
 .f-links a:hover{color:var(--text);}
+.f-icon-links{display:flex;gap:12px;}
+.f-icon-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);text-decoration:none;transition:all 0.2s;flex-shrink:0;}
+.f-icon-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(212,175,55,0.1);transform:translateY(-2px);}
 @media(max-width:968px){
   .hero-grid,.lib-grid,.lb-grid{grid-template-columns:1fr;}
   .s-header{flex-direction:column;align-items:flex-start;gap:16px;}
@@ -598,16 +615,36 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
   </div>
 </div>
 
+<div class="modal-overlay" id="customTopicModal">
+  <div class="modal-box">
+    <div class="modal-icon">🏷️</div>
+    <div class="modal-title">Add Custom Topic</div>
+    <div class="modal-desc">Create your own topic to organize resources, videos, or tests exactly how you like — e.g. "My Revision", "Algebra Practice", "IIT PYQ", "Mock Test".</div>
+    <input type="text" id="customTopicInput" class="ap-input" placeholder="e.g., My Revision" style="text-align:center; margin-bottom:16px;" onkeydown="if(event.key==='Enter')submitCustomTopic();">
+    <div style="display:flex; gap:12px;">
+      <button class="btn-s" style="flex:1; padding:10px;" onclick="closeCustomTopicModal()">Cancel</button>
+      <button class="btn-p" style="flex:1; padding:10px; justify-content:center;" onclick="submitCustomTopic()">Add</button>
+    </div>
+    <div id="customTopicErr" style="color:#C0564A; font-size:12px; margin-top:12px; font-weight:500; display:none;"></div>
+  </div>
+</div>
+
 <footer>
   <div class="p-wrap f-flex">
     <div class="f-left">
       <a href="#" class="f-brand">The Mathematical Scientist</a>
       <div>Premium JEE Learning Framework Core Console.</div>
     </div>
-    <div class="f-links">
-      <a href="https://www.youtube.com/@jitesh_iitian_kgp" target="_blank">YouTube</a>
-      <a href="https://www.instagram.com/jitesh_iitkgp_iitian" target="_blank">Instagram</a>
-      <a href="mailto:jiteshkumarjatav2020@gmail.com">Contact Gmail</a>
+    <div class="f-icon-links">
+      <a href="https://www.youtube.com/@jitesh_iitian_kgp" target="_blank" class="f-icon-btn" title="YouTube" aria-label="YouTube">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8zM9.6 15.6V8.4L15.8 12z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/jitesh_iitian_kgp" target="_blank" class="f-icon-btn" title="Instagram @jitesh_iitian_kgp" aria-label="Instagram">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1.1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="mailto:jiteshkumarjatav2020@gmail.com" class="f-icon-btn" title="Email" aria-label="Email">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+      </a>
     </div>
   </div>
 </footer>
@@ -782,6 +819,14 @@ const CHAPTERS = [
 /* User-added custom chapters/topics (persisted alongside the rest of the site data) */
 let customChapters = [];
 
+/* Chapters that used to exist but are no longer wanted — filtered out on every load
+   so they disappear permanently from anyone's saved data. */
+const DEPRECATED_CHAPTERS = ["find the value f(x)"];
+
+function sanitizeCustomChapters(list){
+  return (list || []).filter(c => !DEPRECATED_CHAPTERS.some(d => d.toLowerCase() === String(c).toLowerCase()));
+}
+
 function getAllChapters(){
   return CHAPTERS.concat(customChapters);
 }
@@ -869,7 +914,7 @@ function loadLocalCache(){
     resourceDatabaseIndex = parsed.resourceDatabaseIndex || [];
     videoLibraryIndex = parsed.videoLibraryIndex || [];
     testSeriesIndex = parsed.testSeriesIndex || [];
-    customChapters = parsed.customChapters || [];
+    customChapters = sanitizeCustomChapters(parsed.customChapters);
     testSeriesIndex.forEach(t => { if(!t.questions) t.questions = []; });
   } catch(e){
     console.error("Local cache load failed:", e);
@@ -901,7 +946,9 @@ function initCloudSync(){
       resourceDatabaseIndex = data.resourceDatabaseIndex || [];
       videoLibraryIndex = data.videoLibraryIndex || [];
       testSeriesIndex = data.testSeriesIndex || [];
-      customChapters = data.customChapters || [];
+      const rawCustomChapters = data.customChapters || [];
+      customChapters = sanitizeCustomChapters(rawCustomChapters);
+      const chapterWasCleaned = customChapters.length !== rawCustomChapters.length;
       testSeriesIndex.forEach(t => { if(!t.questions) t.questions = []; });
       try {
         localStorage.setItem(TMS_STORAGE_KEY, JSON.stringify({
@@ -909,6 +956,7 @@ function initCloudSync(){
         }));
       } catch(e){}
       refreshAllDataViews();
+      if(chapterWasCleaned && isInstructorAuthenticated) saveAllData();
     } else {
       saveAllData();
     }
@@ -1003,8 +1051,14 @@ function rebuildChapterUI(){
     let resHtml = `<span class="filter-lbl">Chapters</span>`;
     resHtml += `<button class="fbtn ${activeChapterFilter==='All'?'active':''}" data-chap="All" onclick="setChapterFilter(this,'All')">All Chapters</button>`;
     allChapters.forEach(ch => {
-      resHtml += `<button class="fbtn ${activeChapterFilter===ch?'active':''}" data-chap="${ch}" onclick="setChapterFilter(this,'${ch.replace(/'/g,"\\'")}')">${ch}</button>`;
+      resHtml += `<div class="fbtn-row">` +
+        `<button class="fbtn ${activeChapterFilter===ch?'active':''}" data-chap="${ch}" onclick="setChapterFilter(this,'${ch.replace(/'/g,"\\'")}')">${ch}</button>` +
+        chapterDeleteButtonHtml(ch) +
+      `</div>`;
     });
+    if(isInstructorAuthenticated){
+      resHtml += `<button class="fbtn add-topic-btn" onclick="openCustomTopicModal('res')">+ Custom Topic</button>`;
+    }
     resFilterBox.innerHTML = resHtml;
   }
 
@@ -1014,8 +1068,14 @@ function rebuildChapterUI(){
     let vidHtml = `<span class="filter-lbl">Chapters</span>`;
     vidHtml += `<button class="fbtn ${activeVideoChapterFilter==='All'?'active':''}" data-vchap="All" onclick="setVideoChapterFilter(this,'All')">All Chapters <span class="fbtn-count" data-vcount="All">0</span></button>`;
     allChapters.forEach(ch => {
-      vidHtml += `<button class="fbtn ${activeVideoChapterFilter===ch?'active':''}" data-vchap="${ch}" onclick="setVideoChapterFilter(this,'${ch.replace(/'/g,"\\'")}')">${ch} <span class="fbtn-count" data-vcount="${ch}">0</span></button>`;
+      vidHtml += `<div class="fbtn-row">` +
+        `<button class="fbtn ${activeVideoChapterFilter===ch?'active':''}" data-vchap="${ch}" onclick="setVideoChapterFilter(this,'${ch.replace(/'/g,"\\'")}')">${ch} <span class="fbtn-count" data-vcount="${ch}">0</span></button>` +
+        chapterDeleteButtonHtml(ch) +
+      `</div>`;
     });
+    if(isInstructorAuthenticated){
+      vidHtml += `<button class="fbtn add-topic-btn" onclick="openCustomTopicModal('vid')">+ Custom Topic</button>`;
+    }
     vidFilterBox.innerHTML = vidHtml;
   }
 
@@ -1026,8 +1086,14 @@ function rebuildChapterUI(){
     testHtml += `<button class="fbtn ${activeTestChapterFilter==='All'?'active':''}" data-tchap="All" onclick="setTestChapterFilter(this,'All')">All Chapters <span class="fbtn-count" data-tcount="All">0</span></button>`;
     testHtml += `<button class="fbtn ${activeTestChapterFilter==='Full Syllabus'?'active':''}" data-tchap="Full Syllabus" onclick="setTestChapterFilter(this,'Full Syllabus')">🌐 Full Syllabus <span class="fbtn-count" data-tcount="Full Syllabus">0</span></button>`;
     allChapters.forEach(ch => {
-      testHtml += `<button class="fbtn ${activeTestChapterFilter===ch?'active':''}" data-tchap="${ch}" onclick="setTestChapterFilter(this,'${ch.replace(/'/g,"\\'")}')">${ch} <span class="fbtn-count" data-tcount="${ch}">0</span></button>`;
+      testHtml += `<div class="fbtn-row">` +
+        `<button class="fbtn ${activeTestChapterFilter===ch?'active':''}" data-tchap="${ch}" onclick="setTestChapterFilter(this,'${ch.replace(/'/g,"\\'")}')">${ch} <span class="fbtn-count" data-tcount="${ch}">0</span></button>` +
+        chapterDeleteButtonHtml(ch) +
+      `</div>`;
     });
+    if(isInstructorAuthenticated){
+      testHtml += `<button class="fbtn add-topic-btn" onclick="openCustomTopicModal('test')">+ Custom Topic</button>`;
+    }
     testFilterBox.innerHTML = testHtml;
   }
 
@@ -1041,6 +1107,79 @@ function rebuildChapterUI(){
 
 function populateChapterControls(){
   rebuildChapterUI();
+}
+
+/* Small "✕" delete affordance shown next to a chapter filter chip, only for
+   admin-added custom topics (never the built-in CHAPTERS list) and only while
+   the instructor is authenticated. */
+function chapterDeleteButtonHtml(ch){
+  if(isInstructorAuthenticated && customChapters.includes(ch)){
+    return `<button type="button" class="chip-del-btn" title="Delete this custom topic" onclick="event.stopPropagation();deleteCustomChapter('${ch.replace(/'/g,"\\'")}')">✕</button>`;
+  }
+  return '';
+}
+
+function deleteCustomChapter(ch){
+  const inUse = resourceDatabaseIndex.some(r => r.chapter === ch)
+    || videoLibraryIndex.some(v => v.chapter === ch)
+    || testSeriesIndex.some(t => t.chapter === ch);
+
+  const warning = inUse
+    ? `"${ch}" is currently used by some existing resources/videos/tests. Removing it from the topic list will NOT delete that content, but it will disappear from the chapter dropdowns and filters. Continue?`
+    : `Delete the custom topic "${ch}"?`;
+  if(!confirm(warning)) return;
+
+  customChapters = customChapters.filter(c => c !== ch);
+  if(activeChapterFilter === ch) activeChapterFilter = 'All';
+  if(activeVideoChapterFilter === ch) activeVideoChapterFilter = 'All';
+  if(activeTestChapterFilter === ch) activeTestChapterFilter = 'All';
+
+  saveAllData();
+  rebuildChapterUI();
+  renderResourceGridLibrary();
+  renderVideoLibraryGrid();
+  renderTestSeriesGrid();
+}
+
+/* ===== "+ CUSTOM TOPIC" MODAL =====
+   Lets the authenticated instructor create a personal organizational topic
+   (e.g. "My Revision", "IIT PYQ", "Mock Test") straight from any chapter
+   filter sidebar. Saved permanently via the same Firestore/localStorage
+   sync used for the rest of the site's data, so it's there on every visit. */
+function openCustomTopicModal(){
+  const input = document.getElementById('customTopicInput');
+  const err = document.getElementById('customTopicErr');
+  if(input) input.value = '';
+  if(err) err.style.display = 'none';
+  document.getElementById('customTopicModal').classList.add('open');
+  setTimeout(() => { if(input) input.focus(); }, 50);
+}
+
+function closeCustomTopicModal(){
+  document.getElementById('customTopicModal').classList.remove('open');
+}
+
+function submitCustomTopic(){
+  const input = document.getElementById('customTopicInput');
+  const err = document.getElementById('customTopicErr');
+  const name = input.value.trim();
+
+  if(!name){
+    err.textContent = "Please type a topic name.";
+    err.style.display = 'block';
+    return;
+  }
+  const exists = getAllChapters().some(c => c.toLowerCase() === name.toLowerCase());
+  if(exists){
+    err.textContent = "This topic already exists in the list.";
+    err.style.display = 'block';
+    return;
+  }
+
+  customChapters.push(name);
+  saveAllData();
+  rebuildChapterUI();
+  closeCustomTopicModal();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -1963,6 +2102,7 @@ function handleAdminToggle(){
     document.getElementById('adminPanel').style.display = "none";
     document.getElementById('videoAdminPanel').style.display = "none";
     document.getElementById('testAdminPanel').style.display = "none";
+    rebuildChapterUI();
     renderResourceGridLibrary();
     renderVideoLibraryGrid();
     renderTestSeriesGrid();
@@ -2030,6 +2170,7 @@ function verifyAdminCredentialToken(){
     document.getElementById('videoAdminPanel').style.display = "block";
     document.getElementById('testAdminPanel').style.display = "block";
     closeAdminAuthenticationModal();
+    rebuildChapterUI();
     renderResourceGridLibrary();
     renderVideoLibraryGrid();
     renderTestSeriesGrid();
