@@ -201,7 +201,7 @@ nav a:hover{color:var(--text);}
 .tr-result{max-width:640px;margin:40px auto;padding:0 24px;}
 .result-hero{text-align:center;margin-bottom:32px;}
 .result-score{font-family:var(--font-serif);font-size:56px;font-weight:900;color:var(--gold);}
-.result-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px;}
+.result-stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:32px;}
 .result-stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 12px;text-align:center;}
 .result-stat-val{font-family:var(--font-serif);font-size:24px;font-weight:700;}
 .result-stat-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;}
@@ -476,19 +476,14 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
           <input type="number" id="testDuration" class="ap-input" placeholder="30" value="30" min="1">
         </div>
       </div>
-      <div class="ap-grid">
-        <div class="ap-field">
-          <label class="ap-lbl">Marks for Correct Answer</label>
-          <input type="number" id="testMarksCorrect" class="ap-input" placeholder="4" value="4" step="0.5">
-        </div>
-        <div class="ap-field">
-          <label class="ap-lbl">Negative Marks for Wrong Answer</label>
-          <input type="number" id="testMarksWrong" class="ap-input" placeholder="1" value="1" step="0.5">
-        </div>
+     <div class="ap-grid" style="grid-template-columns: 1fr;">
         <div class="ap-field">
           <label class="ap-lbl">External Link (optional, Drive/PDF/Form)</label>
           <input type="url" id="testLink" class="ap-input" placeholder="https://drive.google.com/... (optional)">
         </div>
+      </div>
+      <div style="background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.25);border-radius:8px;padding:12px 16px;margin-bottom:20px;font-size:12px;color:var(--muted);">
+        📐 Marking follows the <b style="color:var(--gold);">JEE Advanced pattern</b> automatically, based on the Question Type you pick below — no per-test marks needed.
       </div>
       <div class="ap-actions">
         <button class="btn-p" style="padding:10px 24px; font-size:14px;" onclick="addTestSeriesAsset()">Create Test</button>
@@ -509,10 +504,12 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
             <option value="MCQ">MCQ — Single Correct</option>
             <option value="MSQ">MSQ — Multiple Correct</option>
             <option value="NAT">NAT — Numerical Answer</option>
+            <option value="MATCH">Match the Following</option>
           </select>
         </div>
       </div>
 
+      <div id="qMarkingSchemeBox" style="background:var(--bg);border:1px solid rgba(212,175,55,0.3);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:12.5px;color:var(--text);line-height:1.6;"></div>
       <div class="ap-field" style="margin-bottom:16px;">
         <label class="ap-lbl">Question Input Method</label>
         <div class="d-btn-group">
@@ -549,6 +546,27 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
         <div class="ap-field" style="margin-bottom:16px;">
           <label class="ap-lbl">Optional Caption / Extra Text</label>
           <textarea id="qImageCaption" class="ap-input" rows="2" placeholder="Optional short note shown above the image..."></textarea>
+        </div>
+      </div>
+
+      <div id="qMatchWrapper" style="display:none;margin-bottom:16px;">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Fill List-I (4 items) and List-II (5 items). The four options below (A–D) should describe the four possible matching combinations — mark the one correct combination using "Correct Option".</div>
+        <div class="ap-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="ap-field">
+            <label class="ap-lbl">List-I</label>
+            <input type="text" id="qMatchListI_P" class="ap-input" placeholder="P. ..." style="margin-bottom:8px;">
+            <input type="text" id="qMatchListI_Q" class="ap-input" placeholder="Q. ..." style="margin-bottom:8px;">
+            <input type="text" id="qMatchListI_R" class="ap-input" placeholder="R. ..." style="margin-bottom:8px;">
+            <input type="text" id="qMatchListI_S" class="ap-input" placeholder="S. ...">
+          </div>
+          <div class="ap-field">
+            <label class="ap-lbl">List-II</label>
+            <input type="text" id="qMatchListII_1" class="ap-input" placeholder="1. ..." style="margin-bottom:8px;">
+            <input type="text" id="qMatchListII_2" class="ap-input" placeholder="2. ..." style="margin-bottom:8px;">
+            <input type="text" id="qMatchListII_3" class="ap-input" placeholder="3. ..." style="margin-bottom:8px;">
+            <input type="text" id="qMatchListII_4" class="ap-input" placeholder="4. ..." style="margin-bottom:8px;">
+            <input type="text" id="qMatchListII_5" class="ap-input" placeholder="5. ...">
+          </div>
         </div>
       </div>
 
@@ -1215,6 +1233,7 @@ function submitCustomTopic(){
 window.addEventListener('DOMContentLoaded', () => {
   populateChapterControls();
   buildMathToolbar();
+  updateMarkingSchemeDisplay('MCQ');
   initCloudSync();
   synchronizeYouTubeLiveFeed();
 });
@@ -1399,8 +1418,6 @@ function addTestSeriesAsset(){
   const chapter = getEffectiveChapter('test');
   const url = document.getElementById('testLink').value.trim();
   const durationMinutes = parseInt(document.getElementById('testDuration').value) || 30;
-  const marksCorrect = parseFloat(document.getElementById('testMarksCorrect').value) || 4;
-  const marksWrong = parseFloat(document.getElementById('testMarksWrong').value) || 1;
   const msg = document.getElementById('testApMsg');
 
   if(!title){
@@ -1419,7 +1436,7 @@ function addTestSeriesAsset(){
 
   testSeriesIndex.push({
     id: "test_" + Date.now(),
-    title, chapter, url, durationMinutes, marksCorrect, marksWrong,
+    title, chapter, url, durationMinutes,
     questions: [],
     timestamp: new Date().toISOString()
   });
@@ -1463,15 +1480,29 @@ function updateQuestionCountDisplay(){
   const test = testSeriesIndex.find(t => t.id === sel.value);
   display.textContent = test ? `Questions added so far: ${(test.questions || []).length}` : '';
 }
+const JEE_MARKING_SCHEME = {
+  MCQ:   { label: 'MCQ — Single Correct',   html: '✅ Correct: <b style="color:#4A9C7A;">+3</b> &nbsp;|&nbsp; ➖ Unanswered: <b>0</b> &nbsp;|&nbsp; ❌ Wrong: <b style="color:#C0564A;">−1</b>' },
+  MSQ:   { label: 'MSQ — Multiple Correct', html: '✅ All correct chosen: <b style="color:#4A9C7A;">+4</b> &nbsp;|&nbsp; 🟡 Partial (only correct options chosen): <b style="color:#D4AF37;">+1 / +2 / +3</b> &nbsp;|&nbsp; ➖ Unanswered: <b>0</b> &nbsp;|&nbsp; ❌ Any wrong option chosen: <b style="color:#C0564A;">−2</b>' },
+  NAT:   { label: 'NAT — Numerical Answer', html: '✅ Correct value (within tolerance): <b style="color:#4A9C7A;">+4</b> &nbsp;|&nbsp; ❌ Wrong / Unanswered: <b>0</b>' },
+  MATCH: { label: 'Match the Following',    html: '✅ Correct combination: <b style="color:#4A9C7A;">+4</b> &nbsp;|&nbsp; ➖ Unanswered: <b>0</b> &nbsp;|&nbsp; ❌ Wrong: <b style="color:#C0564A;">−1</b>' }
+};
+
+function updateMarkingSchemeDisplay(type){
+  const box = document.getElementById('qMarkingSchemeBox');
+  if(!box) return;
+  const scheme = JEE_MARKING_SCHEME[type] || JEE_MARKING_SCHEME.MCQ;
+  box.innerHTML = `<b style="color:var(--gold);">📐 Marking Scheme — ${scheme.label}</b><br>${scheme.html}`;
+}
 
 function onQuestionTypeChange(){
   const type = document.getElementById('qType').value;
   document.getElementById('qOptionsWrapper').style.display = (type === 'NAT') ? 'none' : 'block';
   document.getElementById('qNatWrapper').style.display = (type === 'NAT') ? 'block' : 'none';
-  document.getElementById('qMcqCorrectField').style.display = (type === 'MCQ') ? 'flex' : 'none';
+  document.getElementById('qMatchWrapper').style.display = (type === 'MATCH') ? 'block' : 'none';
+  document.getElementById('qMcqCorrectField').style.display = (type === 'MCQ' || type === 'MATCH') ? 'flex' : 'none';
   document.getElementById('qMsqCorrectField').style.display = (type === 'MSQ') ? 'flex' : 'none';
+  updateMarkingSchemeDisplay(type);
 }
-
 /* ===== QUESTION INPUT MODE: Type vs Upload Image ===== */
 let qInputMode = 'text';
 let qImageDataUrl = null;
@@ -1618,7 +1649,7 @@ function addQuestionToTest(){
     questionImage: questionImage
   };
 
-  if(type === 'MCQ' || type === 'MSQ'){
+  if(type === 'MCQ' || type === 'MSQ' || type === 'MATCH'){
     const optA = document.getElementById('qOptA').value.trim();
     const optB = document.getElementById('qOptB').value.trim();
     const optC = document.getElementById('qOptC').value.trim();
@@ -1630,9 +1661,7 @@ function addQuestionToTest(){
     }
     questionObj.options = [optA, optB, optC, optD];
 
-    if(type === 'MCQ'){
-      questionObj.correct = parseInt(document.getElementById('qCorrect').value);
-    } else {
+    if(type === 'MSQ'){
       const correctSet = [];
       if(document.getElementById('qCorrectA').checked) correctSet.push(0);
       if(document.getElementById('qCorrectB').checked) correctSet.push(1);
@@ -1644,6 +1673,21 @@ function addQuestionToTest(){
         return;
       }
       questionObj.correct = correctSet;
+    } else {
+      // MCQ or MATCH — single correct option
+      questionObj.correct = parseInt(document.getElementById('qCorrect').value);
+    }
+
+    if(type === 'MATCH'){
+      const listI = ['P','Q','R','S'].map(k => document.getElementById('qMatchListI_'+k).value.trim());
+      const listII = ['1','2','3','4','5'].map(k => document.getElementById('qMatchListII_'+k).value.trim());
+      if(listI.some(v => !v) || listII.some(v => !v)){
+        msg.textContent = "Please fill all List-I (P,Q,R,S) and List-II (1-5) entries.";
+        msg.className = "ap-msg err";
+        return;
+      }
+      questionObj.listI = listI;
+      questionObj.listII = listII;
     }
   } else if(type === 'NAT'){
     const natAnswer = document.getElementById('qNatAnswer').value.trim();
@@ -1676,6 +1720,8 @@ function addQuestionToTest(){
   document.getElementById('qCorrectD').checked = false;
   document.getElementById('qNatAnswer').value = '';
   document.getElementById('qNatTolerance').value = '0';
+  ['P','Q','R','S'].forEach(k => { const el = document.getElementById('qMatchListI_'+k); if(el) el.value = ''; });
+  ['1','2','3','4','5'].forEach(k => { const el = document.getElementById('qMatchListII_'+k); if(el) el.value = ''; });
 
   updateQuestionCountDisplay();
   renderTestSeriesGrid();
@@ -1734,13 +1780,28 @@ function trIsAnswered(i){
   if(typeof a === 'string') return a.trim() !== '';
   return true;
 }
-
+function buildMatchListsHtml(q){
+  const labelsI = ['P','Q','R','S'];
+  const labelsII = ['1','2','3','4','5'];
+  return `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+      <div>
+        <div style="font-weight:600;font-size:13px;margin-bottom:8px;color:var(--gold);">List-I</div>
+        ${q.listI.map((v,i) => `<div style="padding:8px 10px;border:1px solid var(--border);border-radius:6px;margin-bottom:6px;font-size:13px;"><b>${labelsI[i]}.</b> ${v}</div>`).join('')}
+      </div>
+      <div>
+        <div style="font-weight:600;font-size:13px;margin-bottom:8px;color:var(--gold);">List-II</div>
+        ${q.listII.map((v,i) => `<div style="padding:8px 10px;border:1px solid var(--border);border-radius:6px;margin-bottom:6px;font-size:13px;"><b>${labelsII[i]}.</b> ${v}</div>`).join('')}
+      </div>
+    </div>
+  `;
+}
 function trRenderQuestion(){
   const q = trCurrentTest.questions[trCurrentIndex];
   trVisited.add(trCurrentIndex);
   const selected = trAnswers[trCurrentIndex];
   const letters = ['A','B','C','D'];
-  const typeLabels = { MCQ: 'Single Correct', MSQ: 'Multiple Correct (select all that apply)', NAT: 'Numerical Answer' };
+  const typeLabels = { MCQ: 'Single Correct', MSQ: 'Multiple Correct (select all that apply)', NAT: 'Numerical Answer', MATCH: 'Match the Following — Single Correct' };
 
   let bodyHtml = '';
   if(q.type === 'NAT'){
@@ -1770,10 +1831,12 @@ function trRenderQuestion(){
     ? `<img src="${q.questionImage}" style="max-width:100%;border-radius:10px;border:1px solid var(--border);margin-bottom:16px;display:block;">`
     : '';
 
+  const matchListsHtml = (q.type === 'MATCH') ? buildMatchListsHtml(q) : '';
   document.getElementById('trQArea').innerHTML = `
     <div class="tr-qnum">Question ${trCurrentIndex + 1} of ${trCurrentTest.questions.length} &middot; <span style="color:var(--muted);">${q.type || 'MCQ'} — ${typeLabels[q.type] || typeLabels.MCQ}</span></div>
     ${questionImageHtml}
     <div class="tr-qtext">${q.text || ''}</div>
+    ${matchListsHtml}
     ${bodyHtml}
   `;
   typesetMath(document.getElementById('trQArea'));
@@ -1854,45 +1917,57 @@ function confirmSubmitTest(){
 function submitTest(autoSubmitted){
   if(trTimerHandle) clearInterval(trTimerHandle);
 
-  let correctCount = 0, wrongCount = 0, unattempted = 0, totalMarks = 0;
+let correctCount = 0, wrongCount = 0, unattempted = 0, partialCount = 0, totalMarks = 0;
   const perQuestionReview = [];
   const letters = ['A','B','C','D'];
+
+  function questionMaxMarks(q){
+    if(q.type === 'MCQ') return 3;
+    return 4; // MSQ, NAT, MATCH
+  }
 
   trCurrentTest.questions.forEach((q, i) => {
     const given = trAnswers[i];
     const answered = trIsAnswered(i);
-    let status;
+    let status, marksAwarded = 0;
 
     if(!answered){
       unattempted++;
       status = 'unattempted';
-    } else {
-      let isCorrect = false;
-      if(q.type === 'MSQ'){
-        const givenSet = [...given].sort();
-        const correctSet = [...q.correct].sort();
-        isCorrect = givenSet.length === correctSet.length && givenSet.every((v, idx) => v === correctSet[idx]);
-      } else if(q.type === 'NAT'){
-        const num = parseFloat(given);
-        isCorrect = !isNaN(num) && Math.abs(num - q.correctValue) <= (Number(q.tolerance) || 0) + 1e-9;
+    } else if(q.type === 'MSQ'){
+      // JEE Advanced MSQ partial marking
+      const givenSet = [...given];
+      const correctSet = q.correct;
+      const hasWrong = givenSet.some(x => !correctSet.includes(x));
+      if(hasWrong){
+        marksAwarded = -2; wrongCount++; status = 'wrong';
+      } else if(givenSet.length === correctSet.length){
+        marksAwarded = 4; correctCount++; status = 'correct';
       } else {
-        isCorrect = given === q.correct;
+        marksAwarded = givenSet.length; // +1 / +2 / +3 depending on how many correct chosen
+        partialCount++; status = 'partial';
       }
-
+    } else if(q.type === 'NAT'){
+      const num = parseFloat(given);
+      const isCorrect = !isNaN(num) && Math.abs(num - q.correctValue) <= (Number(q.tolerance) || 0) + 1e-9;
+      if(isCorrect){ marksAwarded = 4; correctCount++; status = 'correct'; }
+      else { marksAwarded = 0; wrongCount++; status = 'wrong'; } // NAT: 0 for wrong, no negative
+    } else {
+      // MCQ or MATCH — single correct
+      const isCorrect = given === q.correct;
       if(isCorrect){
-        correctCount++;
-        totalMarks += Number(trCurrentTest.marksCorrect || 4);
-        status = 'correct';
+        marksAwarded = (q.type === 'MCQ') ? 3 : 4;
+        correctCount++; status = 'correct';
       } else {
-        wrongCount++;
-        totalMarks -= Number(trCurrentTest.marksWrong || 1);
-        status = 'wrong';
+        marksAwarded = -1; wrongCount++; status = 'wrong';
       }
     }
-    perQuestionReview.push({q, given, status});
+
+    totalMarks += marksAwarded;
+    perQuestionReview.push({q, given, status, marksAwarded});
   });
 
-  const maxMarks = trCurrentTest.questions.length * Number(trCurrentTest.marksCorrect || 4);
+  const maxMarks = trCurrentTest.questions.reduce((sum, q) => sum + questionMaxMarks(q), 0);
 
   document.getElementById('trResultContent').innerHTML = `
     <div class="result-hero">
@@ -1901,6 +1976,7 @@ function submitTest(autoSubmitted){
     </div>
     <div class="result-stats-grid">
       <div class="result-stat"><div class="result-stat-val" style="color:#4A9C7A;">${correctCount}</div><div class="result-stat-lbl">Correct</div></div>
+      <div class="result-stat"><div class="result-stat-val" style="color:#D4AF37;">${partialCount}</div><div class="result-stat-lbl">Partial</div></div>
       <div class="result-stat"><div class="result-stat-val" style="color:#C0564A;">${wrongCount}</div><div class="result-stat-lbl">Wrong</div></div>
       <div class="result-stat"><div class="result-stat-val" style="color:var(--muted);">${unattempted}</div><div class="result-stat-lbl">Unattempted</div></div>
       <div class="result-stat"><div class="result-stat-val">${trCurrentTest.questions.length}</div><div class="result-stat-lbl">Total Qs</div></div>
@@ -1926,10 +2002,17 @@ function submitTest(autoSubmitted){
       const reviewImageHtml = r.q.questionImage
         ? `<img src="${r.q.questionImage}" style="max-width:100%;border-radius:8px;border:1px solid var(--border);margin-bottom:10px;display:block;">`
         : '';
+      const matchListsReviewHtml = (r.q.type === 'MATCH') ? buildMatchListsHtml(r.q) : '';
+      const marksColor = r.marksAwarded > 0 ? '#4A9C7A' : (r.marksAwarded < 0 ? '#C0564A' : 'var(--muted)');
+      const marksText = r.marksAwarded > 0 ? '+' + r.marksAwarded : String(r.marksAwarded);
       return `
       <div class="review-q">
-        <div style="font-weight:600;margin-bottom:10px;">Q${i+1}. [${r.q.type || 'MCQ'}] ${r.q.text || ''}</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px;">
+          <div style="font-weight:600;">Q${i+1}. [${r.q.type || 'MCQ'}] ${r.q.text || ''}</div>
+          <div style="font-family:var(--font-mono);font-weight:700;color:${marksColor};white-space:nowrap;">${marksText}</div>
+        </div>
         ${reviewImageHtml}
+        ${matchListsReviewHtml}
         ${answerHtml}
       </div>`;
     }).join('')}
@@ -2490,5 +2573,4 @@ async function synchronizeYouTubeLiveFeed() {
 </script>
 </body>
 </html>
-
 
