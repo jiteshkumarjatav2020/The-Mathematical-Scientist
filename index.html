@@ -269,6 +269,7 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
         <a href="#videos">Lectures</a>
         <a href="#video-library">Video Topics</a>
         <a href="#test-series">Test Series</a>
+        <a href="#leaderboard">Leaderboard</a>
         <a href="#library">Library</a>
       </nav>
     </div>
@@ -631,7 +632,33 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
     </div>
   </div>
 </section>
-
+<section class="section lb-section" id="leaderboard">
+  <div class="p-wrap">
+    <div class="s-header">
+      <div class="s-title-area">
+        <span class="s-tag">Rankings</span>
+        <h2 class="s-title">Leaderboard</h2>
+      </div>
+    </div>
+    <div class="lb-grid">
+      <div class="lb-form-box">
+        <div class="ap-field" style="margin-bottom:16px;">
+          <label class="ap-lbl">Select Test</label>
+          <select id="lbTestSelect" class="ap-select" onchange="renderLeaderboardTable()"></select>
+        </div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.6;">
+          🏆 Top 50 scorers dikhaye jaate hain har test ke liye. Test attempt karke apna naam is list me laayein!
+        </div>
+      </div>
+      <div class="lb-table-box">
+        <table class="lb-table">
+          <thead><tr><th>Rank</th><th>Name</th><th>Score</th><th>Date</th></tr></thead>
+          <tbody id="lbTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
 <div class="modal-overlay" id="adminModal">
   <div class="modal-box">
     <div class="modal-icon">🔒</div>
@@ -671,7 +698,33 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
     <div id="customTopicErr" style="color:#C0564A; font-size:12px; margin-top:12px; font-weight:500; display:none;"></div>
   </div>
 </div>
-
+<div class="modal-overlay" id="studentNameModal">
+  <div class="modal-box" style="max-width:440px;">
+    <div class="modal-icon">🏆</div>
+    <div class="modal-title">Student Test Instructions</div>
+    <div class="modal-desc" style="text-align:left;">
+      Before starting the test, every student must enter their <b>Full Name</b> and <b>Email Address</b>.
+    </div>
+    <div style="text-align:left;font-size:13px;color:var(--muted);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:16px;line-height:1.6;">
+      <b style="color:var(--text);">Why do we ask for this?</b><br>
+      • Your Name is used to display your position on the Leaderboard.<br>
+      • Your Email Address is used to automatically send your Test Score after you complete the test.
+      <br><br>
+      <b style="color:var(--text);">Privacy Notice</b><br>
+      Your name and email will be used only for:<br>
+      1. Sending your test score.<br>
+      2. Displaying the leaderboard.<br>
+      We will not use your email for any other purpose.
+    </div>
+    <input type="text" id="studentNameInput" class="ap-input" placeholder="Full Name" style="text-align:center; margin-bottom:12px;">
+    <input type="email" id="studentEmailInput" class="ap-input" placeholder="Email Address" style="text-align:center; margin-bottom:16px;" onkeydown="if(event.key==='Enter')confirmStudentNameAndStart();">
+    <div style="display:flex; gap:12px;">
+      <button class="btn-s" style="flex:1; padding:10px;" onclick="closeStudentNameModal()">Cancel</button>
+      <button class="btn-p" style="flex:1; padding:10px; justify-content:center;" onclick="confirmStudentNameAndStart()">Start Test</button>
+    </div>
+    <div id="studentNameErr" style="color:#C0564A; font-size:12px; margin-top:12px; font-weight:500; display:none;"></div>
+  </div>
+</div>
 <footer>
   <div class="p-wrap f-flex">
     <div class="f-left">
@@ -850,7 +903,8 @@ const CONFIG = {
   adminPin: "TMS2026",
   adminEmail: "jiteshkumarjatav2020@gmail.com",
   channelUrl: "https://www.youtube.com/@jitesh_iitian_kgp",
-  contactEmail: "jiteshkumarjatav2020@gmail.com"
+  contactEmail: "jiteshkumarjatav2020@gmail.com",
+  appsScriptUrl: "https://script.google.com/macros/s/AKfycbyNtBKN03aaN0TJCw331frxec9hWp7eCXK5Ky-GWKD6Waa4ljZDrAMof1rpkT0My_Y/exec"
 };
 
 const CHAPTERS = [
@@ -882,6 +936,10 @@ function getAllChapters(){
 let resourceDatabaseIndex = [];
 let videoLibraryIndex = [];
 let testSeriesIndex = [];
+let leaderboardIndex = [];
+let pendingTestIdForName = null;
+let trStudentName = '';
+let trStudentEmail = '';
 
 const TMS_STORAGE_KEY = "tms_site_data_v1";
 
@@ -938,14 +996,14 @@ function initFirestore(){
 function saveAllData(){
   try {
     localStorage.setItem(TMS_STORAGE_KEY, JSON.stringify({
-      resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex, customChapters
+      resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex, customChapters, leaderboardIndex
     }));
   } catch(e){
     console.error("Local save failed:", e);
   }
   if(firestoreReady){
     tmsDocRef().set({
-      resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex, customChapters,
+      resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex, customChapters, leaderboardIndex,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }).catch(e => {
       console.error("[TMS] Cloud save failed:", e);
@@ -963,6 +1021,7 @@ function loadLocalCache(){
     videoLibraryIndex = parsed.videoLibraryIndex || [];
     testSeriesIndex = parsed.testSeriesIndex || [];
     customChapters = sanitizeCustomChapters(parsed.customChapters);
+    leaderboardIndex = parsed.leaderboardIndex || [];
     testSeriesIndex.forEach(t => { if(!t.questions) t.questions = []; });
   } catch(e){
     console.error("Local cache load failed:", e);
@@ -975,6 +1034,8 @@ function refreshAllDataViews(){
   renderVideoLibraryGrid();
   renderTestSeriesGrid();
   populateTestSelectorForQuestions();
+  populateLeaderboardTestFilter();
+  renderLeaderboardTable();
 }
 
 function initCloudSync(){
@@ -995,14 +1056,15 @@ function initCloudSync(){
       videoLibraryIndex = data.videoLibraryIndex || [];
       testSeriesIndex = data.testSeriesIndex || [];
       const rawCustomChapters = data.customChapters || [];
-      customChapters = sanitizeCustomChapters(rawCustomChapters);
-      const chapterWasCleaned = customChapters.length !== rawCustomChapters.length;
-      testSeriesIndex.forEach(t => { if(!t.questions) t.questions = []; });
-      try {
-        localStorage.setItem(TMS_STORAGE_KEY, JSON.stringify({
-          resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex, customChapters
-        }));
-      } catch(e){}
+               customChapters = sanitizeCustomChapters(rawCustomChapters);
+                const chapterWasCleaned = customChapters.length !== rawCustomChapters.length;
+                leaderboardIndex = data.leaderboardIndex || [];
+                testSeriesIndex.forEach(t => { if(!t.questions) t.questions = []; });
+                try {
+                    localStorage.setItem(TMS_STORAGE_KEY, JSON.stringify({
+                         resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex, customChapters, leaderboardIndex
+                   }));
+                } catch(e){}
       refreshAllDataViews();
       if(chapterWasCleaned && isInstructorAuthenticated) saveAllData();
     } else {
@@ -1739,6 +1801,46 @@ let trRemainingSeconds = 0;
 let trTimerHandle = null;
 
 function startTest(testId){
+  pendingTestIdForName = testId;
+  document.getElementById('studentNameInput').value = localStorage.getItem('tms_student_name') || '';
+  document.getElementById('studentEmailInput').value = localStorage.getItem('tms_student_email') || '';
+  document.getElementById('studentNameErr').style.display = 'none';
+  document.getElementById('studentNameModal').classList.add('open');
+  setTimeout(() => document.getElementById('studentNameInput').focus(), 50);
+}
+
+function closeStudentNameModal(){
+  document.getElementById('studentNameModal').classList.remove('open');
+  pendingTestIdForName = null;
+}
+
+function confirmStudentNameAndStart(){
+  const name = document.getElementById('studentNameInput').value.trim();
+  const email = document.getElementById('studentEmailInput').value.trim();
+  const err = document.getElementById('studentNameErr');
+
+  if(!name || !email){
+    err.textContent = "Please enter both Full Name and Email Address.";
+    err.style.display = 'block';
+    return;
+  }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    err.textContent = "Please enter a valid email address.";
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+
+  localStorage.setItem('tms_student_name', name);
+  localStorage.setItem('tms_student_email', email);
+  trStudentName = name;
+  trStudentEmail = email;
+  document.getElementById('studentNameModal').classList.remove('open');
+  actuallyStartTest(pendingTestIdForName);
+  pendingTestIdForName = null;
+}
+
+function actuallyStartTest(testId){
   const test = testSeriesIndex.find(t => t.id === testId);
   if(!test || !test.questions || test.questions.length === 0) return;
 
@@ -1969,6 +2071,8 @@ let correctCount = 0, wrongCount = 0, unattempted = 0, partialCount = 0, totalMa
 
   const maxMarks = trCurrentTest.questions.reduce((sum, q) => sum + questionMaxMarks(q), 0);
 
+  saveLeaderboardEntry(trStudentName, trStudentEmail, trCurrentTest, totalMarks, maxMarks);
+
   document.getElementById('trResultContent').innerHTML = `
     <div class="result-hero">
       <div style="font-size:13px;color:var(--muted);margin-bottom:8px;">${trCurrentTest.title}${autoSubmitted ? ' — Time Up, Auto-Submitted' : ''}</div>
@@ -2027,6 +2131,88 @@ let correctCount = 0, wrongCount = 0, unattempted = 0, partialCount = 0, totalMa
 function closeTestResult(){
   document.getElementById('testResultOverlay').classList.remove('open');
   trCurrentTest = null;
+}
+ 
+/* ===== LEADERBOARD + AUTO-EMAIL ===== */
+function saveLeaderboardEntry(name, email, test, score, maxScore){
+  if(!name) return; // anonymous attempts leaderboard me nahi jaate
+
+  leaderboardIndex.push({
+    id: "lb_" + Date.now() + "_" + Math.floor(Math.random()*1000),
+    testId: test.id,
+    testTitle: test.title,
+    chapter: test.chapter,
+    studentName: name,
+    studentEmail: email,
+    score: score,
+    maxScore: maxScore,
+    timestamp: new Date().toISOString()
+  });
+
+  populateLeaderboardTestFilter();
+  renderLeaderboardTable();
+  saveAllData();
+  sendScoreEmail(name, email, test, score, maxScore);
+}
+
+function sendScoreEmail(name, email, test, score, maxScore){
+  if(!email) return;
+  if(!CONFIG.appsScriptUrl || CONFIG.appsScriptUrl.indexOf('PASTE_YOUR') === 0){
+    console.warn("[TMS] Apps Script URL not configured — skipping email send.");
+    return;
+  }
+  fetch(CONFIG.appsScriptUrl, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: JSON.stringify({
+      name: name,
+      email: email,
+      testTitle: test.title,
+      chapter: test.chapter,
+      score: score.toFixed(1),
+      maxScore: maxScore
+    })
+  }).then(() => {
+    console.log("[TMS] Score email request sent to", email);
+  }).catch(err => {
+    console.error("[TMS] Email send failed:", err);
+  });
+}
+
+function populateLeaderboardTestFilter(){
+  const sel = document.getElementById('lbTestSelect');
+  if(!sel) return;
+  const prev = sel.value;
+  const testIdsWithEntries = [...new Set(leaderboardIndex.map(e => e.testId))];
+  const options = testSeriesIndex.filter(t => testIdsWithEntries.includes(t.id));
+  sel.innerHTML = options.length === 0
+    ? `<option value="">Abhi tak koi attempt nahi hua hai</option>`
+    : options.map(t => `<option value="${t.id}">${t.title}</option>`).join('');
+  if(options.some(t => t.id === prev)) sel.value = prev;
+}
+
+function renderLeaderboardTable(){
+  const sel = document.getElementById('lbTestSelect');
+  const tbody = document.getElementById('lbTableBody');
+  if(!sel || !tbody) return;
+  const testId = sel.value;
+  const rows = leaderboardIndex
+    .filter(e => e.testId === testId)
+    .sort((a,b) => b.score - a.score || new Date(a.timestamp) - new Date(b.timestamp))
+    .slice(0, 50);
+
+  if(rows.length === 0){
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:24px;">Is test ke liye abhi tak koi attempt nahi hai.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map((r,i) => `
+    <tr>
+      <td class="lb-rank-cell">${i+1}</td>
+      <td class="lb-name-cell">${r.studentName}</td>
+      <td class="lb-tests">${r.score.toFixed(1)} / ${r.maxScore}</td>
+      <td>${new Date(r.timestamp).toLocaleDateString('en-IN', {day:'numeric', month:'short'})}</td>
+    </tr>
+  `).join('');
 }
 
 /* ===== SCIENTIFIC CALCULATOR =====
@@ -2573,4 +2759,3 @@ async function synchronizeYouTubeLiveFeed() {
 </script>
 </body>
 </html>
-
