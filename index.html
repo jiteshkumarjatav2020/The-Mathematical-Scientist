@@ -883,6 +883,7 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
 
 <!-- MathJax (renders LaTeX math typed in $...$ / $$...$$ inside question text) -->
 <script>
@@ -1000,6 +1001,10 @@ function initFirestore(){
       return false;
     }
     firebase.initializeApp(firebaseConfig);
+    firebase.appCheck().activate(
+               "6LfvmVktAAAAANg2NHY3qxVE-F8qH_hYyNvuGGHr",
+               true
+           );
     db = firebase.firestore();
     auth = firebase.auth();
     return true;
