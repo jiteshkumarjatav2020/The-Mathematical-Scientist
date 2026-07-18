@@ -1559,10 +1559,21 @@ function renderTestSeriesGrid(){
   });
 }
 
+/* Returns YYYY-MM-DD using the VISITOR'S OWN device/browser local time —
+   so wherever a student is, "today's DPP" matches their own local day,
+   not a fixed India time. */
+function getLocalDateStr(d){
+  d = d || new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 function renderDPPSection(){
   const box = document.getElementById('dppContainer');
   if(!box) return;
-  const todayStr = new Date().toISOString().slice(0,10);
+  const todayStr = getLocalDateStr();
   const allDPPs = testSeriesIndex.filter(t => t.isDPP && t.dppDate);
   const todays = allDPPs.filter(t => t.dppDate === todayStr);
   const past = allDPPs.filter(t => t.dppDate < todayStr).sort((a,b) => b.dppDate.localeCompare(a.dppDate)).slice(0, 6);
@@ -1616,7 +1627,7 @@ function addTestSeriesAsset(){
   const durationMinutes = parseInt(document.getElementById('testDuration').value) || 30;
   const msg = document.getElementById('testApMsg');
   const isDPP = document.getElementById('testIsDPP').checked;
-  const dppDate = isDPP ? (document.getElementById('testDPPDate').value || new Date().toISOString().slice(0,10)) : null;
+  const dppDate = isDPP ? (document.getElementById('testDPPDate').value || getLocalDateStr()) : null;
 
   if(!title){
     msg.textContent = "Test title is required.";
