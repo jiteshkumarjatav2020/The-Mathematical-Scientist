@@ -1511,14 +1511,15 @@ function setTestChapterFilter(btn, chap){
 
 function renderTestSeriesGrid(){
   updateHeroStats();
-  const count = (chap) => testSeriesIndex.filter(t => t.chapter === chap).length;
+  const nonDPPTests = testSeriesIndex.filter(t => !t.isDPP);
+  const count = (chap) => nonDPPTests.filter(t => t.chapter === chap).length;
   document.querySelectorAll('#testChapterFilters .fbtn-count').forEach(span => {
     const key = span.getAttribute('data-tcount');
-    span.textContent = key === 'All' ? testSeriesIndex.length : count(key);
+    span.textContent = key === 'All' ? nonDPPTests.length : count(key);
   });
 
   const box = document.getElementById('testSeriesContainer');
-  let dataset = testSeriesIndex.filter(t => (activeTestChapterFilter === "All" || t.chapter === activeTestChapterFilter));
+  let dataset = nonDPPTests.filter(t => (activeTestChapterFilter === "All" || t.chapter === activeTestChapterFilter));
 
   if(dataset.length === 0){
     box.innerHTML = `<div class="empty-state">No test series created yet for this chapter. ${isInstructorAuthenticated ? 'Create a test above.' : ''}</div>`;
@@ -1538,7 +1539,6 @@ function renderTestSeriesGrid(){
           <div class="res-title" title="${t.title}">${t.title}</div>
           <div class="res-meta">
             <span class="res-tag" style="${isFullSyllabus ? 'background:rgba(212,175,55,0.15);color:var(--gold);' : ''}">${isFullSyllabus ? 'Full Syllabus' : t.chapter}</span>
-            ${t.isDPP ? `<div class="res-dot"></div><span style="color:var(--gold);font-weight:600;">📅 DPP · ${new Date(t.dppDate).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</span>` : ''}
             <div class="res-dot"></div>
             <span>${qCount} Question${qCount === 1 ? '' : 's'}</span>
             <div class="res-dot"></div>
