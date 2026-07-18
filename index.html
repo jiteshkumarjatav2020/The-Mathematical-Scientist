@@ -647,7 +647,7 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
           <select id="lbTestSelect" class="ap-select" onchange="renderLeaderboardTable()"></select>
         </div>
         <div style="font-size:13px;color:var(--muted);line-height:1.6;">
-          🏆 Top 50 scorers dikhaye jaate hain har test ke liye. Test attempt karke apna naam is list me laayein!
+          🏆 The top 50 scorers are shown for every test. Take the test and get your name on this list!
         </div>
       </div>
       <div class="lb-table-box">
@@ -2229,7 +2229,7 @@ function populateLeaderboardTestFilter(){
   const testIdsWithEntries = [...new Set(leaderboardIndex.map(e => e.testId))];
   const options = testSeriesIndex.filter(t => testIdsWithEntries.includes(t.id));
   sel.innerHTML = options.length === 0
-    ? `<option value="">Abhi tak koi attempt nahi hua hai</option>`
+    ? `<option value="">No attempt has been made so far</option>`
     : options.map(t => `<option value="${t.id}">${t.title}</option>`).join('');
   if(options.some(t => t.id === prev)) sel.value = prev;
 }
@@ -2245,7 +2245,7 @@ function renderLeaderboardTable(){
     .slice(0, 50);
 
   if(rows.length === 0){
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:24px;">Is test ke liye abhi tak koi attempt nahi hai.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:24px;">There hasn't been any attempt for this test yet.</td></tr>`;
     return;
   }
   tbody.innerHTML = rows.map((r,i) => {
