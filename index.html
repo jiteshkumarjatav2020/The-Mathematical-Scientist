@@ -933,6 +933,19 @@ function getAllChapters(){
   return CHAPTERS.concat(customChapters);
 }
 
+/* Escapes untrusted text before it's dropped into innerHTML — critical since
+   leaderboard entries (studentName etc.) can be written by anyone without
+   login, so that text must never be treated as raw HTML. */
+function escapeHtml(str){
+  if(str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 let resourceDatabaseIndex = [];
 let videoLibraryIndex = [];
 let testSeriesIndex = [];
@@ -2230,14 +2243,23 @@ function renderLeaderboardTable(){
     tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:24px;">Is test ke liye abhi tak koi attempt nahi hai.</td></tr>`;
     return;
   }
-  tbody.innerHTML = rows.map((r,i) => `
+  tbody.innerHTML = rows.map((r,i) => {
+    const safeName = escapeHtml(r.studentName);
+    const safeScore = Number(r.score);
+    const safeMax = Number(r.maxScore);
+    const scoreDisplay = isNaN(safeScore) ? '—' : safeScore.toFixed(1);
+    const maxDisplay = isNaN(safeMax) ? '—' : safeMax;
+    const dateObj = new Date(r.timestamp);
+    const dateDisplay = isNaN(dateObj.getTime()) ? '—' : dateObj.toLocaleDateString('en-IN', {day:'numeric', month:'short'});
+    return `
     <tr>
       <td class="lb-rank-cell">${i+1}</td>
-      <td class="lb-name-cell">${r.studentName}</td>
-      <td class="lb-tests">${r.score.toFixed(1)} / ${r.maxScore}</td>
-      <td>${new Date(r.timestamp).toLocaleDateString('en-IN', {day:'numeric', month:'short'})}</td>
+      <td class="lb-name-cell">${safeName}</td>
+      <td class="lb-tests">${scoreDisplay} / ${maxDisplay}</td>
+      <td>${dateDisplay}</td>
     </tr>
-  `).join('');
+  `;
+  }).join('');
 }
 
 /* ===== SCIENTIFIC CALCULATOR =====
