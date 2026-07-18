@@ -268,8 +268,10 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
       <nav>
         <a href="#videos">Lectures</a>
         <a href="#video-library">Video Topics</a>
+        <a href="#dpp">Daily Practice</a>
         <a href="#test-series">Test Series</a>
         <a href="#leaderboard">Leaderboard</a>
+        <a href="#dashboard">My Progress</a>
         <a href="#library">Library</a>
       </nav>
     </div>
@@ -314,6 +316,18 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
     <div class="v-grid" id="videoGrid">
       <div class="v-status" id="videoStatus">Loading dynamic live feed...</div>
     </div>
+  </div>
+</section>
+
+<section class="section" id="dpp">
+  <div class="p-wrap">
+    <div class="s-header">
+      <div class="s-title-area">
+        <span class="s-tag">Daily Habit</span>
+        <h2 class="s-title">Daily Practice Problems</h2>
+      </div>
+    </div>
+    <div id="dppContainer"></div>
   </div>
 </section>
 
@@ -481,6 +495,15 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
         <div class="ap-field">
           <label class="ap-lbl">External Link (optional, Drive/PDF/Form)</label>
           <input type="url" id="testLink" class="ap-input" placeholder="https://drive.google.com/... (optional)">
+        </div>
+      </div>
+      <div class="ap-grid" style="grid-template-columns: auto 1fr; align-items:center; margin-bottom:20px;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text);white-space:nowrap;">
+          <input type="checkbox" id="testIsDPP" onchange="document.getElementById('testDPPDateWrap').style.display=this.checked?'block':'none';">
+          📅 Mark as Daily Practice Problem (DPP)
+        </label>
+        <div id="testDPPDateWrap" style="display:none;">
+          <input type="date" id="testDPPDate" class="ap-input">
         </div>
       </div>
       <div style="background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.25);border-radius:8px;padding:12px 16px;margin-bottom:20px;font-size:12px;color:var(--muted);">
@@ -657,6 +680,26 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
         </table>
       </div>
     </div>
+  </div>
+</section>
+
+<section class="section alt" id="dashboard">
+  <div class="p-wrap">
+    <div class="s-header">
+      <div class="s-title-area">
+        <span class="s-tag">Track Yourself</span>
+        <h2 class="s-title">My Progress Dashboard</h2>
+      </div>
+    </div>
+    <div class="lb-form-box" style="max-width:520px;margin:0 auto 32px;">
+      <div class="ap-field" style="margin-bottom:14px;">
+        <label class="ap-lbl">Enter the Email you used while taking tests</label>
+        <input type="email" id="dashEmailInput" class="ap-input" placeholder="you@example.com" onkeydown="if(event.key==='Enter')lookupStudentDashboard();">
+      </div>
+      <button class="btn-p" style="width:100%;justify-content:center;padding:10px;" onclick="lookupStudentDashboard()">View My Progress</button>
+      <div id="dashErr" style="color:#C0564A;font-size:12px;margin-top:10px;font-weight:500;display:none;"></div>
+    </div>
+    <div id="dashboardResults"></div>
   </div>
 </section>
 <div class="modal-overlay" id="adminModal">
@@ -1054,6 +1097,7 @@ function refreshAllDataViews(){
   renderResourceGridLibrary();
   renderVideoLibraryGrid();
   renderTestSeriesGrid();
+  renderDPPSection();
   populateTestSelectorForQuestions();
   populateLeaderboardTestFilter();
   renderLeaderboardTable();
@@ -1327,6 +1371,15 @@ window.addEventListener('DOMContentLoaded', () => {
   updateMarkingSchemeDisplay('MCQ');
   initCloudSync();
   synchronizeYouTubeLiveFeed();
+
+  const savedDashEmail = localStorage.getItem('tms_dashboard_email') || localStorage.getItem('tms_student_email');
+  if(savedDashEmail){
+    const dashInput = document.getElementById('dashEmailInput');
+    if(dashInput){
+      dashInput.value = savedDashEmail;
+      setTimeout(() => lookupStudentDashboard(), 800); // small delay so leaderboardIndex has synced from Firestore
+    }
+  }
 });
 
 function extractYouTubeVideoId(url){
@@ -1485,6 +1538,7 @@ function renderTestSeriesGrid(){
           <div class="res-title" title="${t.title}">${t.title}</div>
           <div class="res-meta">
             <span class="res-tag" style="${isFullSyllabus ? 'background:rgba(212,175,55,0.15);color:var(--gold);' : ''}">${isFullSyllabus ? 'Full Syllabus' : t.chapter}</span>
+            ${t.isDPP ? `<div class="res-dot"></div><span style="color:var(--gold);font-weight:600;">📅 DPP · ${new Date(t.dppDate).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</span>` : ''}
             <div class="res-dot"></div>
             <span>${qCount} Question${qCount === 1 ? '' : 's'}</span>
             <div class="res-dot"></div>
@@ -1504,12 +1558,64 @@ function renderTestSeriesGrid(){
   });
 }
 
+function renderDPPSection(){
+  const box = document.getElementById('dppContainer');
+  if(!box) return;
+  const todayStr = new Date().toISOString().slice(0,10);
+  const allDPPs = testSeriesIndex.filter(t => t.isDPP && t.dppDate);
+  const todays = allDPPs.filter(t => t.dppDate === todayStr);
+  const past = allDPPs.filter(t => t.dppDate < todayStr).sort((a,b) => b.dppDate.localeCompare(a.dppDate)).slice(0, 6);
+
+  function dppCard(t, isToday){
+    const qCount = (t.questions || []).length;
+    return `
+      <div class="res-card" style="${isToday ? 'border-color:rgba(212,175,55,0.4);background:rgba(212,175,55,0.05);' : ''}">
+        <div class="res-left">
+          <div class="res-icon">📅</div>
+          <div class="res-details">
+            <div class="res-title" title="${t.title}">${t.title}</div>
+            <div class="res-meta">
+              <span class="res-tag">${t.chapter}</span>
+              <div class="res-dot"></div>
+              <span>${qCount} Question${qCount === 1 ? '' : 's'}</span>
+              <div class="res-dot"></div>
+              <span>${t.durationMinutes || 15} min</span>
+              <div class="res-dot"></div>
+              <span>${new Date(t.dppDate).toLocaleDateString('en-IN', {day:'numeric', month:'short'})}</span>
+            </div>
+          </div>
+        </div>
+        <div class="res-right">
+          ${qCount > 0 ? `<button class="btn-p" style="padding:8px 16px; font-size:13px;" onclick="startTest('${t.id}')">${isToday ? "Start Today's DPP" : 'Start Test'}</button>` : `<span style="font-size:12px;color:var(--muted);">Questions coming soon</span>`}
+        </div>
+      </div>`;
+  }
+
+  let html = '';
+  if(todays.length > 0){
+    html += `<div style="display:flex;flex-direction:column;gap:14px;margin-bottom:${past.length ? '28px' : '0'};">${todays.map(t => dppCard(t, true)).join('')}</div>`;
+  } else {
+    html += `<div class="empty-state">No Daily Practice Problem scheduled for today yet. Check back soon! ${isInstructorAuthenticated ? '<br><br>Create one from the Test Series admin panel below and tick "Mark as Daily Practice Problem".' : ''}</div>`;
+  }
+
+  if(past.length > 0){
+    html += `<div style="margin-top:24px;">
+      <div style="font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Previous DPPs</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">${past.map(t => dppCard(t, false)).join('')}</div>
+    </div>`;
+  }
+
+  box.innerHTML = html;
+}
+
 function addTestSeriesAsset(){
   const title = document.getElementById('testTitle').value.trim();
   const chapter = getEffectiveChapter('test');
   const url = document.getElementById('testLink').value.trim();
   const durationMinutes = parseInt(document.getElementById('testDuration').value) || 30;
   const msg = document.getElementById('testApMsg');
+  const isDPP = document.getElementById('testIsDPP').checked;
+  const dppDate = isDPP ? (document.getElementById('testDPPDate').value || new Date().toISOString().slice(0,10)) : null;
 
   if(!title){
     msg.textContent = "Test title is required.";
@@ -1528,19 +1634,23 @@ function addTestSeriesAsset(){
   testSeriesIndex.push({
     id: "test_" + Date.now(),
     title, chapter, url, durationMinutes,
+    isDPP, dppDate,
     questions: [],
     timestamp: new Date().toISOString()
   });
 
-  msg.textContent = "Test created successfully. Now add questions to it below.";
+  msg.textContent = isDPP ? `Test created & scheduled as DPP for ${dppDate}.` : "Test created successfully. Now add questions to it below.";
   msg.className = "ap-msg ok";
 
   document.getElementById('testTitle').value = '';
   document.getElementById('testLink').value = '';
+  document.getElementById('testIsDPP').checked = false;
+  document.getElementById('testDPPDateWrap').style.display = 'none';
 
   resetChapterModeAfterSave('test', chapter);
   populateTestSelectorForQuestions();
   renderTestSeriesGrid();
+  renderDPPSection();
   saveAllData();
   setTimeout(() => { msg.textContent = ''; }, 4000);
 }
@@ -1550,6 +1660,7 @@ function removeTestSeriesAsset(id){
   testSeriesIndex = testSeriesIndex.filter(t => t.id !== id);
   populateTestSelectorForQuestions();
   renderTestSeriesGrid();
+  renderDPPSection();
   saveAllData();
 }
 
@@ -2265,6 +2376,140 @@ function renderLeaderboardTable(){
     </tr>
   `;
   }).join('');
+}
+
+/* ===== MY PROGRESS DASHBOARD (reuses leaderboardIndex, no extra Firestore reads) ===== */
+function lookupStudentDashboard(){
+  const input = document.getElementById('dashEmailInput');
+  const err = document.getElementById('dashErr');
+  const email = input.value.trim().toLowerCase();
+  err.style.display = 'none';
+
+  if(!email || !email.includes('@')){
+    err.textContent = "Please enter a valid email address.";
+    err.style.display = 'block';
+    document.getElementById('dashboardResults').innerHTML = '';
+    return;
+  }
+
+  localStorage.setItem('tms_dashboard_email', email);
+
+  const attempts = leaderboardIndex
+    .filter(e => (e.studentEmail || '').trim().toLowerCase() === email)
+    .sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  if(attempts.length === 0){
+    document.getElementById('dashboardResults').innerHTML =
+      `<div class="empty-state">No test attempts found for this email yet. Take a test from the Test Series section — your progress will show up here automatically.</div>`;
+    return;
+  }
+
+  renderStudentDashboard(attempts);
+}
+
+function renderStudentDashboard(attempts){
+  const totalTests = attempts.length;
+  const totalScore = attempts.reduce((s,a) => s + (Number(a.score) || 0), 0);
+  const totalMax = attempts.reduce((s,a) => s + (Number(a.maxScore) || 0), 0);
+  const overallPct = totalMax > 0 ? (totalScore / totalMax * 100) : 0;
+  const best = attempts.reduce((b,a) => {
+    const pct = (Number(a.maxScore) || 0) > 0 ? (Number(a.score) / Number(a.maxScore) * 100) : 0;
+    return (!b || pct > b.pct) ? {...a, pct} : b;
+  }, null);
+
+  // Chapter-wise average performance
+  const chapterMap = {};
+  attempts.forEach(a => {
+    const ch = a.chapter || 'Uncategorized';
+    if(!chapterMap[ch]) chapterMap[ch] = {score:0, max:0, count:0};
+    chapterMap[ch].score += Number(a.score) || 0;
+    chapterMap[ch].max += Number(a.maxScore) || 0;
+    chapterMap[ch].count++;
+  });
+  const chapterStats = Object.keys(chapterMap).map(ch => {
+    const c = chapterMap[ch];
+    return { chapter: ch, pct: c.max > 0 ? (c.score / c.max * 100) : 0, count: c.count };
+  }).sort((a,b) => a.pct - b.pct);
+
+  const weakest = chapterStats.slice(0, 3);
+
+  // Simple study streak — count of distinct calendar days with at least one attempt, ending today or yesterday
+  const attemptDays = [...new Set(attempts.map(a => new Date(a.timestamp).toDateString()))]
+    .map(d => new Date(d)).sort((a,b) => b - a);
+  let streak = 0;
+  if(attemptDays.length > 0){
+    let cursor = new Date(); cursor.setHours(0,0,0,0);
+    const mostRecent = new Date(attemptDays[0]); mostRecent.setHours(0,0,0,0);
+    const dayGap = Math.round((cursor - mostRecent) / 86400000);
+    if(dayGap <= 1){
+      streak = 1;
+      for(let i=1; i<attemptDays.length; i++){
+        const prev = new Date(attemptDays[i-1]); prev.setHours(0,0,0,0);
+        const cur = new Date(attemptDays[i]); cur.setHours(0,0,0,0);
+        if(Math.round((prev - cur) / 86400000) === 1) streak++; else break;
+      }
+    }
+  }
+
+  const barColor = (pct) => pct >= 60 ? '#4A9C7A' : (pct >= 35 ? '#D4AF37' : '#C0564A');
+
+  const html = `
+    <div class="result-stats-grid" style="grid-template-columns:repeat(4,1fr);">
+      <div class="result-stat"><div class="result-stat-val">${totalTests}</div><div class="result-stat-lbl">Tests Taken</div></div>
+      <div class="result-stat"><div class="result-stat-val" style="color:${barColor(overallPct)};">${overallPct.toFixed(1)}%</div><div class="result-stat-lbl">Overall Accuracy</div></div>
+      <div class="result-stat"><div class="result-stat-val" style="color:#4A9C7A;">${best ? best.pct.toFixed(1) : 0}%</div><div class="result-stat-lbl">Best Score</div></div>
+      <div class="result-stat"><div class="result-stat-val">${streak}</div><div class="result-stat-lbl">Day Streak 🔥</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:8px;">
+      <div class="lb-table-box" style="padding:24px;">
+        <div style="font-family:var(--font-serif);font-size:16px;margin-bottom:16px;">Chapter-wise Performance</div>
+        ${chapterStats.map(c => `
+          <div style="margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px;">
+              <span>${escapeHtml(c.chapter)} <span style="color:var(--muted);">(${c.count})</span></span>
+              <span style="font-weight:600;color:${barColor(c.pct)};">${c.pct.toFixed(0)}%</span>
+            </div>
+            <div style="background:var(--bg);border-radius:6px;height:8px;overflow:hidden;">
+              <div style="width:${Math.max(c.pct,3)}%;height:100%;background:${barColor(c.pct)};border-radius:6px;"></div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="lb-table-box" style="padding:24px;">
+        <div style="font-family:var(--font-serif);font-size:16px;margin-bottom:16px;">Weakest Topics — Focus Here</div>
+        ${weakest.length === 0 ? '<div style="font-size:13px;color:var(--muted);">Not enough data yet.</div>' : weakest.map((c,i) => `
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 0;${i < weakest.length-1 ? 'border-bottom:1px solid var(--border);' : ''}">
+            <div style="font-family:var(--font-serif);font-size:18px;color:var(--gold);">${i+1}</div>
+            <div style="flex:1;">
+              <div style="font-size:13.5px;font-weight:600;">${escapeHtml(c.chapter)}</div>
+              <div style="font-size:11.5px;color:var(--muted);">${c.count} attempt${c.count===1?'':'s'} · ${c.pct.toFixed(0)}% accuracy</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="lb-table-box" style="margin-top:24px;">
+      <table class="lb-table">
+        <thead><tr><th>Test</th><th>Chapter</th><th>Score</th><th>Date</th></tr></thead>
+        <tbody>
+          ${attempts.slice(0, 15).map(a => {
+            const pct = (Number(a.maxScore) || 0) > 0 ? (Number(a.score) / Number(a.maxScore) * 100) : 0;
+            return `<tr>
+              <td>${escapeHtml(a.testTitle || '—')}</td>
+              <td>${escapeHtml(a.chapter || '—')}</td>
+              <td style="color:${barColor(pct)};font-weight:600;">${Number(a.score).toFixed(1)} / ${a.maxScore}</td>
+              <td>${new Date(a.timestamp).toLocaleDateString('en-IN', {day:'numeric', month:'short'})}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  document.getElementById('dashboardResults').innerHTML = html;
 }
 
 /* ===== SCIENTIFIC CALCULATOR =====
