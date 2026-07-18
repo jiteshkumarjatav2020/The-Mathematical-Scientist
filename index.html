@@ -1286,6 +1286,7 @@ function rebuildChapterUI(){
   const tBox = document.getElementById('testSeriesContainer');
   if(vBox) renderVideoLibraryGrid();
   if(tBox) renderTestSeriesGrid();
+  renderDPPSection();
 }
 
 function populateChapterControls(){
@@ -1927,6 +1928,7 @@ function addQuestionToTest(){
 
   updateQuestionCountDisplay();
   renderTestSeriesGrid();
+  renderDPPSection();
   saveAllData();
   setTimeout(() => { msg.textContent = ''; }, 3000);
 }
