@@ -517,6 +517,8 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
       <div style="border-top:1px solid var(--border); margin:24px 0 16px;"></div>
 
       <div class="ap-title">Add Question to a Test</div>
+      <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;margin-bottom:20px;">
+      <div id="qEditorFields" style="flex:1 1 420px;min-width:300px;">
       <div class="ap-grid" style="grid-template-columns: 1fr 1fr; margin-bottom:16px;">
         <div class="ap-field">
           <label class="ap-lbl">Select Test</label>
@@ -543,14 +545,10 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
       </div>
 
       <div id="qTextModeWrapper">
-        <div class="ap-field" style="margin-bottom:8px;">
+        <div class="ap-field" style="margin-bottom:16px;">
           <label class="ap-lbl">Question Text (supports Math — wrap equations in $...$)</label>
           <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;" id="mathToolbar"></div>
-          <textarea id="qText" class="ap-input" rows="3" placeholder="e.g., Evaluate $\int_{0}^{1} x^2 \,dx$" style="resize:vertical;font-family:var(--font-mono);" oninput="updateMathPreview()"></textarea>
-        </div>
-        <div class="ap-field" style="margin-bottom:16px;">
-          <label class="ap-lbl">Live Preview</label>
-          <div id="qPreview" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;min-height:44px;font-size:15px;color:var(--text);"></div>
+          <textarea id="qText" class="ap-input" rows="3" placeholder="e.g., Evaluate $\int_{0}^{1} x^2 \,dx$" style="resize:vertical;font-family:var(--font-mono);" oninput="renderLiveQuestionPreview()"></textarea>
         </div>
       </div>
 
@@ -637,10 +635,23 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
       </div>
 
       <div class="ap-actions">
-        <button class="btn-p" style="padding:10px 24px; font-size:14px;" onclick="addQuestionToTest()">Add Question</button>
+        <button class="btn-p" style="padding:10px 24px; font-size:14px;" onclick="addQuestionToTest()" id="qSaveBtn">Add Question</button>
+        <button class="btn-s" style="padding:10px 20px; font-size:14px; display:none;" onclick="cancelEditQuestion()" id="qCancelEditBtn">Cancel Edit</button>
         <span class="ap-msg" id="qApMsg"></span>
       </div>
       <div id="qCountDisplay" style="font-size:12px;color:var(--muted);margin-top:8px;"></div>
+      </div>
+
+      <div style="flex:1 1 380px;min-width:300px;position:sticky;top:20px;">
+        <div class="ap-title" style="font-size:13px;margin-bottom:10px;">🔍 Live Preview — Exactly What Students See</div>
+        <div id="qLivePreviewCard" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;min-height:220px;"></div>
+      </div>
+      </div>
+
+      <div style="margin:8px 0 24px;">
+        <div class="ap-title" style="font-size:14px;">Questions in Selected Test</div>
+        <div id="qQuestionListBox" style="display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;"></div>
+      </div>
     </div>
 
     <div class="lib-grid">
@@ -1373,6 +1384,15 @@ window.addEventListener('DOMContentLoaded', () => {
   initCloudSync();
   synchronizeYouTubeLiveFeed();
 
+  const qEditorBox = document.getElementById('qEditorFields');
+  if(qEditorBox){
+    qEditorBox.addEventListener('input', (e) => {
+      if(e.target && e.target.id !== 'qText') renderLiveQuestionPreview();
+    });
+    qEditorBox.addEventListener('change', renderLiveQuestionPreview);
+    loadQuestionDraftIfAny();
+  }
+
   const savedDashEmail = localStorage.getItem('tms_dashboard_email') || localStorage.getItem('tms_student_email');
   if(savedDashEmail){
     const dashInput = document.getElementById('dashEmailInput');
@@ -1694,6 +1714,8 @@ function updateQuestionCountDisplay(){
   if(!sel || !display) return;
   const test = testSeriesIndex.find(t => t.id === sel.value);
   display.textContent = test ? `Questions added so far: ${(test.questions || []).length}` : '';
+  if(editingQuestionId) cancelEditQuestion();
+  renderQuestionListForSelectedTest();
 }
 const JEE_MARKING_SCHEME = {
   MCQ:   { label: 'MCQ — Single Correct',   html: '✅ Correct: <b style="color:#4A9C7A;">+3</b> &nbsp;|&nbsp; ➖ Unanswered: <b>0</b> &nbsp;|&nbsp; ❌ Wrong: <b style="color:#C0564A;">−1</b>' },
@@ -1717,6 +1739,7 @@ function onQuestionTypeChange(){
   document.getElementById('qMcqCorrectField').style.display = (type === 'MCQ' || type === 'MATCH') ? 'flex' : 'none';
   document.getElementById('qMsqCorrectField').style.display = (type === 'MSQ') ? 'flex' : 'none';
   updateMarkingSchemeDisplay(type);
+  renderLiveQuestionPreview();
 }
 /* ===== QUESTION INPUT MODE: Type vs Upload Image ===== */
 let qInputMode = 'text';
@@ -1728,6 +1751,7 @@ function setQuestionInputMode(mode){
   document.getElementById('qModeImageBtn').classList.toggle('active', mode === 'image');
   document.getElementById('qTextModeWrapper').style.display = (mode === 'text') ? 'block' : 'none';
   document.getElementById('qImageModeWrapper').style.display = (mode === 'image') ? 'block' : 'none';
+  renderLiveQuestionPreview();
 }
 
 function handleQuestionImageUpload(evt){
@@ -1750,6 +1774,7 @@ function handleQuestionImageUpload(evt){
       qImageDataUrl = canvas.toDataURL('image/jpeg', 0.75);
       document.getElementById('qImagePreview').src = qImageDataUrl;
       document.getElementById('qImagePreviewWrap').style.display = 'block';
+      renderLiveQuestionPreview();
     };
     img.src = e.target.result;
   };
@@ -1760,6 +1785,7 @@ function clearQuestionImage(){
   qImageDataUrl = null;
   document.getElementById('qImageFile').value = '';
   document.getElementById('qImagePreviewWrap').style.display = 'none';
+  renderLiveQuestionPreview();
 }
 
 /* ===== MATH EDITOR TOOLBAR (inserts LaTeX snippets) ===== */
@@ -1804,7 +1830,7 @@ function insertMathSnippet(i){
   ta.focus();
   const cursorPos = start + toInsert.length;
   ta.setSelectionRange(cursorPos, cursorPos);
-  updateMathPreview();
+  renderLiveQuestionPreview();
 }
 
 let mathPreviewDebounce = null;
@@ -1857,8 +1883,9 @@ function addQuestionToTest(){
     }
   }
 
+  const isEditing = !!editingQuestionId;
   const questionObj = {
-    id: "q_" + Date.now() + "_" + Math.floor(Math.random()*1000),
+    id: isEditing ? editingQuestionId : ("q_" + Date.now() + "_" + Math.floor(Math.random()*1000)),
     type, text,
     inputMode: qInputMode,
     questionImage: questionImage
@@ -1915,15 +1942,33 @@ function addQuestionToTest(){
     questionObj.tolerance = parseFloat(document.getElementById('qNatTolerance').value) || 0;
   }
 
-  test.questions.push(questionObj);
-
-  msg.textContent = "Question added successfully.";
+  if(isEditing){
+    const idx = test.questions.findIndex(q => q.id === editingQuestionId);
+    if(idx > -1) test.questions[idx] = questionObj;
+    msg.textContent = "Question updated successfully.";
+  } else {
+    test.questions.push(questionObj);
+    msg.textContent = "Question added successfully.";
+  }
   msg.className = "ap-msg ok";
 
+  editingQuestionId = null;
+  document.getElementById('qSaveBtn').textContent = 'Add Question';
+  document.getElementById('qCancelEditBtn').style.display = 'none';
+  resetQuestionFormFields();
+  clearQuestionDraft();
+
+  updateQuestionCountDisplay();
+  renderTestSeriesGrid();
+  renderDPPSection();
+  saveAllData();
+  setTimeout(() => { msg.textContent = ''; }, 3000);
+}
+
+function resetQuestionFormFields(){
   document.getElementById('qText').value = '';
   document.getElementById('qImageCaption').value = '';
   clearQuestionImage();
-  document.getElementById('qPreview').innerHTML = '';
   document.getElementById('qOptA').value = '';
   document.getElementById('qOptB').value = '';
   document.getElementById('qOptC').value = '';
@@ -1937,12 +1982,266 @@ function addQuestionToTest(){
   document.getElementById('qNatTolerance').value = '0';
   ['P','Q','R','S'].forEach(k => { const el = document.getElementById('qMatchListI_'+k); if(el) el.value = ''; });
   ['1','2','3','4','5'].forEach(k => { const el = document.getElementById('qMatchListII_'+k); if(el) el.value = ''; });
+  renderLiveQuestionPreview();
+}
 
+/* ===== EDIT / DELETE EXISTING QUESTIONS ===== */
+function renderQuestionListForSelectedTest(){
+  const box = document.getElementById('qQuestionListBox');
+  if(!box) return;
+  const testId = document.getElementById('qTestSelect').value;
+  const test = testSeriesIndex.find(t => t.id === testId);
+  if(!test || !test.questions || test.questions.length === 0){
+    box.innerHTML = `<div style="font-size:12.5px;color:var(--muted);padding:12px 0;">No questions added to this test yet.</div>`;
+    return;
+  }
+  box.innerHTML = test.questions.map((q, i) => {
+    const preview = (q.text || (q.questionImage ? '📷 Image question' : 'Untitled question')).slice(0, 70);
+    return `
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);${editingQuestionId === q.id ? 'border-color:var(--gold);background:rgba(212,175,55,0.06);' : ''}">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Q${i+1}. [${q.type}] ${escapeHtml(preview)}${(q.text||'').length > 70 ? '…' : ''}</div>
+        </div>
+        <button class="btn-s" style="padding:6px 12px;font-size:12px;flex-shrink:0;" onclick="editQuestion('${q.id}')">✏️ Edit</button>
+        <button class="btn-s" style="padding:6px 12px;font-size:12px;color:#C0564A;border-color:rgba(192,86,74,0.2);flex-shrink:0;" onclick="deleteQuestionFromTest('${q.id}')">Delete</button>
+      </div>`;
+  }).join('');
+}
+
+function editQuestion(qId){
+  const testId = document.getElementById('qTestSelect').value;
+  const test = testSeriesIndex.find(t => t.id === testId);
+  if(!test) return;
+  const q = test.questions.find(x => x.id === qId);
+  if(!q) return;
+
+  editingQuestionId = qId;
+  document.getElementById('qType').value = q.type;
+  onQuestionTypeChange();
+
+  if(q.questionImage){
+    setQuestionInputMode('image');
+    qImageDataUrl = q.questionImage;
+    document.getElementById('qImagePreview').src = q.questionImage;
+    document.getElementById('qImagePreviewWrap').style.display = 'block';
+    document.getElementById('qImageCaption').value = q.text || '';
+  } else {
+    setQuestionInputMode('text');
+    document.getElementById('qText').value = q.text || '';
+  }
+
+  if(q.type === 'MCQ' || q.type === 'MSQ' || q.type === 'MATCH'){
+    document.getElementById('qOptA').value = q.options[0] || '';
+    document.getElementById('qOptB').value = q.options[1] || '';
+    document.getElementById('qOptC').value = q.options[2] || '';
+    document.getElementById('qOptD').value = q.options[3] || '';
+    if(q.type === 'MSQ'){
+      document.getElementById('qCorrectA').checked = q.correct.includes(0);
+      document.getElementById('qCorrectB').checked = q.correct.includes(1);
+      document.getElementById('qCorrectC').checked = q.correct.includes(2);
+      document.getElementById('qCorrectD').checked = q.correct.includes(3);
+    } else {
+      document.getElementById('qCorrect').value = String(q.correct);
+    }
+    if(q.type === 'MATCH'){
+      ['P','Q','R','S'].forEach((k,i) => { document.getElementById('qMatchListI_'+k).value = q.listI[i] || ''; });
+      ['1','2','3','4','5'].forEach((k,i) => { document.getElementById('qMatchListII_'+k).value = q.listII[i] || ''; });
+    }
+  } else if(q.type === 'NAT'){
+    document.getElementById('qNatAnswer').value = q.correctValue;
+    document.getElementById('qNatTolerance').value = q.tolerance || 0;
+  }
+
+  document.getElementById('qSaveBtn').textContent = 'Save Changes';
+  document.getElementById('qCancelEditBtn').style.display = 'inline-flex';
+  renderQuestionListForSelectedTest();
+  renderLiveQuestionPreview();
+  document.getElementById('qEditorFields').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function cancelEditQuestion(){
+  editingQuestionId = null;
+  document.getElementById('qSaveBtn').textContent = 'Add Question';
+  document.getElementById('qCancelEditBtn').style.display = 'none';
+  resetQuestionFormFields();
+  renderQuestionListForSelectedTest();
+  document.getElementById('qApMsg').textContent = '';
+}
+
+function deleteQuestionFromTest(qId){
+  if(!confirm("Delete this question permanently?")) return;
+  const testId = document.getElementById('qTestSelect').value;
+  const test = testSeriesIndex.find(t => t.id === testId);
+  if(!test) return;
+  test.questions = test.questions.filter(q => q.id !== qId);
+  if(editingQuestionId === qId) cancelEditQuestion();
   updateQuestionCountDisplay();
   renderTestSeriesGrid();
   renderDPPSection();
   saveAllData();
-  setTimeout(() => { msg.textContent = ''; }, 3000);
+}
+
+/* ===== LIVE QUESTION PREVIEW (Overleaf-style, exactly as students see it) ===== */
+function getCurrentQuestionFormAsObject(){
+  const type = document.getElementById('qType').value;
+  const q = { type };
+
+  if(qInputMode === 'image'){
+    q.questionImage = qImageDataUrl;
+    q.text = document.getElementById('qImageCaption').value;
+  } else {
+    q.questionImage = null;
+    q.text = document.getElementById('qText').value;
+  }
+
+  if(type === 'MCQ' || type === 'MSQ' || type === 'MATCH'){
+    q.options = [
+      document.getElementById('qOptA').value,
+      document.getElementById('qOptB').value,
+      document.getElementById('qOptC').value,
+      document.getElementById('qOptD').value
+    ];
+    if(type === 'MSQ'){
+      const sel = [];
+      if(document.getElementById('qCorrectA').checked) sel.push(0);
+      if(document.getElementById('qCorrectB').checked) sel.push(1);
+      if(document.getElementById('qCorrectC').checked) sel.push(2);
+      if(document.getElementById('qCorrectD').checked) sel.push(3);
+      q.correct = sel;
+    } else {
+      q.correct = parseInt(document.getElementById('qCorrect').value) || 0;
+    }
+    if(type === 'MATCH'){
+      q.listI = ['P','Q','R','S'].map(k => document.getElementById('qMatchListI_'+k).value || (k + '. ...'));
+      q.listII = ['1','2','3','4','5'].map(k => document.getElementById('qMatchListII_'+k).value || (k + '. ...'));
+    }
+  } else if(type === 'NAT'){
+    q.correctValue = document.getElementById('qNatAnswer').value;
+    q.tolerance = document.getElementById('qNatTolerance').value;
+  }
+  return q;
+}
+
+function renderLiveQuestionPreview(){
+  const box = document.getElementById('qLivePreviewCard');
+  if(!box) return;
+  const q = getCurrentQuestionFormAsObject();
+  const letters = ['A','B','C','D'];
+  const typeLabels = { MCQ: 'Single Correct', MSQ: 'Multiple Correct (select all that apply)', NAT: 'Numerical Answer', MATCH: 'Match the Following — Single Correct' };
+
+  let bodyHtml = '';
+  if(q.type === 'NAT'){
+    bodyHtml = `
+      <div style="max-width:280px;">
+        <input type="number" class="ap-input" style="font-size:16px;padding:14px;" placeholder="Enter your numerical answer" disabled>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:10px;">Correct answer: <b style="color:#4A9C7A;">${q.correctValue !== '' && q.correctValue !== undefined ? q.correctValue : '—'}</b>${q.tolerance ? ' &plusmn; ' + q.tolerance : ''}</div>
+    `;
+  } else if(!q.options || q.options.every(o => !o)){
+    bodyHtml = `<div style="font-size:12.5px;color:var(--muted);">Options will appear here as you type them...</div>`;
+  } else {
+    const correctArr = q.type === 'MSQ' ? (q.correct || []) : [q.correct];
+    bodyHtml = `
+      <div class="tr-options">
+        ${q.options.map((opt,i) => {
+          const isCorrect = correctArr.includes(i);
+          return `
+          <div class="tr-option" style="pointer-events:none;${isCorrect ? 'border-color:#4A9C7A;background:rgba(74,156,122,0.08);' : ''}">
+            <span class="tr-opt-letter" style="${q.type === 'MSQ' ? 'border-radius:6px;' : ''}${isCorrect ? 'background:#4A9C7A;border-color:#4A9C7A;color:#fff;' : ''}">${letters[i]}</span>
+            <span style="flex:1;">${opt || `<span style="color:var(--muted);">Option ${letters[i]}...</span>`}</span>
+            ${isCorrect ? '<span style="color:#4A9C7A;font-size:11px;font-weight:700;">✓ CORRECT</span>' : ''}
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  const questionImageHtml = q.questionImage
+    ? `<img src="${q.questionImage}" style="max-width:100%;border-radius:10px;border:1px solid var(--border);margin-bottom:16px;display:block;">`
+    : '';
+
+  const matchListsHtml = (q.type === 'MATCH' && q.listI && q.listII) ? buildMatchListsHtml(q) : '';
+
+  box.innerHTML = `
+    <div class="tr-qnum">Live Preview &middot; <span style="color:var(--muted);">${q.type || 'MCQ'} — ${typeLabels[q.type] || typeLabels.MCQ}</span></div>
+    ${questionImageHtml}
+    <div class="tr-qtext">${q.text || '<span style="color:var(--muted);font-weight:400;">Start typing your question — it will appear here exactly as students will see it...</span>'}</div>
+    ${matchListsHtml}
+    ${bodyHtml}
+  `;
+  typesetMath(box);
+  saveQuestionDraft();
+}
+
+/* ===== AUTO-SAVE DRAFT (so an accidental refresh never loses in-progress work) ===== */
+const Q_DRAFT_KEY = 'tms_question_draft';
+let draftSaveDebounce = null;
+
+function saveQuestionDraft(){
+  if(editingQuestionId) return; // don't overwrite drafts while editing an existing question
+  if(draftSaveDebounce) clearTimeout(draftSaveDebounce);
+  draftSaveDebounce = setTimeout(() => {
+    try {
+      const draft = getCurrentQuestionFormAsObject();
+      draft.qType = document.getElementById('qType').value;
+      draft.qInputMode = qInputMode;
+      localStorage.setItem(Q_DRAFT_KEY, JSON.stringify(draft));
+    } catch(e){}
+  }, 500);
+}
+
+function clearQuestionDraft(){
+  localStorage.removeItem(Q_DRAFT_KEY);
+}
+
+function loadQuestionDraftIfAny(){
+  try {
+    const raw = localStorage.getItem(Q_DRAFT_KEY);
+    if(!raw) return;
+    const d = JSON.parse(raw);
+    if(!d || (!d.text && !d.questionImage)) return;
+
+    document.getElementById('qType').value = d.qType || 'MCQ';
+    onQuestionTypeChange();
+    if(d.qInputMode === 'image' && d.questionImage){
+      setQuestionInputMode('image');
+      qImageDataUrl = d.questionImage;
+      document.getElementById('qImagePreview').src = d.questionImage;
+      document.getElementById('qImagePreviewWrap').style.display = 'block';
+      document.getElementById('qImageCaption').value = d.text || '';
+    } else {
+      document.getElementById('qText').value = d.text || '';
+    }
+    if(d.options){
+      document.getElementById('qOptA').value = d.options[0] || '';
+      document.getElementById('qOptB').value = d.options[1] || '';
+      document.getElementById('qOptC').value = d.options[2] || '';
+      document.getElementById('qOptD').value = d.options[3] || '';
+    }
+    if(d.qType === 'MSQ' && Array.isArray(d.correct)){
+      document.getElementById('qCorrectA').checked = d.correct.includes(0);
+      document.getElementById('qCorrectB').checked = d.correct.includes(1);
+      document.getElementById('qCorrectC').checked = d.correct.includes(2);
+      document.getElementById('qCorrectD').checked = d.correct.includes(3);
+    } else if(d.correct !== undefined){
+      document.getElementById('qCorrect').value = String(d.correct);
+    }
+    if(d.listI){
+      ['P','Q','R','S'].forEach((k,i) => { document.getElementById('qMatchListI_'+k).value = d.listI[i] || ''; });
+      ['1','2','3','4','5'].forEach((k,i) => { document.getElementById('qMatchListII_'+k).value = d.listII[i] || ''; });
+    }
+    if(d.correctValue !== undefined){
+      document.getElementById('qNatAnswer').value = d.correctValue;
+      document.getElementById('qNatTolerance').value = d.tolerance || 0;
+    }
+    renderLiveQuestionPreview();
+    const msg = document.getElementById('qApMsg');
+    if(msg){
+      msg.textContent = 'Draft restored from your last unsaved session.';
+      msg.className = 'ap-msg ok';
+      setTimeout(() => { msg.textContent = ''; }, 4000);
+    }
+  } catch(e){ console.error('Draft restore failed:', e); }
 }
 
 /* ===== TEST RUNNER (Online Exam System) ===== */
