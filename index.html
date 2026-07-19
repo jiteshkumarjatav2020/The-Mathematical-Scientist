@@ -1055,10 +1055,21 @@ function initFirestore(){
       return false;
     }
     firebase.initializeApp(firebaseConfig);
-    firebase.appCheck().activate(
-               "6LfvmVktAAAAANg2NHY3qxVE-F8qH_hYyNvuGGHr",
-               true
-           );
+
+    // App Check is optional hardening — if it fails (wrong domain, blocked
+    // reCAPTCHA script, opened via file:// instead of http/https, etc.) it
+    // must NOT prevent Auth/Firestore from initializing.
+    try {
+      if(firebase.appCheck){
+        firebase.appCheck().activate(
+          "6LfvmVktAAAAANg2NHY3qxVE-F8qH_hYyNvuGGHr",
+          true
+        );
+      }
+    } catch(appCheckErr){
+      console.warn("[TMS] App Check failed to activate (continuing without it):", appCheckErr);
+    }
+
     db = firebase.firestore();
     auth = firebase.auth();
     return true;
