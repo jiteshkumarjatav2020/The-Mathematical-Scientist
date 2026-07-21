@@ -515,7 +515,7 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
           <input type="date" id="testDPPDate" class="ap-input">
         </div>
       </div>
-      <div style="background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.25);border-radius:8px;padding:12px 16px;margin-bottom:20px;font-size:12px;color:var(--muted);">
+      <div style="background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.25);border-radius:8px;padding:12px 16px;margin-bottom:20px;font-size:12px;color:var(--muted);" id="testPatternNote">
         📐 Marking follows the <b style="color:var(--gold);">JEE Advanced pattern</b> automatically, based on the Question Type you pick below — no per-test marks needed.
       </div>
       <div class="ap-actions">
@@ -1217,11 +1217,13 @@ let isInstructorAuthenticated = false;
 const PROGRAM_CONTENT = {
   JEE: {
     badge: "⚡ IIT JEE Premium Hub",
-    desc: "High-yield chapter-wise mathematics notes, hand-crafted test series, and comprehensive PYQ packages curated specially for JEE Main & Advanced aspirants."
+    desc: "High-yield chapter-wise mathematics notes, hand-crafted test series, and comprehensive PYQ packages curated specially for JEE Main & Advanced aspirants.",
+    testPatternNote: '📐 Marking follows the <b style="color:var(--gold);">JEE Advanced pattern</b> automatically, based on the Question Type you pick below — no per-test marks needed.'
   },
   JAM: {
     badge: "🎓 IIT JAM Premium Hub",
-    desc: "Chapter-wise mathematics notes, mock tests, and PYQ packages curated specially for the IIT JAM Mathematics (MA) program aspirants."
+    desc: "Chapter-wise mathematics notes, mock tests, and PYQ packages curated specially for the IIT JAM Mathematics (MA) program aspirants.",
+    testPatternNote: '📐 Marking follows the official <b style="color:var(--gold);">IIT JAM pattern</b> automatically: 1st–10th MCQ = +1 (−⅓ wrong), 11th–30th MCQ = +2 (−⅔ wrong), MSQ = +2 with no negative/partial marking, 1st–10th NAT = +2, 11th–20th NAT = +1 (no negative). Add questions of each type in the same order as the real paper so positions line up.'
   }
 };
 
@@ -1242,6 +1244,10 @@ function setProgram(prog){
   const desc = document.getElementById('heroDesc');
   if(badge) badge.textContent = content.badge;
   if(desc) desc.textContent = content.desc;
+  const patternNote = document.getElementById('testPatternNote');
+  if(patternNote) patternNote.innerHTML = content.testPatternNote;
+  const qTypeSelect = document.getElementById('qType');
+  if(qTypeSelect) updateMarkingSchemeDisplay(qTypeSelect.value);
 
   // Reset chapter/category filters — a JEE chapter filter has no meaning while browsing JAM
   activeCategoryFilter = "All";
@@ -1823,11 +1829,26 @@ const JEE_MARKING_SCHEME = {
   MATCH: { label: 'Match the Following',    html: '✅ Correct combination: <b style="color:#4A9C7A;">+4</b> &nbsp;|&nbsp; ➖ Unanswered: <b>0</b> &nbsp;|&nbsp; ❌ Wrong: <b style="color:#C0564A;">−1</b>' }
 };
 
+/* IIT JAM Mathematics official exam pattern (Section A: MCQ, Section B: MSQ, Section C: NAT).
+   Marks depend on the QUESTION'S POSITION among questions of the same type inside a test
+   (1st–10th MCQ = 1 mark, 11th–30th MCQ = 2 marks; 1st–10th NAT = 2 marks, 11th–20th NAT = 1 mark),
+   mirroring Q1–Q10 / Q11–Q30 / Q41–Q50 / Q51–Q60 of the real paper — see questionMaxMarksJAM(). */
+const JAM_MARKING_SCHEME = {
+  MCQ:   { label: 'MCQ — Section A',  html: 'Q1–Q10 in this type: <b style="color:#4A9C7A;">+1</b>, wrong <b style="color:#C0564A;">−⅓</b> &nbsp;|&nbsp; Q11–Q30: <b style="color:#4A9C7A;">+2</b>, wrong <b style="color:#C0564A;">−⅔</b> &nbsp;|&nbsp; ➖ Unanswered: <b>0</b>' },
+  MSQ:   { label: 'MSQ — Section B',  html: '✅ All correct options chosen (no extra, no missing): <b style="color:#4A9C7A;">+2</b> &nbsp;|&nbsp; ❌ Anything else / Unanswered: <b>0</b> &nbsp;|&nbsp; No negative marking, no partial marking' },
+  NAT:   { label: 'NAT — Section C',  html: 'Q41–Q50 in this type: <b style="color:#4A9C7A;">+2</b> &nbsp;|&nbsp; Q51–Q60: <b style="color:#4A9C7A;">+1</b> &nbsp;|&nbsp; ❌ Wrong / Unanswered: <b>0</b> &nbsp;|&nbsp; No negative marking' },
+  MATCH: { label: 'Match the Following', html: '✅ Correct combination: <b style="color:#4A9C7A;">+2</b> &nbsp;|&nbsp; ❌ Wrong / Unanswered: <b>0</b> &nbsp;|&nbsp; No negative marking' }
+};
+
 function updateMarkingSchemeDisplay(type){
   const box = document.getElementById('qMarkingSchemeBox');
   if(!box) return;
-  const scheme = JEE_MARKING_SCHEME[type] || JEE_MARKING_SCHEME.MCQ;
-  box.innerHTML = `<b style="color:var(--gold);">📐 Marking Scheme — ${scheme.label}</b><br>${scheme.html}`;
+  const schemeSet = currentProgram === 'JAM' ? JAM_MARKING_SCHEME : JEE_MARKING_SCHEME;
+  const scheme = schemeSet[type] || schemeSet.MCQ;
+  const patternNote = currentProgram === 'JAM'
+    ? '<div style="font-size:11px;color:var(--muted);margin-top:4px;">Following the official IIT JAM pattern — add questions of a type in the same order as the real paper (e.g. all 30 MCQs, then 10 MSQs, then 20 NAT) so positions line up correctly.</div>'
+    : '';
+  box.innerHTML = `<b style="color:var(--gold);">📐 Marking Scheme — ${scheme.label}</b><br>${scheme.html}${patternNote}`;
 }
 
 function onQuestionTypeChange(){
@@ -2572,57 +2593,100 @@ function confirmSubmitTest(){
 function submitTest(autoSubmitted){
   if(trTimerHandle) clearInterval(trTimerHandle);
 
-let correctCount = 0, wrongCount = 0, unattempted = 0, partialCount = 0, totalMarks = 0;
+let correctCount = 0, wrongCount = 0, unattempted = 0, partialCount = 0, totalMarks = 0, maxMarks = 0;
   const perQuestionReview = [];
   const letters = ['A','B','C','D'];
 
-  function questionMaxMarks(q){
-    if(q.type === 'MCQ') return 3;
-    return 4; // MSQ, NAT, MATCH
+  const isJamTest = itemProgram(trCurrentTest) === 'JAM';
+  /* Tracks how many questions of each type have already been seen, so the
+     IIT JAM position-based marks (Q1–10 vs Q11–30 MCQ, Q41–50 vs Q51–60 NAT)
+     can be applied. Assumes questions of a type were added in the same
+     order as the real paper — noted to the admin in the marking-scheme box. */
+  const typeSeenCount = { MCQ: 0, MSQ: 0, NAT: 0, MATCH: 0 };
+
+  function jamMaxMarks(type, idxInType){
+    if(type === 'MCQ') return idxInType < 10 ? 1 : 2;
+    if(type === 'NAT') return idxInType < 10 ? 2 : 1;
+    return 2; // MSQ and MATCH
   }
 
   trCurrentTest.questions.forEach((q, i) => {
     const given = trAnswers[i];
     const answered = trIsAnswered(i);
-    let status, marksAwarded = 0;
+    let status, marksAwarded = 0, qMax;
 
-    if(!answered){
-      unattempted++;
-      status = 'unattempted';
-    } else if(q.type === 'MSQ'){
-      // JEE Advanced MSQ partial marking
-      const givenSet = [...given];
-      const correctSet = q.correct;
-      const hasWrong = givenSet.some(x => !correctSet.includes(x));
-      if(hasWrong){
-        marksAwarded = -2; wrongCount++; status = 'wrong';
-      } else if(givenSet.length === correctSet.length){
-        marksAwarded = 4; correctCount++; status = 'correct';
+    const idxInType = typeSeenCount[q.type] !== undefined ? typeSeenCount[q.type] : 0;
+    if(typeSeenCount[q.type] !== undefined) typeSeenCount[q.type]++;
+
+    if(isJamTest){
+      qMax = jamMaxMarks(q.type, idxInType);
+
+      if(!answered){
+        unattempted++;
+        status = 'unattempted';
+      } else if(q.type === 'MSQ'){
+        // IIT JAM MSQ: full marks only for an exact match, no partial, no negative
+        const givenSet = [...given];
+        const correctSet = q.correct;
+        const exactMatch = givenSet.length === correctSet.length && givenSet.every(x => correctSet.includes(x));
+        if(exactMatch){ marksAwarded = qMax; correctCount++; status = 'correct'; }
+        else { marksAwarded = 0; wrongCount++; status = 'wrong'; }
+      } else if(q.type === 'NAT'){
+        const num = parseFloat(given);
+        const isCorrect = !isNaN(num) && Math.abs(num - q.correctValue) <= (Number(q.tolerance) || 0) + 1e-9;
+        if(isCorrect){ marksAwarded = qMax; correctCount++; status = 'correct'; }
+        else { marksAwarded = 0; wrongCount++; status = 'wrong'; } // NAT: no negative marking in JAM
       } else {
-        marksAwarded = givenSet.length; // +1 / +2 / +3 depending on how many correct chosen
-        partialCount++; status = 'partial';
+        // MCQ or MATCH — single correct
+        const isCorrect = given === q.correct;
+        if(isCorrect){
+          marksAwarded = qMax; correctCount++; status = 'correct';
+        } else if(q.type === 'MCQ'){
+          marksAwarded = -(idxInType < 10 ? (1/3) : (2/3)); wrongCount++; status = 'wrong';
+        } else {
+          marksAwarded = 0; wrongCount++; status = 'wrong'; // MATCH: no negative in JAM
+        }
       }
-    } else if(q.type === 'NAT'){
-      const num = parseFloat(given);
-      const isCorrect = !isNaN(num) && Math.abs(num - q.correctValue) <= (Number(q.tolerance) || 0) + 1e-9;
-      if(isCorrect){ marksAwarded = 4; correctCount++; status = 'correct'; }
-      else { marksAwarded = 0; wrongCount++; status = 'wrong'; } // NAT: 0 for wrong, no negative
     } else {
-      // MCQ or MATCH — single correct
-      const isCorrect = given === q.correct;
-      if(isCorrect){
-        marksAwarded = (q.type === 'MCQ') ? 3 : 4;
-        correctCount++; status = 'correct';
+      // ===== JEE Advanced marking scheme (unchanged) =====
+      qMax = (q.type === 'MCQ') ? 3 : 4; // MSQ, NAT, MATCH
+
+      if(!answered){
+        unattempted++;
+        status = 'unattempted';
+      } else if(q.type === 'MSQ'){
+        const givenSet = [...given];
+        const correctSet = q.correct;
+        const hasWrong = givenSet.some(x => !correctSet.includes(x));
+        if(hasWrong){
+          marksAwarded = -2; wrongCount++; status = 'wrong';
+        } else if(givenSet.length === correctSet.length){
+          marksAwarded = 4; correctCount++; status = 'correct';
+        } else {
+          marksAwarded = givenSet.length; // +1 / +2 / +3 depending on how many correct chosen
+          partialCount++; status = 'partial';
+        }
+      } else if(q.type === 'NAT'){
+        const num = parseFloat(given);
+        const isCorrect = !isNaN(num) && Math.abs(num - q.correctValue) <= (Number(q.tolerance) || 0) + 1e-9;
+        if(isCorrect){ marksAwarded = 4; correctCount++; status = 'correct'; }
+        else { marksAwarded = 0; wrongCount++; status = 'wrong'; } // NAT: 0 for wrong, no negative
       } else {
-        marksAwarded = -1; wrongCount++; status = 'wrong';
+        // MCQ or MATCH — single correct
+        const isCorrect = given === q.correct;
+        if(isCorrect){
+          marksAwarded = (q.type === 'MCQ') ? 3 : 4;
+          correctCount++; status = 'correct';
+        } else {
+          marksAwarded = -1; wrongCount++; status = 'wrong';
+        }
       }
     }
 
     totalMarks += marksAwarded;
+    maxMarks += qMax;
     perQuestionReview.push({q, given, status, marksAwarded});
   });
-
-  const maxMarks = trCurrentTest.questions.reduce((sum, q) => sum + questionMaxMarks(q), 0);
 
   saveLeaderboardEntry(trStudentName, trStudentEmail, trCurrentTest, totalMarks, maxMarks);
 
