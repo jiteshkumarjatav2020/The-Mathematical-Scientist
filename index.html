@@ -1223,7 +1223,7 @@ const PROGRAM_CONTENT = {
   JAM: {
     badge: "🎓 IIT JAM Premium Hub",
     desc: "Chapter-wise mathematics notes, mock tests, and PYQ packages curated specially for the IIT JAM Mathematics (MA) program aspirants.",
-    testPatternNote: '📐 Marking follows the official <b style="color:var(--gold);">IIT JAM pattern</b> automatically: 1st–10th MCQ = +1 (−⅓ wrong), 11th–30th MCQ = +2 (−⅔ wrong), MSQ = +2 with no negative/partial marking, 1st–10th NAT = +2, 11th–20th NAT = +1 (no negative). Add questions of each type in the same order as the real paper so positions line up.'
+    testPatternNote: '📐 Marking follows the official <b style="color:var(--gold);">IIT JAM pattern</b> automatically: 1st–10th MCQ = +1 (−⅓ wrong), 11th–30th MCQ = +2 (−⅔ wrong), MSQ = +2 with no negative/partial marking, 1st–10th NAT = +1, 11th–20th NAT = +2 (no negative). Add questions of each type in the same order as the real paper so positions line up.'
   }
 };
 
@@ -1831,12 +1831,12 @@ const JEE_MARKING_SCHEME = {
 
 /* IIT JAM Mathematics official exam pattern (Section A: MCQ, Section B: MSQ, Section C: NAT).
    Marks depend on the QUESTION'S POSITION among questions of the same type inside a test
-   (1st–10th MCQ = 1 mark, 11th–30th MCQ = 2 marks; 1st–10th NAT = 2 marks, 11th–20th NAT = 1 mark),
-   mirroring Q1–Q10 / Q11–Q30 / Q41–Q50 / Q51–Q60 of the real paper — see questionMaxMarksJAM(). */
+   (1st–10th MCQ = 1 mark, 11th–30th MCQ = 2 marks; 1st–10th NAT = 1 mark, 11th–20th NAT = 2 marks),
+   mirroring Q1–Q10 / Q11–Q30 / Q41–Q50 (1 mark) / Q51–Q60 (2 marks) of the real paper — see jamMaxMarks(). */
 const JAM_MARKING_SCHEME = {
   MCQ:   { label: 'MCQ — Section A',  html: 'Q1–Q10 in this type: <b style="color:#4A9C7A;">+1</b>, wrong <b style="color:#C0564A;">−⅓</b> &nbsp;|&nbsp; Q11–Q30: <b style="color:#4A9C7A;">+2</b>, wrong <b style="color:#C0564A;">−⅔</b> &nbsp;|&nbsp; ➖ Unanswered: <b>0</b>' },
   MSQ:   { label: 'MSQ — Section B',  html: '✅ All correct options chosen (no extra, no missing): <b style="color:#4A9C7A;">+2</b> &nbsp;|&nbsp; ❌ Anything else / Unanswered: <b>0</b> &nbsp;|&nbsp; No negative marking, no partial marking' },
-  NAT:   { label: 'NAT — Section C',  html: 'Q41–Q50 in this type: <b style="color:#4A9C7A;">+2</b> &nbsp;|&nbsp; Q51–Q60: <b style="color:#4A9C7A;">+1</b> &nbsp;|&nbsp; ❌ Wrong / Unanswered: <b>0</b> &nbsp;|&nbsp; No negative marking' },
+  NAT:   { label: 'NAT — Section C',  html: 'Q41–Q50 in this type: <b style="color:#4A9C7A;">+1</b> &nbsp;|&nbsp; Q51–Q60: <b style="color:#4A9C7A;">+2</b> &nbsp;|&nbsp; ❌ Wrong / Unanswered: <b>0</b> &nbsp;|&nbsp; No negative marking' },
   MATCH: { label: 'Match the Following', html: '✅ Correct combination: <b style="color:#4A9C7A;">+2</b> &nbsp;|&nbsp; ❌ Wrong / Unanswered: <b>0</b> &nbsp;|&nbsp; No negative marking' }
 };
 
@@ -2606,7 +2606,7 @@ let correctCount = 0, wrongCount = 0, unattempted = 0, partialCount = 0, totalMa
 
   function jamMaxMarks(type, idxInType){
     if(type === 'MCQ') return idxInType < 10 ? 1 : 2;
-    if(type === 'NAT') return idxInType < 10 ? 2 : 1;
+    if(type === 'NAT') return idxInType < 10 ? 1 : 2;
     return 2; // MSQ and MATCH
   }
 
