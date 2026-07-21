@@ -29,6 +29,11 @@ nav a:hover{color:var(--text);}
 .admin-btn{background:none;border:1px solid var(--gold);color:var(--gold);padding:8px 16px;border-radius:20px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s;}
 .admin-btn:hover{background:var(--gold);color:#0A0A0A;}
 .admin-btn.active{background:rgba(212,175,55,0.15);}
+.program-toggle{display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:24px;padding:4px;}
+.program-btn{background:none;border:none;color:var(--muted);padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.program-btn:hover{color:var(--text);}
+.program-btn.active{background:var(--gold);color:#0A0A0A;}
+@media(max-width:768px){ .program-toggle{order:-1;} }
 .hero{padding:96px 0 64px;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
 .hero-grid{display:grid;grid-template-columns:1.2fr 0.8fr;gap:48px;align-items:center;}
 .h-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.2);color:var(--gold);padding:6px 12px;border-radius:100px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:24px;}
@@ -276,6 +281,10 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
       </nav>
     </div>
     <div class="h-right">
+      <div class="program-toggle" id="programToggle">
+        <button type="button" class="program-btn active" data-program="JEE" onclick="setProgram('JEE')">⚡ IIT JEE</button>
+        <button type="button" class="program-btn" data-program="JAM" onclick="setProgram('JAM')">🎓 IIT JAM</button>
+      </div>
       <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">☀️</button>
       <button class="admin-btn" id="adminToggle" onclick="handleAdminToggle()">🔒 Admin</button>
     </div>
@@ -285,9 +294,9 @@ footer{padding:64px 0;border-top:1px solid var(--border);background:var(--bg2);c
 <section class="hero">
   <div class="p-wrap hero-grid">
     <div>
-      <div class="h-badge">⚡ IIT JEE Premium Hub</div>
+      <div class="h-badge" id="heroBadge">⚡ IIT JEE Premium Hub</div>
       <h1 class="h-title">The Mathematical Scientist</h1>
-      <p class="h-desc">High-yield chapter-wise mathematics notes, hand-crafted test series, and comprehensive PYQ packages curated specially for JEE Main & Advanced aspirants.</p>
+      <p class="h-desc" id="heroDesc">High-yield chapter-wise mathematics notes, hand-crafted test series, and comprehensive PYQ packages curated specially for JEE Main & Advanced aspirants.</p>
       <div class="h-ctas">
         <a href="#library" class="btn-p">Explore Library</a>
         <a href="https://www.youtube.com/@jitesh_iitian_kgp" target="_blank" class="btn-s">Watch Lectures</a>
@@ -973,8 +982,19 @@ const CHAPTERS = [
   "Trigonometric Ratios and Identities","Vector Algebra"
 ];
 
+/* IIT JAM Mathematics — chapter list (mirrors the CHAPTERS array above, but for the JAM program) */
+const JAM_CHAPTERS = [
+  "Real Analysis","Multivariable Calculus","Differential Equations","Integral Calculus",
+  "Linear Algebra","Vector Spaces","Group Theory","Basic Algebra"
+];
+
+/* Which program ("JEE" or "JAM") the visitor is currently browsing. Every chapter list,
+   resource/video/test grid, admin form and hero panel below reads/reacts to this. */
+let currentProgram = "JEE";
+
 /* User-added custom chapters/topics (persisted alongside the rest of the site data) */
 let customChapters = [];
+let customChaptersJAM = [];
 
 /* Chapters that used to exist but are no longer wanted — filtered out on every load
    so they disappear permanently from anyone's saved data. */
@@ -984,8 +1004,23 @@ function sanitizeCustomChapters(list){
   return (list || []).filter(c => !DEPRECATED_CHAPTERS.some(d => d.toLowerCase() === String(c).toLowerCase()));
 }
 
+/* Returns whichever custom-chapters array belongs to the currently active program. */
+function getCustomChapters(){
+  return currentProgram === "JAM" ? customChaptersJAM : customChapters;
+}
+function setCustomChapters(arr){
+  if(currentProgram === "JAM") customChaptersJAM = arr; else customChapters = arr;
+}
+
 function getAllChapters(){
-  return CHAPTERS.concat(customChapters);
+  const base = currentProgram === "JAM" ? JAM_CHAPTERS : CHAPTERS;
+  return base.concat(getCustomChapters());
+}
+
+/* Item.program may be undefined on data saved before the JAM program existed —
+   treat that legacy data as belonging to JEE so nothing old silently disappears. */
+function itemProgram(item){
+  return item && item.program ? item.program : "JEE";
 }
 
 /* Escapes untrusted text before it's dropped into innerHTML — critical since
@@ -1082,14 +1117,14 @@ function initFirestore(){
 function saveAllData(){
   try {
     localStorage.setItem(TMS_STORAGE_KEY, JSON.stringify({
-      resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex, customChapters, leaderboardIndex
+      resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex, customChapters, customChaptersJAM, leaderboardIndex
     }));
   } catch(e){
     console.error("Local save failed:", e);
   }
   if(firestoreReady){
     tmsDocRef().set({
-      resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex, customChapters,
+      resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex, customChapters, customChaptersJAM,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }).catch(e => {
       console.error("[TMS] Cloud save failed:", e);
@@ -1107,6 +1142,7 @@ function loadLocalCache(){
     videoLibraryIndex = parsed.videoLibraryIndex || [];
     testSeriesIndex = parsed.testSeriesIndex || [];
     customChapters = sanitizeCustomChapters(parsed.customChapters);
+    customChaptersJAM = sanitizeCustomChapters(parsed.customChaptersJAM);
     leaderboardIndex = parsed.leaderboardIndex || [];
     testSeriesIndex.forEach(t => { if(!t.questions) t.questions = []; });
   } catch(e){
@@ -1152,12 +1188,14 @@ function initCloudSync(){
       videoLibraryIndex = data.videoLibraryIndex || [];
       testSeriesIndex = data.testSeriesIndex || [];
       const rawCustomChapters = data.customChapters || [];
+      const rawCustomChaptersJAM = data.customChaptersJAM || [];
                customChapters = sanitizeCustomChapters(rawCustomChapters);
-                const chapterWasCleaned = customChapters.length !== rawCustomChapters.length;
+               customChaptersJAM = sanitizeCustomChapters(rawCustomChaptersJAM);
+                const chapterWasCleaned = (customChapters.length !== rawCustomChapters.length) || (customChaptersJAM.length !== rawCustomChaptersJAM.length);
                 testSeriesIndex.forEach(t => { if(!t.questions) t.questions = []; });
                 try {
                     localStorage.setItem(TMS_STORAGE_KEY, JSON.stringify({
-                         resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex, customChapters, leaderboardIndex
+                         resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex, customChapters, customChaptersJAM, leaderboardIndex
                    }));
                 } catch(e){}
       refreshAllDataViews();
@@ -1175,6 +1213,53 @@ let activeChapterFilter = "All";
 let activeVideoChapterFilter = "All";
 let activeTestChapterFilter = "All";
 let isInstructorAuthenticated = false;
+
+const PROGRAM_CONTENT = {
+  JEE: {
+    badge: "⚡ IIT JEE Premium Hub",
+    desc: "High-yield chapter-wise mathematics notes, hand-crafted test series, and comprehensive PYQ packages curated specially for JEE Main & Advanced aspirants."
+  },
+  JAM: {
+    badge: "🎓 IIT JAM Premium Hub",
+    desc: "Chapter-wise mathematics notes, mock tests, and PYQ packages curated specially for the IIT JAM Mathematics (MA) program aspirants."
+  }
+};
+
+/* Switches the whole site (chapters, notes, videos, PYQs, tests, DPP) between
+   the IIT JEE and IIT JAM programs. Existing data saved before JAM existed has
+   no "program" field and is treated as JEE (see itemProgram()), so nothing old
+   disappears when this is introduced. */
+function setProgram(prog){
+  if(prog !== "JEE" && prog !== "JAM") return;
+  currentProgram = prog;
+
+  document.querySelectorAll('#programToggle .program-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-program') === prog);
+  });
+
+  const content = PROGRAM_CONTENT[prog];
+  const badge = document.getElementById('heroBadge');
+  const desc = document.getElementById('heroDesc');
+  if(badge) badge.textContent = content.badge;
+  if(desc) desc.textContent = content.desc;
+
+  // Reset chapter/category filters — a JEE chapter filter has no meaning while browsing JAM
+  activeCategoryFilter = "All";
+  activeChapterFilter = "All";
+  activeVideoChapterFilter = "All";
+  activeTestChapterFilter = "All";
+  document.querySelectorAll('#library .filter-group:nth-child(1) .fbtn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-cat') === 'All');
+  });
+
+  rebuildChapterUI();
+  renderResourceGridLibrary();
+  renderVideoLibraryGrid();
+  renderTestSeriesGrid();
+  renderDPPSection();
+  populateLeaderboardTestFilter();
+  renderLeaderboardTable();
+}
 
 /* ===== CUSTOM CHAPTER / TOPIC MANAGEMENT =====
    "Chapter" (pick from the existing list) and "Custom" (type a brand new one)
@@ -1212,7 +1297,7 @@ function getEffectiveChapter(prefix){
     const name = input ? input.value.trim() : '';
     if(!name) return '';
     const exists = getAllChapters().some(c => c.toLowerCase() === name.toLowerCase());
-    if(!exists) customChapters.push(name);
+    if(!exists) getCustomChapters().push(name);
     return name;
   }
   const select = document.getElementById(prefix + 'Chapter');
@@ -1319,7 +1404,7 @@ function populateChapterControls(){
    admin-added custom topics (never the built-in CHAPTERS list) and only while
    the instructor is authenticated. */
 function chapterDeleteButtonHtml(ch){
-  if(isInstructorAuthenticated && customChapters.includes(ch)){
+  if(isInstructorAuthenticated && getCustomChapters().includes(ch)){
     return `<button type="button" class="chip-del-btn" title="Delete this custom topic" onclick="event.stopPropagation();deleteCustomChapter('${ch.replace(/'/g,"\\'")}')">✕</button>`;
   }
   return '';
@@ -1335,7 +1420,7 @@ function deleteCustomChapter(ch){
     : `Delete the custom topic "${ch}"?`;
   if(!confirm(warning)) return;
 
-  customChapters = customChapters.filter(c => c !== ch);
+  setCustomChapters(getCustomChapters().filter(c => c !== ch));
   if(activeChapterFilter === ch) activeChapterFilter = 'All';
   if(activeVideoChapterFilter === ch) activeVideoChapterFilter = 'All';
   if(activeTestChapterFilter === ch) activeTestChapterFilter = 'All';
@@ -1382,7 +1467,7 @@ function submitCustomTopic(){
     return;
   }
 
-  customChapters.push(name);
+  getCustomChapters().push(name);
   saveAllData();
   rebuildChapterUI();
   closeCustomTopicModal();
@@ -1437,14 +1522,15 @@ function setVideoChapterFilter(btn, chap){
 
 function renderVideoLibraryGrid(){
   updateHeroStats();
-  const count = (chap) => videoLibraryIndex.filter(v => v.chapter === chap).length;
+  const ownVideos = videoLibraryIndex.filter(v => itemProgram(v) === currentProgram);
+  const count = (chap) => ownVideos.filter(v => v.chapter === chap).length;
   document.querySelectorAll('#videoChapterFilters .fbtn-count').forEach(span => {
     const key = span.getAttribute('data-vcount');
-    span.textContent = key === 'All' ? videoLibraryIndex.length : count(key);
+    span.textContent = key === 'All' ? ownVideos.length : count(key);
   });
 
   const box = document.getElementById('videoLibraryContainer');
-  let dataset = videoLibraryIndex.filter(v => (activeVideoChapterFilter === "All" || v.chapter === activeVideoChapterFilter));
+  let dataset = ownVideos.filter(v => (activeVideoChapterFilter === "All" || v.chapter === activeVideoChapterFilter));
 
   if(dataset.length === 0){
     box.innerHTML = `<div class="empty-state">No videos linked yet for this chapter. ${isInstructorAuthenticated ? 'Link a video above.' : ''}</div>`;
@@ -1511,6 +1597,7 @@ function addVideoAsset(){
     id: "video_" + Date.now(),
     title, chapter, url: cleanUrl,
     notesUrl: rawNotesUrl || null,
+    program: currentProgram,
     timestamp: new Date().toISOString()
   });
 
@@ -1543,7 +1630,7 @@ function setTestChapterFilter(btn, chap){
 
 function renderTestSeriesGrid(){
   updateHeroStats();
-  const nonDPPTests = testSeriesIndex.filter(t => !t.isDPP);
+  const nonDPPTests = testSeriesIndex.filter(t => !t.isDPP && itemProgram(t) === currentProgram);
   const count = (chap) => nonDPPTests.filter(t => t.chapter === chap).length;
   document.querySelectorAll('#testChapterFilters .fbtn-count').forEach(span => {
     const key = span.getAttribute('data-tcount');
@@ -1605,7 +1692,7 @@ function renderDPPSection(){
   const box = document.getElementById('dppContainer');
   if(!box) return;
   const todayStr = getLocalDateStr();
-  const allDPPs = testSeriesIndex.filter(t => t.isDPP && t.dppDate);
+  const allDPPs = testSeriesIndex.filter(t => t.isDPP && t.dppDate && itemProgram(t) === currentProgram);
   const todays = allDPPs.filter(t => t.dppDate === todayStr);
   const past = allDPPs.filter(t => t.dppDate < todayStr).sort((a,b) => b.dppDate.localeCompare(a.dppDate)).slice(0, 6);
 
@@ -1679,6 +1766,7 @@ function addTestSeriesAsset(){
     id: "test_" + Date.now(),
     title, chapter, url, durationMinutes,
     isDPP, dppDate,
+    program: currentProgram,
     questions: [],
     timestamp: new Date().toISOString()
   });
@@ -2606,6 +2694,7 @@ function saveLeaderboardEntry(name, email, test, score, maxScore){
     testId: test.id,
     testTitle: test.title,
     chapter: test.chapter,
+    program: itemProgram(test),
     studentName: name,
     studentEmail: email,
     score: score,
@@ -2663,7 +2752,7 @@ function populateLeaderboardTestFilter(){
   if(!sel) return;
   const prev = sel.value;
   const testIdsWithEntries = [...new Set(leaderboardIndex.map(e => e.testId))];
-  const options = testSeriesIndex.filter(t => testIdsWithEntries.includes(t.id));
+  const options = testSeriesIndex.filter(t => testIdsWithEntries.includes(t.id) && itemProgram(t) === currentProgram);
   sel.innerHTML = options.length === 0
     ? `<option value="">No attempt has been made so far</option>`
     : options.map(t => `<option value="${t.id}">${t.title}</option>`).join('');
@@ -3216,18 +3305,22 @@ function setChapterFilter(btn, chap){
 }
 
 function updateHeroStats() {
-  const notesCount = resourceDatabaseIndex.filter(r => r.category === 'Notes').length;
-  const pyqCount = resourceDatabaseIndex.filter(r => r.category === 'PYQ').length;
+  const ownRes = resourceDatabaseIndex.filter(r => itemProgram(r) === currentProgram);
+  const ownVideos = videoLibraryIndex.filter(v => itemProgram(v) === currentProgram);
+  const ownTests = testSeriesIndex.filter(t => itemProgram(t) === currentProgram);
+  const notesCount = ownRes.filter(r => r.category === 'Notes').length;
+  const pyqCount = ownRes.filter(r => r.category === 'PYQ').length;
   document.getElementById('statNotes').textContent = notesCount;
   document.getElementById('statPyqs').textContent = pyqCount;
-  document.getElementById('statVideos').textContent = videoLibraryIndex.length;
-  document.getElementById('statTests').textContent = testSeriesIndex.length;
+  document.getElementById('statVideos').textContent = ownVideos.length;
+  document.getElementById('statTests').textContent = ownTests.length;
 }
 
 function calculateDynamicStatsCounter() {
-  const count = (cat) => resourceDatabaseIndex.filter(r => r.category === cat).length;
+  const ownRes = resourceDatabaseIndex.filter(r => itemProgram(r) === currentProgram);
+  const count = (cat) => ownRes.filter(r => r.category === cat).length;
 
-  document.getElementById('c-all').textContent = resourceDatabaseIndex.length;
+  document.getElementById('c-all').textContent = ownRes.length;
   document.getElementById('c-notes').textContent = count('Notes');
   document.getElementById('c-pyq').textContent = count('PYQ');
   document.getElementById('c-test').textContent = count('Test Series');
@@ -3240,9 +3333,10 @@ function renderResourceGridLibrary() {
   const box = document.getElementById('resourceContainer');
   
   let dataset = resourceDatabaseIndex.filter(r => {
+    const matchProgram = itemProgram(r) === currentProgram;
     const matchCat = (activeCategoryFilter === "All" || r.category === activeCategoryFilter);
     const matchChap = (activeChapterFilter === "All" || r.chapter === activeChapterFilter);
-    return matchCat && matchChap;
+    return matchProgram && matchCat && matchChap;
   });
 
   if(dataset.length === 0) {
@@ -3307,6 +3401,7 @@ function addResourceAsset() {
   const asset = {
     id: "asset_" + Date.now(),
     title, category, chapter, url,
+    program: currentProgram,
     timestamp: new Date().toISOString()
   };
 
