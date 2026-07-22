@@ -1484,6 +1484,7 @@ window.addEventListener('DOMContentLoaded', () => {
   buildMathToolbar();
   updateMarkingSchemeDisplay('MCQ');
   initCloudSync();
+  tryResumeTestSession();
   synchronizeYouTubeLiveFeed();
 
   const qEditorBox = document.getElementById('qEditorFields');
@@ -2373,6 +2374,73 @@ let trVisited = new Set();
 let trCurrentIndex = 0;
 let trRemainingSeconds = 0;
 let trTimerHandle = null;
+let trEndsAt = 0; // absolute ms timestamp when the timer runs out — survives refresh/tab-close
+
+/* A test session (answers, marks, current position, remaining time) is saved here as the
+   student progresses, so a lost connection, an accidental refresh, or closing the site
+   doesn't cost them the attempt. On reopening, the exact same absolute end-time is reused —
+   no extra time is granted, keeping it fair like the real exam. */
+const TR_SESSION_KEY = "tms_active_test_session";
+
+function trSaveSession(){
+  if(!trCurrentTest) return;
+  try {
+    localStorage.setItem(TR_SESSION_KEY, JSON.stringify({
+      testId: trCurrentTest.id,
+      answers: trAnswers,
+      marked: [...trMarked],
+      visited: [...trVisited],
+      currentIndex: trCurrentIndex,
+      endsAt: trEndsAt,
+      studentName: trStudentName,
+      studentEmail: trStudentEmail
+    }));
+  } catch(e){
+    console.error("[TMS] Test session save failed:", e);
+  }
+}
+
+function trClearSession(){
+  try { localStorage.removeItem(TR_SESSION_KEY); } catch(e){}
+}
+
+/* Runs once on page load. If an unfinished test session is found (and its timer hasn't
+   already run out), silently resumes the student straight back into it. */
+function tryResumeTestSession(){
+  let raw;
+  try { raw = localStorage.getItem(TR_SESSION_KEY); } catch(e){ return; }
+  if(!raw) return;
+
+  let session;
+  try { session = JSON.parse(raw); } catch(e){ trClearSession(); return; }
+  if(!session || !session.testId || !session.endsAt) { trClearSession(); return; }
+
+  const remaining = Math.round((session.endsAt - Date.now()) / 1000);
+  if(remaining <= 0){ trClearSession(); return; }
+
+  const test = testSeriesIndex.find(t => t.id === session.testId);
+  if(!test || !test.questions || test.questions.length === 0){ trClearSession(); return; }
+
+  trCurrentTest = test;
+  trAnswers = session.answers || {};
+  trMarked = new Set(session.marked || []);
+  trVisited = new Set(session.visited || []);
+  trCurrentIndex = Math.min(session.currentIndex || 0, test.questions.length - 1);
+  trStudentName = session.studentName || '';
+  trStudentEmail = session.studentEmail || '';
+  trEndsAt = session.endsAt;
+  trRemainingSeconds = remaining;
+
+  document.getElementById('trTitle').textContent = test.title;
+  document.getElementById('testRunnerOverlay').classList.add('open');
+
+  trRenderQuestion();
+  trRenderPalette();
+  trUpdateTimerDisplay();
+
+  if(trTimerHandle) clearInterval(trTimerHandle);
+  trTimerHandle = setInterval(trTimerTick, 1000);
+}
 
 function startTest(testId){
   pendingTestIdForName = testId;
@@ -2424,6 +2492,7 @@ function actuallyStartTest(testId){
   trVisited = new Set();
   trCurrentIndex = 0;
   trRemainingSeconds = (test.durationMinutes || 30) * 60;
+  trEndsAt = Date.now() + trRemainingSeconds * 1000;
 
   document.getElementById('trTitle').textContent = test.title;
   document.getElementById('testRunnerOverlay').classList.add('open');
@@ -2431,16 +2500,23 @@ function actuallyStartTest(testId){
   trRenderQuestion();
   trRenderPalette();
   trUpdateTimerDisplay();
+  trSaveSession();
 
   if(trTimerHandle) clearInterval(trTimerHandle);
-  trTimerHandle = setInterval(() => {
-    trRemainingSeconds--;
-    trUpdateTimerDisplay();
-    if(trRemainingSeconds <= 0){
-      clearInterval(trTimerHandle);
-      submitTest(true);
-    }
-  }, 1000);
+  trTimerHandle = setInterval(trTimerTick, 1000);
+}
+
+/* Ticks once a second. Always recomputed from the absolute trEndsAt timestamp rather than
+   simply decremented, so the countdown self-corrects after a refresh, a throttled/backgrounded
+   tab, or any gap — no extra time is ever gained or lost. */
+function trTimerTick(){
+  trRemainingSeconds = Math.max(0, Math.round((trEndsAt - Date.now()) / 1000));
+  trUpdateTimerDisplay();
+  trSaveSession();
+  if(trRemainingSeconds <= 0){
+    clearInterval(trTimerHandle);
+    submitTest(true);
+  }
 }
 
 function trUpdateTimerDisplay(){
@@ -2537,6 +2613,7 @@ function trRenderPalette(){
 function trGoToQuestion(i){
   trCurrentIndex = i;
   trRenderQuestion();
+  trSaveSession();
 }
 
 function trSelectOption(i){
@@ -2549,11 +2626,13 @@ function trSelectOption(i){
     trAnswers[trCurrentIndex] = i;
   }
   trRenderQuestion();
+  trSaveSession();
 }
 
 function trSetNatAnswer(value){
   trAnswers[trCurrentIndex] = value;
   trRenderPalette();
+  trSaveSession();
 }
 
 function trSaveAndNext(){
@@ -2563,6 +2642,7 @@ function trSaveAndNext(){
   } else {
     trRenderPalette();
   }
+  trSaveSession();
 }
 
 function trMarkForReviewNext(){
@@ -2573,6 +2653,7 @@ function trMarkForReviewNext(){
 function trClearResponse(){
   delete trAnswers[trCurrentIndex];
   trRenderQuestion();
+  trSaveSession();
 }
 
 function trPrevQuestion(){
@@ -2580,6 +2661,7 @@ function trPrevQuestion(){
     trCurrentIndex--;
     trRenderQuestion();
   }
+  trSaveSession();
 }
 
 function confirmSubmitTest(){
@@ -2592,6 +2674,7 @@ function confirmSubmitTest(){
 
 function submitTest(autoSubmitted){
   if(trTimerHandle) clearInterval(trTimerHandle);
+  trClearSession();
 
 let correctCount = 0, wrongCount = 0, unattempted = 0, partialCount = 0, totalMarks = 0, maxMarks = 0;
   const perQuestionReview = [];
