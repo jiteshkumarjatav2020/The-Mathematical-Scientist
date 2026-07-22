@@ -1127,8 +1127,8 @@ function saveAllData(){
       resourceDatabaseIndex, videoLibraryIndex, testSeriesIndex, customChapters, customChaptersJAM,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }).catch(e => {
-      console.error("[TMS] Cloud save failed:", e);
-      alert("Cloud save failed — you may not be signed in as the authorized admin, or the change wasn't saved to the cloud. Local copy on this device was still updated.");
+      console.error("[TMS] Cloud save failed:", e.code, e.message, e);
+      alert("Cloud save failed (" + (e.code || "unknown error") + ") — you may not be signed in as the authorized admin, or the change wasn't saved to the cloud. Local copy on this device was still updated.\n\nDetail: " + e.message);
     });
   }
 }
@@ -3497,7 +3497,7 @@ function renderResourceGridLibrary() {
     c.className = "res-card";
     
     let emoji = "📝";
-    if(r.category === 'PYQ') emoji = "❓";
+    if(r.category === 'PYQ') emoji = "📄";
     if(r.category === 'Test Series') emoji = "🏆";
     if(r.category === 'Rankers Book') emoji = "📚";
 
