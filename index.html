@@ -1023,6 +1023,14 @@ function itemProgram(item){
   return item && item.program ? item.program : "JEE";
 }
 
+/* New test series default to `published:false` (a Draft) so incomplete tests never
+   show to students while you're still adding questions/settings. Tests saved before
+   this feature existed have no `published` field at all — those are treated as
+   already-published so nothing you'd already shared quietly disappears. */
+function isPublished(test){
+  return test && test.published !== false;
+}
+
 /* Escapes untrusted text before it's dropped into innerHTML — critical since
    leaderboard entries (studentName etc.) can be written by anyone without
    login, so that text must never be treated as raw HTML. */
@@ -1637,7 +1645,8 @@ function setTestChapterFilter(btn, chap){
 
 function renderTestSeriesGrid(){
   updateHeroStats();
-  const nonDPPTests = testSeriesIndex.filter(t => !t.isDPP && itemProgram(t) === currentProgram);
+  const nonDPPTests = testSeriesIndex.filter(t => !t.isDPP && itemProgram(t) === currentProgram
+    && (isInstructorAuthenticated || isPublished(t)));
   const count = (chap) => nonDPPTests.filter(t => t.chapter === chap).length;
   document.querySelectorAll('#testChapterFilters .fbtn-count').forEach(span => {
     const key = span.getAttribute('data-tcount');
@@ -1658,12 +1667,14 @@ function renderTestSeriesGrid(){
     c.className = "res-card";
     const qCount = (t.questions || []).length;
     const isFullSyllabus = t.chapter === 'Full Syllabus';
+    const draft = !isPublished(t);
     c.innerHTML = `
       <div class="res-left">
         <div class="res-icon">${isFullSyllabus ? '🌐' : '🏆'}</div>
         <div class="res-details">
           <div class="res-title" title="${t.title}">${t.title}</div>
           <div class="res-meta">
+            ${draft ? `<span class="res-tag" style="background:rgba(212,175,55,0.15);color:var(--gold);">Draft</span><div class="res-dot"></div>` : ''}
             <span class="res-tag" style="${isFullSyllabus ? 'background:rgba(212,175,55,0.15);color:var(--gold);' : ''}">${isFullSyllabus ? 'Full Syllabus' : t.chapter}</span>
             <div class="res-dot"></div>
             <span>${qCount} Question${qCount === 1 ? '' : 's'}</span>
@@ -1677,6 +1688,7 @@ function renderTestSeriesGrid(){
       <div class="res-right">
         ${qCount > 0 ? `<button class="btn-p" style="padding:8px 16px; font-size:13px;" onclick="startTest('${t.id}')">Start Test</button>` : ''}
         ${t.url ? `<a href="${t.url}" target="_blank" class="btn-s" style="padding:8px 16px; font-size:13px; text-decoration:none;">Open Link</a>` : ''}
+        ${isInstructorAuthenticated ? `<button class="btn-s" style="padding:8px 12px; font-size:13px; ${draft ? 'color:#4A9C7A;border-color:rgba(74,156,122,0.3);' : 'color:var(--muted);'}" onclick="toggleTestPublish('${t.id}')">${draft ? 'Publish' : 'Unpublish'}</button>` : ''}
         ${isInstructorAuthenticated ? `<button class="btn-s" style="padding:8px 12px; font-size:13px; color:#C0564A; border-color:rgba(192,86,74,0.2);" onclick="removeTestSeriesAsset('${t.id}')">Delete</button>` : ''}
       </div>
     `;
@@ -1699,12 +1711,14 @@ function renderDPPSection(){
   const box = document.getElementById('dppContainer');
   if(!box) return;
   const todayStr = getLocalDateStr();
-  const allDPPs = testSeriesIndex.filter(t => t.isDPP && t.dppDate && itemProgram(t) === currentProgram);
+  const allDPPs = testSeriesIndex.filter(t => t.isDPP && t.dppDate && itemProgram(t) === currentProgram
+    && (isInstructorAuthenticated || isPublished(t)));
   const todays = allDPPs.filter(t => t.dppDate === todayStr);
   const past = allDPPs.filter(t => t.dppDate < todayStr).sort((a,b) => b.dppDate.localeCompare(a.dppDate)).slice(0, 6);
 
   function dppCard(t, isToday){
     const qCount = (t.questions || []).length;
+    const draft = !isPublished(t);
     return `
       <div class="res-card" style="${isToday ? 'border-color:rgba(212,175,55,0.4);background:rgba(212,175,55,0.05);' : ''}">
         <div class="res-left">
@@ -1712,6 +1726,7 @@ function renderDPPSection(){
           <div class="res-details">
             <div class="res-title" title="${t.title}">${t.title}</div>
             <div class="res-meta">
+              ${draft ? `<span class="res-tag" style="background:rgba(212,175,55,0.15);color:var(--gold);">Draft</span><div class="res-dot"></div>` : ''}
               <span class="res-tag">${t.chapter}</span>
               <div class="res-dot"></div>
               <span>${qCount} Question${qCount === 1 ? '' : 's'}</span>
@@ -1724,6 +1739,7 @@ function renderDPPSection(){
         </div>
         <div class="res-right">
           ${qCount > 0 ? `<button class="btn-p" style="padding:8px 16px; font-size:13px;" onclick="startTest('${t.id}')">${isToday ? "Start Today's DPP" : 'Start Test'}</button>` : `<span style="font-size:12px;color:var(--muted);">Questions coming soon</span>`}
+          ${isInstructorAuthenticated ? `<button class="btn-s" style="padding:8px 12px; font-size:13px; ${draft ? 'color:#4A9C7A;border-color:rgba(74,156,122,0.3);' : 'color:var(--muted);'}" onclick="toggleTestPublish('${t.id}')">${draft ? 'Publish' : 'Unpublish'}</button>` : ''}
           ${isInstructorAuthenticated ? `<button class="btn-s" style="padding:8px 12px; font-size:13px; color:#C0564A; border-color:rgba(192,86,74,0.2);" onclick="removeTestSeriesAsset('${t.id}')">Delete</button>` : ''}
         </div>
       </div>`;
@@ -1774,11 +1790,14 @@ function addTestSeriesAsset(){
     title, chapter, url, durationMinutes,
     isDPP, dppDate,
     program: currentProgram,
+    published: false, // Draft by default — use the Publish button once questions/settings are ready
     questions: [],
     timestamp: new Date().toISOString()
   });
 
-  msg.textContent = isDPP ? `Test created & scheduled as DPP for ${dppDate}.` : "Test created successfully. Now add questions to it below.";
+  msg.textContent = isDPP
+    ? `Test created & scheduled as DPP for ${dppDate}. It's saved as a Draft — click Publish once it's ready for students.`
+    : "Test created as a Draft. Add questions below, then click Publish to make it visible to students.";
   msg.className = "ap-msg ok";
 
   document.getElementById('testTitle').value = '';
@@ -1792,6 +1811,18 @@ function addTestSeriesAsset(){
   renderDPPSection();
   saveAllData();
   setTimeout(() => { msg.textContent = ''; }, 4000);
+}
+
+function toggleTestPublish(id){
+  const t = testSeriesIndex.find(x => x.id === id);
+  if(!t) return;
+  if(!isPublished(t) && (t.questions || []).length === 0){
+    if(!confirm("This test has no questions yet. Publish it anyway?")) return;
+  }
+  t.published = !isPublished(t);
+  renderTestSeriesGrid();
+  renderDPPSection();
+  saveAllData();
 }
 
 function removeTestSeriesAsset(id){
@@ -1809,7 +1840,7 @@ function populateTestSelectorForQuestions(){
   const prevValue = sel.value;
   sel.innerHTML = testSeriesIndex.length === 0
     ? `<option value="">-- Please create a test first --</option>`
-    : testSeriesIndex.map(t => `<option value="${t.id}">${t.title} (${t.chapter})</option>`).join('');
+    : testSeriesIndex.map(t => `<option value="${t.id}">${isPublished(t) ? '' : '[Draft] '}${t.title} (${t.chapter})</option>`).join('');
   if(testSeriesIndex.some(t => t.id === prevValue)) sel.value = prevValue;
   updateQuestionCountDisplay();
 }
@@ -2443,6 +2474,11 @@ function tryResumeTestSession(){
 }
 
 function startTest(testId){
+  const test = testSeriesIndex.find(t => t.id === testId);
+  if(test && !isPublished(test) && !isInstructorAuthenticated){
+    alert("This test isn't published yet. Please check back once it's ready.");
+    return;
+  }
   pendingTestIdForName = testId;
   document.getElementById('studentNameInput').value = localStorage.getItem('tms_student_name') || '';
   document.getElementById('studentEmailInput').value = localStorage.getItem('tms_student_email') || '';
